@@ -1,11 +1,14 @@
 require("dotenv").config();
 const morgan = require("morgan");
 const express = require("express");
+const cors = require("cors");
+
 const app = express();
 const db = require("./db"); // one dot means current directory
 app.use(morgan("tiny"));
 
 app.use(express.json());
+app.use(cors());
 
 
 /*
@@ -23,7 +26,9 @@ app.use((req, res, next) =>{
 */
 
 
-
+app.listen(3000, ()=>{
+    console.log("server is upp on port 3000");
+})
 
 // get all birds
 app.get("/api/v1/birds", async (req, res) => {
