@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const Dashboard = ({ setAuth }) => {
-  const [inputs, setInputs] = useState({ email: '', password: '', name: '' });
+  const [inputs, setInputs] = useState({ email: '', password: '', name: '' });  //initialized
   const { email, password, name } = inputs;
   console.log(inputs);
   const onChange = e => {

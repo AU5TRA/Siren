@@ -26,20 +26,16 @@ app.use((req, res, next) =>{
 */
 
 
-app.listen(3000, ()=>{
-    console.log("server is upp on port 3000");
-})
-
 // get all birds
-app.get("/api/v1/birds", async (req, res) => {
+app.get("/api/v1/users", async (req, res) => {
     try {
-        const results = await db.query("select * from bird");
+        const results = await db.query("select * from passenger");
         console.log(results);
         res.status(200).json({ // 404 is for NOT FOUND
             status: "success",
             results: results.rows.length,
             data: {
-                birds: results.rows,
+                passengers: results.rows,
             },
 
         });
@@ -53,15 +49,15 @@ app.get("/api/v1/birds", async (req, res) => {
 
 
 // GET a bird
-app.get("/api/v1/birds/:birdid", async(req, res) => {
-    console.log(req.params.birdid);
+app.get("/api/v1/users/:id", async(req, res) => {
+    console.log(req.params.id);
     try {
-        const results = await db.query("select * from bird where id= $1", [req.params.birdid]);
+        const results = await db.query("select * from passenger where user_id= $1", [req.params.id]);
         console.log(results.rows[0]);
         res.status(200).json({
             status: "success",
             data: {
-                bird: results.rows[0],
+                passengers: results.rows[0],
             }
         });
     } catch (error) {
@@ -72,14 +68,15 @@ app.get("/api/v1/birds/:birdid", async(req, res) => {
 
 
 // create a bird 
-app.post("/api/v1/birds", async(req, res) => {
+app.post("/api/v1/users", async(req, res) => {
     console.log(req.body);
     try{
-        const results= await db.query("INSERT INTO BIRD (name, color, size) values($1, $2, $3) returning *", [req.body.name, req.body.color, req.body.size]);
+        // const results= await db.query("INSERT INTO BIRD (name, color, size) values($1, $2, $3) returning *", [req.body.name, req.body.color, req.body.size]);
+        const results= await db.query("INSERT INTO passenger (username, email, nid, gender, phone, password ) values ($1, $2, $3, $4, $5, $6) returning *", [req.body.username, req.body.email, req.body.nid, req.body.gender, req.body.phone, req.body.password]);
         res.status(201).json({
             status: "success",
             data: {
-                bird: results.rows[0]
+                passengers: results.rows[0]
             }
         });
     }catch(error){
@@ -89,15 +86,15 @@ app.post("/api/v1/birds", async(req, res) => {
 });
 
 // update a bird
-app.put("/api/v1/birds/:birdid", async (req, res) => {
-    console.log(req.params.birdid);
+app.put("/api/v1/users/:id", async (req, res) => {
+    console.log(req.params.id);
     console.log(req.body);
     try{
-        const results= await db.query("Update bird set name= $1, color= $2, size= $3 where id= $4 returning *", [req.body.name, req.body.color, req.body.size, req.params.birdid]);
+        const results= await db.query("Update passenger set username= $1, email= $2, nid= $3 , gender= $4, phone= $5, password= $6 where user_id= $7 returning *", [req.body.username, req.body.email, req.body.nid, req.body.gender, req.body.phone, req.body.password, req.params.id]);
         res.status(200).json({
             status: "success",
             data: {
-                bird: results.rows[0]
+                passengers: results.rows[0]
             }
         });
     }catch(error){
@@ -113,9 +110,9 @@ app.put("/api/v1/birds/:birdid", async (req, res) => {
 });
 
 // delete a bird
-app.delete("/api/v1/birds/:birdid", async (req, res) => {
+app.delete("/api/v1/users/:id", async (req, res) => {
     try{
-        const results= await db.query("Delete from bird where id= $1", [req.params.birdid]);
+        const results= await db.query("Delete from passenger where user_id= $1", [req.params.id]);
         res.status(200).json({
             status: "success",
         });
