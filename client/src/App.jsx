@@ -13,9 +13,7 @@ const App= () =>{
         <Router>
             <Routes>
             <Route exact path= "/"  element ={<Home/>}/>
-            <Route exact path= "/users/:id/update" element={<Update/>}/>
-            <Route exact path= "/auth/register/" element={<Register/>}/>
-            <Route exact path= "/users/:id/" element={<Users/>}/>
+            <Route exact path= "/users/" element={<Update/>}/>
             </Routes>
         </Router>
     </div>);

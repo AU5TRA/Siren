@@ -6,7 +6,7 @@ import UserList from '../components/UserList';
 const Home = () => {
   return (<div>
     <center><Header/></center>
-    <AddUser/>
+    
     <UserList/>
   </div>);
 }
