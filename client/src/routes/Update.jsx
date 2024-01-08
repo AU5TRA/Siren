@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Update = () => {
-  return (<div>updating list</div>);
+  return (<div><h1>updating list</h1></div>);
 }
 
 export default Update;

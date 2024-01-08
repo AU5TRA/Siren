@@ -1,8 +1,21 @@
-import React from 'react';
+import React, {useState, Fragment} from 'react';
+
 import './style.css';
 
 const AddUser = () => {
+    const[description, setDescription]= useState("hello");
+    const onSubmitForm = async(e)=>{
+        e.preventDefault();
+        try{
+            const body= {description};
+            const response= fetch()
+        }catch(err){
+            console.error(err.message);
+        }
+
+    }
     return (
+        <Fragment>
         <div className='top-spacing mb-3'>
             <form action="">
                 <div className="form-row">
@@ -29,6 +42,7 @@ const AddUser = () => {
 
 
         </div>
+        </Fragment>
         )
     
 }

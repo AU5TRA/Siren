@@ -2,7 +2,7 @@ import React from 'react';
 import { useTransition } from 'react';
 
 const Users = () => {
-  return (<div>uselist</div>);
+  return (<div><h1>uselist</h1></div>);
 }
 
-export default useTransition;
+export default Users;
