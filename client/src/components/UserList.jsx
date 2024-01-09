@@ -25,6 +25,7 @@ const UserList = () => {
                     <tr className='bg-primary'>
                         <th scope="col">Name</th>
                         <th scope="col">Email</th>
+                        <th scope="col">Phone Number</th>
                         <th scope="col">NID</th>
                         <th scope="col">Gender</th>
                         <th scope="col">Edit</th>
@@ -36,6 +37,7 @@ const UserList = () => {
                         <tr key={index}>
                             <td>{user.username}</td>
                             <td>{user.email}</td>
+                            <td>{user.phone}</td>
                             <td>{user.nid}</td>
                             <td>{user.gender}</td>
                             <td><button className="btn btn-warning">Update</button></td>
