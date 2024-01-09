@@ -1,3 +1,10 @@
 .top-spacing {
-    margin-top: 50px; /* Adjust this value as needed */
+    margin-top: 30px; /* Adjust this value as needed */
+}
+.left-auto {
+    margin-left: auto; /* Pushes the button to the right */
+}
+
+.right-auto {
+    margin-right: auto; /* Pushes the button to the right */
 }

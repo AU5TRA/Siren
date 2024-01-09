@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
-    
+    const navigate= useNavigate();
+    const registerUser = () => {
+        try {
+            navigate('/users');
+        } catch (err) {
+            console.error(err.message);
+        }
+    }
     const deleteUser= async(id) => {
         try{
             const deleteUser= await fetch(`http://localhost:3001/users/${id}`, {
@@ -30,8 +38,11 @@ const UserList = () => {
     }, []);
 
     return (
+        <div className='top-spacing mb-3'>
+        <button className='btn btn-success ' onClick={ ()=> registerUser()}>Register</button>
+        
         <div className='list-group'>
-            <table className="table table-hover table-dark">
+            <table className="table table-hover table-dark top-spacing mb-2">
                 <thead>
                     <tr className='bg-primary'>
                         <th scope="col">Name</th>
@@ -57,6 +68,7 @@ const UserList = () => {
                     ))}
                 </tbody>
             </table>
+        </div>
         </div>
     );
 };
