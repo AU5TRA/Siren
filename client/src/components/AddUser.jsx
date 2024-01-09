@@ -36,6 +36,7 @@ const AddUser = () => {
             return; 
         }
         try {
+            
             const body = { username, email, nid, gender, phone };
             const response = await fetch("http://localhost:3001/users/", {
                 method: "POST",
@@ -71,9 +72,9 @@ const AddUser = () => {
                         <div className='col-md-6 mb-2'>
                             <h5>Gender:</h5>
                             <select className='custom-select my-10 mr-sm-12 ' value={gender} onChange={e => setGender(e.target.value)}>
-                                <option value='1'>Male</option>
-                                <option value='2'>Female</option>
-                                <option value='3'>Other</option>
+                                <option value='M'>Male</option>
+                                <option value='F'>Female</option>
+                                <option value='O'>Other</option>
                             </select>
                         </div>
                         <div className='col-md-6 mb-2'>
