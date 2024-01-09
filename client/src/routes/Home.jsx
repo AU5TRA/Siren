@@ -5,8 +5,7 @@ import UserList from '../components/UserList';
 
 const Home = () => {
   return (<div>
-    <center><Header/></center>
-    
+    <center><div><h1 classname="font-weight-light display-1 text-center">List of Passengers</h1></div></center>
     <UserList/>
   </div>);
 }

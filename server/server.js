@@ -111,7 +111,7 @@ app.put("/users/:id", async (req, res) => {
 });
 
 // delete a bird
-app.delete("/api/v1/users/:id", async (req, res) => {
+app.delete("/users/:id", async (req, res) => {
     try{
         const results= await db.query("Delete from passenger where user_id= $1", [req.params.id]);
         res.status(200).json({

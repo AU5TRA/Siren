@@ -1,7 +1,7 @@
 import React from 'react';
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Home from './routes/Home';
-import Update from './routes/Update';
+import Registration from './routes/Registration';
 import Users from './routes/Users';
 import Register from './routes/Register';
 import Login from './routes/Login';
@@ -13,7 +13,7 @@ const App= () =>{
         <Router>
             <Routes>
             <Route exact path= "/"  element ={<Home/>}/>
-            <Route exact path= "/users/" element={<Update/>}/>
+            <Route exact path= "/users/" element={<Registration/>}/>
             </Routes>
         </Router>
     </div>);
