@@ -2,7 +2,7 @@ import React from 'react'
 import ShowUser from '../components/ShowUser'
 import Header from '../components/Header'
 
-const ShowUserInfo = () => {
+const showUserInfo = () => {
   return (
     <div>
       <center><Header /></center>
@@ -11,4 +11,4 @@ const ShowUserInfo = () => {
   )
 }
 
-export default ShowUserInfo
+export default showUserInfo

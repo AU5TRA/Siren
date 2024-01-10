@@ -1,9 +1,14 @@
-import React from 'react'
+import React from "react";
+import './comp.css'
 
 const Header = () => {
-    return (
-        <div><h1 classname="font-weight-light display-1 text-center">Passenger Searching</h1></div>
-    );
+  return (
+    <div>
+      <h1 className="header-title">
+        Siren
+      </h1>
+    </div>
+  );
 };
 
 export default Header;

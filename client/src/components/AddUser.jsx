@@ -1,93 +1,130 @@
-import React, { useState, Fragment } from 'react';
+import React, { Fragment, useState} from 'react'
 import { useNavigate } from 'react-router-dom';
 
-import './style.css';
 
-const AddUser = () => {
-    let navigate = useNavigate();
-    const [username, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [nid, setNid] = useState("");
-    const [phone, setPhone] = useState("");
-    const [gender, setGender] = useState("M");
+function AddUser() {
+  let navigate = useNavigate();
+  const [first_name, setFirstName] = useState('');
+  const [last_name, setLastName] = useState('');
+  const [nid_number, setNid] = useState('');
+  const [phone_number, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [gender, setGender] = useState('1');
 
-    const clearForm = () => {
-        setName("");
-        setEmail("");
-        setNid("");
-        setPhone("");
-        setGender("1");
-    };
-    const goHome = () => {
-        try {
-            navigate('/');
-        } catch (err) {
-            console.error(err.message);
-        }
+  const [message, setMessage] = useState('');
+  const [showMessage, setShowMessage] = useState(false)
+  const [userID, setUserID] = useState('not available');
+
+  const onSubmitForm = async (e) => {
+    e.preventDefault();
+    try {
+      const body = { first_name, last_name, nid_number, phone_number, email, password, gender };
+      const response = await fetch("http://localhost:3001/users/", {    // fetch get req kore post set kore over write
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      //window.location = "/";
+      const data = await response.json(); 
+      const userIDfromRes = data.userID;
+      console.log(data);
+      setUserID(userIDfromRes); 
+
+      console.log();
+      if (response.status === 400) {
+        setMessage(`User with this contact information already exists! User ID ${userIDfromRes}`);
+      }
+      else if(response.status === 300)
+      {
+        setMessage('Both Email and Phone number can not be empty')
+      }
+      else {
+        setMessage(`Account is created successfully! Your user ID id ${userIDfromRes}`)
+      }
+      setShowMessage(true);
+      // console.log(response);
+      // console.log("ok");
+
+    } catch (err) {
+      console.error(err.message);
     }
+  };
 
-    const onSubmitForm = async (e) => {
-        e.preventDefault();
-
-        if (!username.trim() || !email.trim() || !nid.trim() || !phone.trim() || !gender.trim()) {
-            console.error("All fields are required");
-            return; 
-        }
-        try {
-            
-            const body = { username, email, nid, gender, phone };
-            const response = await fetch("http://localhost:3001/users/", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body)
-            });
-            console.log(response);
-            if (response.ok) {
-                clearForm();
-            }
-        } catch (err) {
-            console.error(err.message);
-        }
-
+  const goHome = () => {
+    try {
+        navigate('/');
+    } catch (err) {
+        console.error(err.message);
     }
-    return (
-        <Fragment>
-            <div className='top-spacing mb-3'>
-                <form action="" onSubmit={onSubmitForm}>
-                    <div className="form-row">
-                        <div className='col-md-6 mb-2 '>
-                            <input type="text" className='form-control' placeholder='Name' value={username} onChange={e => setName(e.target.value)} />
-                        </div>
-                        <div className='col-md-6 mb-2'>
-                            <input type="text" className='form-control' placeholder='Email' value={email} onChange={e => setEmail(e.target.value)} />
-                        </div>
-                        <div className='col-md-6 mb-2'>
-                            <input type="text" className='form-control' placeholder='NID' value={nid} onChange={e => setNid(e.target.value)} />
-                        </div>
-                        <div className='col-md-6 mb-2'>
-                            <input type="text" className='form-control' placeholder='Phone number' value={phone} onChange={e => setPhone(e.target.value)} />
-                        </div>
-                        <div className='col-md-6 mb-2'>
-                            <h5>Gender:</h5>
-                            <select className='custom-select my-10 mr-sm-12 ' value={gender} onChange={e => setGender(e.target.value)}>
-                                <option value='M'>Male</option>
-                                <option value='F'>Female</option>
-                                <option value='O'>Other</option>
-                            </select>
-                        </div>
-                        <div className='col-md-6 mb-2'>
-                        <button className="btn btn-primary">Register</button></div>
+}
+  const closeMessage = () => {
+    setShowMessage(false);
+    if (message === `Account is created successfully! Your user ID id ${userID}`) {
+      window.location = "/";
+    }
+  };
 
-                    </div>
 
-                </form>
-
-                <button className='btn btn-success ' onClick={ ()=> goHome()}>back</button>
-
+  return (
+    <Fragment>
+      <div className='top-spacing mb-3'>
+        <form action="" onSubmit={onSubmitForm}>
+          <div className="form-row">
+            <div className='col-md-6 mb-2 '>
+              <input type="text" className='form-control' placeholder='First name' value={first_name} onChange={e => setFirstName(e.target.value)} />
             </div>
-        </Fragment>
-    )
+            <div className='col-md-6 mb-2 '>
+              <input type="text" className='form-control' placeholder='Last name' value={last_name} onChange={e => setLastName(e.target.value)} />
+            </div>
+            <div className='col-md-6 mb-2'>
+              <input type="text" className='form-control' placeholder='NID number' value={nid_number} onChange={e => setNid(e.target.value)} />
+            </div>
+            <div className='col-md-6 mb-2'>
+              <input type="text" className='form-control' placeholder='Phone number' value={phone_number} onChange={e => setPhone(e.target.value)} />
+            </div>
+            <div className='col-md-6 mb-2 '>
+              <input type="text" className='form-control' placeholder='E-mail' value={email} onChange={e => setEmail(e.target.value)} />
+            </div>
+            <div className='col-md-6 mb-2'>
+              <input type="text" className='form-control' placeholder='Password' value={password} onChange={e => setPassword(e.target.value)} />
+            </div>
+            <div className='col-md-6 mb-2'>
+              <h5>Gender:</h5>
+              <select className='custom-select my-10 mr-sm-12 ' value={gender} onChange={e => setGender(e.target.value)}>
+                <option value='1'>Male</option>
+                <option value='2'>Female</option>
+                <option value='3'>Other</option>
+              </select>
+            </div>
+            <button className="btn btn-primary">Register</button>
+          </div>
+        </form>
 
+        <button className='btn btn-success ' onClick={ ()=> goHome()}>back</button>
+      </div>
+      {showMessage && (
+        <div className="modal" style={{ display: 'block' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Message</h5>
+                <button type="button" className="close" onClick={closeMessage}>
+                  <span>&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <p>{message}</p>
+                <button type="button" className="btn btn-primary" onClick={closeMessage}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </Fragment>
+  )
 }
 
-export default AddUser
+export default AddUser;

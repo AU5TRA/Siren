@@ -1,132 +1,203 @@
 require("dotenv").config();
-const morgan = require("morgan");
 const express = require("express");
 const cors = require("cors");
+const db = require("./db");
 
 const app = express();
-const db = require("./db"); // one dot means current directory
-app.use(morgan("tiny"));
 
 app.use(express.json());
 app.use(cors());
 
 
-/*
-app.use((req, res, next) => {  // next function
-   console.log("middleware lmao");
-   next();
-});
-
-app.use((req, res, next) =>{
-   res.status(404).json({
-       status:'fail'
-   });
-   next();
-});  // returned everywhere
-*/
-
-
-// get all birds
+// Get all users
 app.get("/users", async (req, res) => {
-    try {
-        const results = await db.query("select * from passenger");
-        console.log(results);
-        res.status(200).json({ // 404 is for NOT FOUND
-            status: "success",
-            results: results.rows.length,
-            data: {
-                passengers: results.rows,
-            },
+  try {
+    // console.log("route handler");
 
-        });
-    } catch (error) {
-        console.log(error);
-    }
+    const results = await db.query('SELECT * FROM "user" ORDER BY user_id');
 
-
-});
-// http://localhost:4000/api/v1/birds
-
-
-// GET a bird
-app.get("/users/:id", async(req, res) => {
-    console.log(req.params.id);
-    try {
-        const results = await db.query("select * from passenger where user_id= $1", [req.params.id]);
-        console.log(results.rows[0]);
-        res.status(200).json({
-            status: "success",
-            data: {
-                passengers: results.rows[0],
-            }
-        });
-    } catch (error) {
-        console.log(error);
-    }
-    
+    res.status(200).json({
+      status: "success",
+      result: results.rows.length,
+      data: {
+        users: results.rows,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
+//Get a user
+app.get("/users/:id", async (req, res) => {
+  console.log(req.params.id);
 
-// create a bird 
-app.post("/users", async(req, res) => {
-    console.log(req.body);
-    console.log("hello2.4");
-    try{
-        // const results= await db.query("INSERT INTO BIRD (name, color, size) values($1, $2, $3) returning *", [req.body.name, req.body.color, req.body.size]);
-        const results= await db.query("INSERT INTO passenger (username, email, nid, gender, phone ) values ($1, $2, $3, $4, $5) returning *", [req.body.username, req.body.email, req.body.nid, req.body.gender, req.body.phone]);
+  try {
+    const userID = parseInt(req.params.id);
+    const results = await db.query(
+      'SELECT * FROM "user" WHERE user_id = $1',
+      [userID]
+    );
+
+    res.status(200).json({
+      status: "succes",
+      data: {
+        result: results.rows[0],
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+// Create a user
+
+app.post("/users", async (req, res) => {
+  console.log(req.body);
+  try {
+    const phone_number = req.body.phone_number
+    const email = req.body.email;
+    console.log(phone_number + " " +email);
+    //
+    if (!email && !phone_number) {
+      return res.status(300).json({ status: "email and phone_number cannot both be empty" });
+    }
+    else if (!email && phone_number) {
+      const result1 = await db.query('SELECT * FROM "user" WHERE phone_number = $1', [req.body.phone_number]);
+      
+      if (result1.rows.length !== 0) {
+        // res.send("user already exists")
+        res.status(400).json(
+          {
+            status: "user already exists",
+            "userID" : result1.rows[0].user_id
+          }
+        )
+      }
+      else {
+        const results = await db.query(
+          'INSERT INTO "user" (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+          [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, req.body.password]
+        );
+        console.log("row start");
+        console.log(results.rows[0].user_id);
+        console.log("row end");
         res.status(201).json({
-            status: "success",
-            data: {
-                passengers: results.rows[0]
-            }
+          status: "succes",
+          "userID" : results.rows[0].user_id
         });
-    }catch(error){
-        console.log(error);
+      }
     }
-    
+    else if (!phone_number && email) {
+      const result2 = await db.query('SELECT * FROM "user" WHERE email = $1', [req.body.email]);
+      
+      if (result2.rows.length !== 0) {
+        res.status(400).json(
+          {
+            status: "user already exists",
+            "userID" : result2.rows[0].user_id
+          }
+        )
+      }
+      else {
+        const results = await db.query(
+          'INSERT INTO "user" (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+          [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, req.body.password]
+        );
+        console.log("row start");
+        console.log(results.rows[0].user_id);
+        console.log("row end");
+        res.status(201).json({
+          status: "succes",
+          "userID" : results.rows[0].user_id
+        });
+      }
+    }
+    else {
+      const check = await db.query('SELECT * FROM "user" WHERE email = $1 OR phone_number = $2', [req.body.email, req.body.phone_number]);
+      console.log(check);
+      if (check.rows.length !== 0) {
+        res.status(400).json(
+          {
+            status: "user already exists",
+            "userID" : check.rows[0].user_id
+          }
+        )
+      }
+      //
+      else {
+        const results = await db.query(
+          'INSERT INTO "user" (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+          [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, req.body.password]
+        );
+        //console.log("row start");
+        console.log(results.rows[0].user_id);
+        //console.log("row end");
+        res.status(201).json({
+          status: "succes",
+          "userID" : results.rows[0].user_id
+        });
+      }
+    }
+  } catch (err) {
+    console.log(err);
+  }
 });
 
-// update a bird
+
+// Update user
+
 app.put("/users/:id/update", async (req, res) => {
-    console.log(req.params.id);
-    console.log(req.body);
-    try{
-        const results= await db.query("Update passenger set username= $1, email= $2, nid= $3 , gender= $4, phone= $5 where user_id= $6 returning *", [req.body.username, req.body.email, req.body.nid, req.body.gender, req.body.phone, req.params.id]);
-        res.status(200).json({
-            status: "success",
-            data: {
-                passengers: results.rows[0]
-            }
-        });
-    }catch(error){
-        console.log(error);
-    }
-    // res.status(200).json({
-    //     status: "success",
-    //     data: {
-    //         bird: "sheikh"
-    //     }
-    // });
+  try {
+    const results = await db.query(
+      'UPDATE "user" SET address = $1, post_code = $2, phone_number = $3, email = $4, password = $5, date_of_birth = $6, birth_registration_number = $7 WHERE user_id = $8 returning *',
+      [
+        req.body.address,
+        req.body.post_code,
+        req.body.phone_number,
+        req.body.email,
+        req.body.password,
+        req.body.date_of_birth,
+        req.body.birth_registration_number,
+        req.params.id
+      ]
+    );
 
+    console.log(results);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        user: results.rows[0],
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// delete a bird
+
+// Delete user
+
 app.delete("/users/:id", async (req, res) => {
-    try{
-        const results= await db.query("Delete from passenger where user_id= $1", [req.params.id]);
-        res.status(200).json({
-            status: "success",
-        });
-    }catch(error){
-        console.log(error);
-    }
-    
+  try {
+    console.log("deleting user " + req.params.id);
+    const results = db.query('DELETE FROM "user" where user_id = $1', [
+      req.params.id,
+    ]);
+    // console.log(results);
+    res.status(204).json({
+      status: "sucess",
+
+    });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 
-
-console.log("hello");
-const port = process.env.PORT;  //   || 3001, if port is defined use it, else use the 3001 port
+const port = process.env.PORT || 3001;        //environ variable -> env // port env te pass na korle default value 3001
 app.listen(port, () => {
-    console.log(`server is uppp on port ${port}`);
+  console.log(`server is up and listening on port ${port}`);
 });

@@ -1,24 +1,24 @@
 import React from 'react';
-import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
-import Home from './routes/Home';
-import Registration from './routes/Registration';
-import ShowUserInfo from './routes/ShowUserInfo';
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom" 
+import home from './routes/home'
+import updateUserInfo from './routes/updateUserInfo'
+import showUserInfo from './routes/showUserInfo'
+import addUserInfo from './routes/addUserInfo';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 
-const App= () =>{
-    return (
-    <div className= "container">
+const App = () => {
+    return <div className = "container">
         <Router>
             <Routes>
-            <Route exact path= "/"  element ={<Home/>}/>
-            <Route exact path= "/users/" element={<Registration/>}/>
-            <Route exact path= "/users/:id" element={<ShowUserInfo/>}/>
-           
-
-
+                <Route exact path="/" Component={home} />
+                <Route exact path="/users/:id/update" Component={updateUserInfo} />
+                <Route exact path="/users/:id" Component={showUserInfo} />
+                <Route exact path="/users" Component={addUserInfo} />
             </Routes>
         </Router>
-    </div>);
+    </div>;
 };
 
 export default App;
