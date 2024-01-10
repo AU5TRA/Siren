@@ -4,6 +4,7 @@ import home from './routes/home'
 import updateUserInfo from './routes/updateUserInfo'
 import showUserInfo from './routes/showUserInfo'
 import addUserInfo from './routes/addUserInfo';
+import searchUserInfo from './routes/searchUserInfo'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -16,6 +17,7 @@ const App = () => {
                 <Route exact path="/users/:id/update" Component={updateUserInfo} />
                 <Route exact path="/users/:id" Component={showUserInfo} />
                 <Route exact path="/users" Component={addUserInfo} />
+                <Route exact path="/search" Component={searchUserInfo}/>
             </Routes>
         </Router>
     </div>;
