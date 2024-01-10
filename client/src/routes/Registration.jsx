@@ -6,7 +6,7 @@ import UserList from '../components/UserList';
 const Update = () => {
   return (<div>
     <center><div><h1 classname="font-weight-light display-1 text-center">Passenger Registration</h1></div></center>
-    <AddUser />
+    <AddUser/>
     
   </div>);
 }

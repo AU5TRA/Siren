@@ -1,9 +1,7 @@
 import React, { useState, Fragment } from 'react';
-
-import './style.css';
 import { useNavigate } from 'react-router-dom';
 
-
+import './style.css';
 
 const AddUser = () => {
     let navigate = useNavigate();
@@ -11,7 +9,7 @@ const AddUser = () => {
     const [email, setEmail] = useState("");
     const [nid, setNid] = useState("");
     const [phone, setPhone] = useState("");
-    const [gender, setGender] = useState("1");
+    const [gender, setGender] = useState("M");
 
     const clearForm = () => {
         setName("");

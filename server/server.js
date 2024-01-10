@@ -87,11 +87,11 @@ app.post("/users", async(req, res) => {
 });
 
 // update a bird
-app.put("/users/:id", async (req, res) => {
+app.put("/users/:id/update", async (req, res) => {
     console.log(req.params.id);
     console.log(req.body);
     try{
-        const results= await db.query("Update passenger set username= $1, email= $2, nid= $3 , gender= $4, phone= $5, password= $6 where user_id= $7 returning *", [req.body.username, req.body.email, req.body.nid, req.body.gender, req.body.phone, req.body.password, req.params.id]);
+        const results= await db.query("Update passenger set username= $1, email= $2, nid= $3 , gender= $4, phone= $5 where user_id= $6 returning *", [req.body.username, req.body.email, req.body.nid, req.body.gender, req.body.phone, req.params.id]);
         res.status(200).json({
             status: "success",
             data: {

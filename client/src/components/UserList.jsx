@@ -22,6 +22,17 @@ const UserList = () => {
             console.error(err.message)
         }
     }
+
+
+    const updateUser= async(id) => {
+        try {
+            navigate(`users/${id}`)
+        } catch (err) {
+            console.error(err.message);
+        }
+    }
+
+    
     const getUser = async () => {
         try {
             const response = await fetch('http://localhost:3001/users');
@@ -62,7 +73,7 @@ const UserList = () => {
                             <td>{user.phone}</td>
                             <td>{user.nid}</td>
                             <td>{user.gender}</td>
-                            <td><button className="btn btn-warning">Update</button></td>
+                            <td><button className="btn btn-warning" onClick={() => updateUser(user.user_id)}>Update</button></td>
                             <td><button className="btn btn-danger" onClick={() => deleteUser(user.user_id)}>Delete</button></td>
                         </tr>
                     ))}
