@@ -19,19 +19,19 @@ CREATE TABLE passenger (
 
 -- Creating the 'class' table
 CREATE TABLE class (
-    class_id PRIMARY KEY,
+    class_id INTEGER PRIMARY KEY,
     class_name VARCHAR(50) UNIQUE NOT NULL
 );
 
 -- Creating the 'train' table
 CREATE TABLE train (
-    train_id PRIMARY KEY,
+    train_id INTEGER PRIMARY KEY,
     train_name VARCHAR(50) NOT NULL
 );
 
 -- Creating the 'station' table
 CREATE TABLE station (
-    station_id PRIMARY KEY,
+    station_id INTEGER PRIMARY KEY,
     station_name VARCHAR(50) UNIQUE NOT NULL,
     location VARCHAR(100),
     zone VARCHAR(50)
@@ -77,7 +77,7 @@ CREATE TABLE offer (
 
 -- Creating the 'Ticket' table
 CREATE TABLE ticket (
-    ticket_id PRIMARY KEY,
+    ticket_id VARCHAR(15) PRIMARY KEY,
     user_id INTEGER REFERENCES passenger(user_id),
     seat_id INTEGER REFERENCES seat(seat_id),
     start_station INTEGER REFERENCES station(station_id),
@@ -103,7 +103,7 @@ CREATE TABLE review (
 
 -- Creating the 'Payment' table
 CREATE TABLE payment (
-    transaction_id PRIMARY KEY,
+    transaction_id INTEGER PRIMARY KEY,
     user_id INTEGER REFERENCES passenger(user_id),
     ticket_id INTEGER REFERENCES ticket(ticket_id),
     mode_of_transaction VARCHAR(50) NOT NULL,
