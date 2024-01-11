@@ -197,6 +197,33 @@ app.delete("/users/:id", async (req, res) => {
 });
 
 
+
+// Search User
+app.get("/search", async (req, res) => {
+  try {
+    const userName = req.query.name; 
+    console.log(userName);
+    const results = await db.query(
+      'SELECT * FROM "user" WHERE first_name ILIKE $1', 
+      [`%${userName}%`] 
+    );
+    console.log(results);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        result: results.rows, 
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+});
+
 const port = process.env.PORT || 3001;        //environ variable -> env // port env te pass na korle default value 3001
 app.listen(port, () => {
   console.log(`server is up and listening on port ${port}`);
