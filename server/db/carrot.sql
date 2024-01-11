@@ -61,8 +61,14 @@ CREATE TABLE seat (
     train_id INTEGER REFERENCES train(train_id),
     class_id INTEGER REFERENCES class(class_id),
     seat_number VARCHAR(10),
-    available_stations INTEGER[] REFERENCES station(station_id) ARRAY,
+    -- available_stations INTEGER[] REFERENCES station(station_id) ARRAY,
     travel_date DATE
+);
+
+CREATE TABLE seat_availability (
+    seat_id INTEGER REFERENCES seat(seat_id),
+    station_id INTEGER REFERENCES station(station_id),
+    PRIMARY KEY (seat_id, station_id) -- Composite primary key
 );
 
 
@@ -119,6 +125,5 @@ CREATE TABLE refund (
     time_of_refund TIMESTAMP,
     refund_amount DECIMAL(10, 2) NOT NULL
 );
-
 
 
