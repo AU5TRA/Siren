@@ -7,19 +7,20 @@ function AddUser() {
   const [first_name, setFirstName] = useState('');
   const [last_name, setLastName] = useState('');
   const [nid_number, setNid] = useState('');
+  const [birth_registration_number, setBirthRFeg] = useState('');
   const [phone_number, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [date_of_birth, setDob] = useState('');
   const [password, setPassword] = useState('');
-  const [gender, setGender] = useState('1');
-
+  const [gender, setGender] = useState('Other');
   const [message, setMessage] = useState('');
-  const [showMessage, setShowMessage] = useState(false)
+  const [showMessage, setShowMessage] = useState(false);
   const [userID, setUserID] = useState('not available');
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
     try {
-      const body = { first_name, last_name, nid_number, phone_number, email, password, gender };
+      const body = { first_name, last_name, nid_number, birth_registration_number, phone_number, email, date_of_birth, password, gender };
       const response = await fetch("http://localhost:3001/users/", {    // fetch get req kore post set kore over write
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -81,10 +82,16 @@ function AddUser() {
               <input type="text" className='form-control' placeholder='NID number' value={nid_number} onChange={e => setNid(e.target.value)} />
             </div>
             <div className='col-md-6 mb-2'>
+              <input type="text" className='form-control' placeholder='Birth registration number' value={birth_registration_number} onChange={e => setBirthRFeg(e.target.value)} />
+            </div>
+            <div className='col-md-6 mb-2'>
               <input type="text" className='form-control' placeholder='Phone number' value={phone_number} onChange={e => setPhone(e.target.value)} />
             </div>
             <div className='col-md-6 mb-2 '>
               <input type="text" className='form-control' placeholder='E-mail' value={email} onChange={e => setEmail(e.target.value)} />
+            </div>
+            <div className='col-md-6 mb-2 '>
+              <input type="text" className='form-control' placeholder='Date of birth' value={date_of_birth} onChange={e => setDob(e.target.value)} />
             </div>
             <div className='col-md-6 mb-2'>
               <input type="text" className='form-control' placeholder='Password' value={password} onChange={e => setPassword(e.target.value)} />

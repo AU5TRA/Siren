@@ -14,7 +14,7 @@ app.get("/users", async (req, res) => {
   try {
     // console.log("route handler");
 
-    const results = await db.query('SELECT * FROM "user" ORDER BY user_id');
+    const results = await db.query('SELECT * FROM passenger ORDER BY user_id');
 
     res.status(200).json({
       status: "success",
@@ -35,7 +35,7 @@ app.get("/users/:id", async (req, res) => {
   try {
     const userID = parseInt(req.params.id);
     const results = await db.query(
-      'SELECT * FROM "user" WHERE user_id = $1',
+      'SELECT * FROM passenger WHERE user_id = $1',
       [userID]
     );
 
@@ -63,7 +63,7 @@ app.post("/users", async (req, res) => {
       return res.status(300).json({ status: "email and phone_number cannot both be empty" });
     }
     else if (!email && phone_number) {
-      const result1 = await db.query('SELECT * FROM "user" WHERE phone_number = $1', [req.body.phone_number]);
+      const result1 = await db.query('SELECT * FROM passenger WHERE phone_number = $1', [req.body.phone_number]);
       
       if (result1.rows.length !== 0) {
         // res.send("user already exists")
@@ -76,7 +76,7 @@ app.post("/users", async (req, res) => {
       }
       else {
         const results = await db.query(
-          'INSERT INTO "user" (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+          'INSERT INTO passenger (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
           [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, req.body.password]
         );
         console.log("row start");
@@ -89,7 +89,7 @@ app.post("/users", async (req, res) => {
       }
     }
     else if (!phone_number && email) {
-      const result2 = await db.query('SELECT * FROM "user" WHERE email = $1', [req.body.email]);
+      const result2 = await db.query('SELECT * FROM passenger WHERE email = $1', [req.body.email]);
       
       if (result2.rows.length !== 0) {
         res.status(400).json(
@@ -114,7 +114,7 @@ app.post("/users", async (req, res) => {
       }
     }
     else {
-      const check = await db.query('SELECT * FROM "user" WHERE email = $1 OR phone_number = $2', [req.body.email, req.body.phone_number]);
+      const check = await db.query('SELECT * FROM passenger WHERE email = $1 OR phone_number = $2', [req.body.email, req.body.phone_number]);
       console.log(check);
       if (check.rows.length !== 0) {
         res.status(400).json(
@@ -127,7 +127,7 @@ app.post("/users", async (req, res) => {
       //
       else {
         const results = await db.query(
-          'INSERT INTO "user" (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+          'INSERT INTO passenger (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
           [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, req.body.password]
         );
         //console.log("row start");
@@ -150,7 +150,7 @@ app.post("/users", async (req, res) => {
 app.put("/users/:id/update", async (req, res) => {
   try {
     const results = await db.query(
-      'UPDATE "user" SET address = $1, post_code = $2, phone_number = $3, email = $4, password = $5, date_of_birth = $6, birth_registration_number = $7 WHERE user_id = $8 returning *',
+      'UPDATE passenger SET address = $1, post_code = $2, phone_number = $3, email = $4, password = $5, date_of_birth = $6, birth_registration_number = $7 WHERE user_id = $8 returning *',
       [
         req.body.address,
         req.body.post_code,
@@ -183,7 +183,7 @@ app.put("/users/:id/update", async (req, res) => {
 app.delete("/users/:id", async (req, res) => {
   try {
     console.log("deleting user " + req.params.id);
-    const results = db.query('DELETE FROM "user" where user_id = $1', [
+    const results = db.query('DELETE FROM passenger where user_id = $1', [
       req.params.id,
     ]);
     // console.log(results);
@@ -204,7 +204,7 @@ app.get("/search", async (req, res) => {
     const userName = req.query.name; 
     console.log(userName);
     const results = await db.query(
-      'SELECT * FROM "user" WHERE first_name ILIKE $1', 
+      'SELECT * FROM passenger WHERE first_name ILIKE $1', 
       [`%${userName}%`] 
     );
     console.log(results);
