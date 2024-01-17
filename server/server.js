@@ -57,20 +57,20 @@ app.post("/users", async (req, res) => {
   try {
     const phone_number = req.body.phone_number
     const email = req.body.email;
-    console.log(phone_number + " " +email);
+    console.log(phone_number + " " + email);
     //
     if (!email && !phone_number) {
       return res.status(300).json({ status: "email and phone_number cannot both be empty" });
     }
     else if (!email && phone_number) {
       const result1 = await db.query('SELECT * FROM passenger WHERE phone_number = $1', [req.body.phone_number]);
-      
+
       if (result1.rows.length !== 0) {
         // res.send("user already exists")
         res.status(400).json(
           {
             status: "user already exists",
-            "userID" : result1.rows[0].user_id
+            "userID": result1.rows[0].user_id
           }
         )
       }
@@ -84,18 +84,18 @@ app.post("/users", async (req, res) => {
         console.log("row end");
         res.status(201).json({
           status: "succes",
-          "userID" : results.rows[0].user_id
+          "userID": results.rows[0].user_id
         });
       }
     }
     else if (!phone_number && email) {
       const result2 = await db.query('SELECT * FROM passenger WHERE email = $1', [req.body.email]);
-      
+
       if (result2.rows.length !== 0) {
         res.status(400).json(
           {
             status: "user already exists",
-            "userID" : result2.rows[0].user_id
+            "userID": result2.rows[0].user_id
           }
         )
       }
@@ -109,7 +109,7 @@ app.post("/users", async (req, res) => {
         console.log("row end");
         res.status(201).json({
           status: "succes",
-          "userID" : results.rows[0].user_id
+          "userID": results.rows[0].user_id
         });
       }
     }
@@ -120,7 +120,7 @@ app.post("/users", async (req, res) => {
         res.status(400).json(
           {
             status: "user already exists",
-            "userID" : check.rows[0].user_id
+            "userID": check.rows[0].user_id
           }
         )
       }
@@ -135,7 +135,7 @@ app.post("/users", async (req, res) => {
         //console.log("row end");
         res.status(201).json({
           status: "succes",
-          "userID" : results.rows[0].user_id
+          "userID": results.rows[0].user_id
         });
       }
     }
@@ -201,18 +201,20 @@ app.delete("/users/:id", async (req, res) => {
 // Search User
 app.get("/search", async (req, res) => {
   try {
-    const userName = req.query.name; 
+    const userName = req.query.name;
     console.log(userName);
     const results = await db.query(
-      'SELECT * FROM passenger WHERE first_name ILIKE $1', 
-      [`%${userName}%`] 
+      'SELECT * FROM passenger WHERE LOWER(first_name) LIKE LOWER($1)',
+      [`%${userName.toLowerCase()}%`]
     );
     console.log(results);
+    //const firstNames = results.rows.map(row => row.first_name);
 
     res.status(200).json({
       status: "success",
       data: {
-        result: results.rows, 
+        result: results.rows,
+        //names : firstNames 
       },
     });
   } catch (error) {
