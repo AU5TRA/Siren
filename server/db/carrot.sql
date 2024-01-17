@@ -86,7 +86,6 @@ CREATE TABLE ticket (
     seat_id INTEGER REFERENCES seat(seat_id),
     start_station INTEGER REFERENCES station(station_id),
     destination_station INTEGER REFERENCES station(station_id),
-    offer_id INTEGER REFERENCES offer(offer_id),
     total_fare DECIMAL(10, 2) NOT NULL,
     travel_status VARCHAR(20) 
 );
