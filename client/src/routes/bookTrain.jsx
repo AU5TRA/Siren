@@ -1,16 +1,16 @@
 import React from 'react'
-import TrainInfo from '../components/TrainInfo'
+import AddUser from '../components/AddUser'
 import Header from '../components/Header'
 
-const trains = () => {
+const bookTrain = () => {
   return (
     <div>
       <center><h1 className="header-title">
-        List of Trains
+        Register New User
       </h1></center>
-      <TrainInfo />
+      <AddUser />
     </div>
   )
 }
 
-export default trains
+export default bookTrain

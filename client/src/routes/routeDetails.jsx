@@ -5,7 +5,7 @@ import Header from '../components/Header'
 const routeDetails = () => {
   return (
     <div>
-      <center><Header /> Details of the Route</center>
+      
       <TrainRoute/>
     </div>
   )

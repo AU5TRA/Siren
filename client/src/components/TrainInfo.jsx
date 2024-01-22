@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const TrainInfo = () => {
     const [trains, setTrains] = useState([]);
@@ -32,8 +33,8 @@ const TrainInfo = () => {
             <tbody>
                 {trains.map(train => (
                     <tr>
-                        <td>{train.train_id}</td>
-                        <td>{train.train_name}</td>
+                        <td style={{ fontSize: '18px' }}><Link to={`/train/${train.train_id}`} className="link-style">{train.train_id}</Link></td>
+                        <td style={{ fontSize: '18px' }}><Link to={`/train/${train.train_id}`} className="link-style">{train.train_name}</Link></td>
                     </tr>
                 ))}
             </tbody>

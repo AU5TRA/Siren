@@ -55,7 +55,7 @@ app.get("/trains/:id", async (req, res) => {
   try {
     const trainID = parseInt(req.params.id);
     const results = await db.query(
-      'SELECT (SELECT s.station_name FROM station s WHERE s.station_id = q.station_id) AS station_name, q.arrival, q.departure FROM schedule q WHERE q.train_id = $1 ORDER BY q.sequence;',
+      'SELECT (SELECT s.station_name FROM station s WHERE s.station_id = q.station_id) AS station_name, q.arrival, q.departure, (SELECT t.train_name from train t where t.train_id= q.train_id) as train_name FROM schedule q WHERE q.train_id = $1 ORDER BY q.sequence',
       [trainID]
     );
 
