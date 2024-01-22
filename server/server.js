@@ -29,6 +29,49 @@ app.get("/users", async (req, res) => {
   }
 });
 
+// get all trains
+app.get("/trains", async (req, res) => {
+  try {
+    // console.log("route handler");
+
+    const results = await db.query('SELECT * FROM train ORDER BY train_id');
+    console.log(results.rows[0]);
+    res.status(200).json({
+      status: "success",
+      result: results.rows.length,
+      data: {
+        trains: results.rows,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//Get a train route
+app.get("/trains/:id", async (req, res) => {
+  console.log(req.params.id);
+
+  try {
+    const trainID = parseInt(req.params.id);
+    const results = await db.query(
+      'SELECT (SELECT s.station_name FROM station s WHERE s.station_id = q.station_id) AS station_name, q.arrival, q.departure FROM schedule q WHERE q.train_id = $1 ORDER BY q.sequence;',
+      [trainID]
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        result: results.rows,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+
+
 //Get a user
 app.get("/users/:id", async (req, res) => {
   console.log(req.params.id);
@@ -50,6 +93,7 @@ app.get("/users/:id", async (req, res) => {
     console.log(err);
   }
 });
+
 
 // Create a user
 
@@ -227,11 +271,8 @@ app.get("/search", async (req, res) => {
   }
 });
 
-//login
-app.post("/users/login", async(req,res))
-{
 
-}
+
 
 const port = process.env.PORT || 3001;        //environ variable -> env // port env te pass na korle default value 3001
 app.listen(port, () => {

@@ -1,16 +1,16 @@
 import React from 'react'
-import UserList from '../components/UserList'
+import TrainInfo from '../components/TrainInfo'
 import Header from '../components/Header'
 
-const home = () => {
+const trains = () => {
   return (
     <div>
       <center><h1 className="header-title">
-        Passenger List
+        Train List
       </h1></center>
-      <UserList />
+      <TrainInfo />
     </div>
   )
 }
 
-export default home
+export default trains
