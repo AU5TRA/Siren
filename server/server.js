@@ -9,6 +9,52 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.get("/book/search", async (req, res) => {
+  try {
+    const fromS= req.query.from;
+    const toS = req.query.to;
+    console.log(fromS);
+    const r1= await db.query('SELECT station_id FROM station WHERE station_name = $1', [fromS.toUpperCase()]);
+    const r2= await db.query('SELECT station_id FROM station WHERE station_name = $1', [toS.toUpperCase()]);
+    console.log(r1.rows[0]);
+    const fromStationId = parseInt(r1.rows[0].station_id); // Parse to integer
+    const toStationId = parseInt(r2.rows[0].station_id);     // Parse to integer
+    console.log(fromStationId);
+    const query = `
+      SELECT train_id
+      FROM Schedule
+      WHERE station_id = $1
+        AND train_id IN (
+          SELECT train_id
+          FROM Schedule
+          WHERE station_id = $2
+            AND sequence > ANY(
+              SELECT s.sequence
+              FROM Schedule s
+              WHERE train_id = s.train_id
+                AND station_id = $1
+            )
+        )`;
+
+    const results = await db.query(query, [fromStationId, toStationId]);
+    console.log(results);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        result: results.rows,
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+});
+
+
 
 // Get all users
 app.get("/users", async (req, res) => {
