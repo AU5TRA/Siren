@@ -274,7 +274,36 @@ app.get("/search", async (req, res) => {
     const userName = req.query.name;
     console.log(userName);
     const results = await db.query(
-      'SELECT * FROM passenger WHERE LOWER(first_name) LIKE LOWER($1)',
+      'SELECT * FROM train WHERE LOWER(train_name) LIKE LOWER($1)',
+      [`%${userName.toLowerCase()}%`]
+    );
+    console.log(results);
+    //const firstNames = results.rows.map(row => row.first_name);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        result: results.rows,
+        //names : firstNames 
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+});
+
+
+// Search Train
+app.get("/trains/search", async (req, res) => {
+  try {
+    const userName = req.query.name;
+    console.log(userName);
+    const results = await db.query(
+      'SELECT * FROM train WHERE LOWER(train_name) LIKE LOWER($1)',
       [`%${userName.toLowerCase()}%`]
     );
     console.log(results);

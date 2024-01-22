@@ -21,7 +21,7 @@ const SearchUser = () => {
             console.log(received);
             if (Array.isArray(received)) {
                 setData(received);
-                setSuggestions(received.map(item => item.first_name));
+                setSuggestions(received.map(item => item.train_name));
             } else {
                 setData([]);
                 setSuggestions([]);
@@ -34,7 +34,7 @@ const SearchUser = () => {
     const onSelectSuggestion = (selectedSuggestion) => {
         setInputValue(selectedSuggestion);
         setSelectedSuggestion(selectedSuggestion);
-        setSuggestions([]); // Clear suggestions when a suggestion is selected
+        setSuggestions([]);
     }
 
     const onSearch = async () => {
@@ -49,8 +49,8 @@ const SearchUser = () => {
             console.log(received)
             setInfoData(received)
 
-//baki info show kora
-// ekta selected search suggestion theke user info ber korbo
+            //baki info show kora
+            // ekta selected search suggestion theke user info ber korbo
 
         } catch (err) {
             setInfoData([]);
@@ -62,7 +62,7 @@ const SearchUser = () => {
         <div className="container">
             <div className="search">
                 <div>
-                    <input type="text" onChange={onChangeFunc} value={inputValue} />
+                    <input type="text" style={{ width: '200px' }} onChange={onChangeFunc} value={inputValue} />
                     <button onClick={onSearch}>search</button>
                 </div>
                 <div className="drop-down">
@@ -76,11 +76,11 @@ const SearchUser = () => {
                     }
                 </div>
             </div>
-            {selectedSuggestion && (
+            {showInfoData.length > 0 && (
                 <div className="user-info">
-                    <h3>User Information</h3>
-                    <p>Name: {selectedSuggestion.first_name} {selectedSuggestion.last_name}</p>
-                    <p>Email: {selectedSuggestion.email}</p>
+                    <h3>Train Information</h3>
+                    <p>ID: {showInfoData[0].train_id}</p>
+                    <p>Name: {showInfoData[0].train_name}</p>
                 </div>
             )}
         </div>
