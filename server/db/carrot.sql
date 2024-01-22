@@ -33,8 +33,7 @@ CREATE TABLE train (
 CREATE TABLE station (
     station_id INTEGER PRIMARY KEY,
     station_name VARCHAR(50) UNIQUE NOT NULL,
-    location VARCHAR(100),
-    zone VARCHAR(50)
+    
 );
 
 
@@ -91,6 +90,14 @@ CREATE TABLE ticket (
 );
 
 
+CREATE TABLE Schedule (
+    train_id INTEGER REFERENCES train(train_id),
+    station_id INTEGER REFERENCES station(station_id),
+    sequence INTEGER,
+    arrival TIME,
+    departure TIME,
+    PRIMARY KEY (train_id, station_id)
+);
 
 CREATE TABLE review (
     review_id SERIAL PRIMARY KEY,
