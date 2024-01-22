@@ -20,7 +20,7 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  /* Position relative for positioning the dropdown */
+  
 }
 
 input {

@@ -8,7 +8,6 @@ function updateUserInfo() {
       <center><Header/></center>
       <UpdateUser/>
     </div>
-
   )
 }
 
