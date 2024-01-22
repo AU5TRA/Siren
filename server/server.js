@@ -2,7 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
-
+const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
 const app = express();
 
 app.use(express.json());
@@ -225,6 +226,12 @@ app.get("/search", async (req, res) => {
     });
   }
 });
+
+//login
+app.post("/users/login", async(req,res))
+{
+
+}
 
 const port = process.env.PORT || 3001;        //environ variable -> env // port env te pass na korle default value 3001
 app.listen(port, () => {
