@@ -18,6 +18,7 @@ function convertTo12HourFormat(time24) {
 const TrainRoute = () => {
     const { id } = useParams();
     const [routes, setRoute] = useState(null);
+    const [train_name, setTrainName] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -26,6 +27,8 @@ const TrainRoute = () => {
                 const rec = await response.json();
                 console.log(rec.data.result);
                 setRoute(rec.data.result);
+                const train_name = rec.data.result[0].train_name;
+                setTrainName(train_name); 
                 // console.log(userData);
             } catch (error) {
                 console.error(error.message);
@@ -37,7 +40,10 @@ const TrainRoute = () => {
 
     return (
         <Fragment>
+            <h3 style={{ marginBottom: '50px', marginTop:'50px'}}><b><center> {train_name} </center></b></h3>
             {routes && routes.map(route => (
+                <div style={{ marginBottom: '30px' }}>
+                    
                 <ul className="list-group list-group-flush" style={{ marginBottom: '30px' }} key={route.station_id}>
                     <li className="list-group-item">
                         <img src="../../location.png" style={{ width: '20px', height: '25px' }} />
@@ -47,7 +53,7 @@ const TrainRoute = () => {
                     {route.arrival !== null && route.departure !== null && (
                         <li className="list-group-item">
                             Arrival: {convertTo12HourFormat(route.arrival)}
-                            <span style={{ marginLeft: '150px' }}>Departure: {convertTo12HourFormat(route.departure)}</span>
+                            <span style={{ marginLeft: '150px' }}> Departure: {convertTo12HourFormat(route.departure)}</span>
                         </li>
                     )}
                     {route.arrival === null && route.departure !== null && (
@@ -66,6 +72,7 @@ const TrainRoute = () => {
                         </li>
                     )}
                 </ul>
+                </div>
             ))}
         </Fragment>
 
