@@ -1,8 +1,11 @@
 import React, { Fragment, useState } from 'react'
-import './comp.css'
+import { useNavigate } from 'react-router-dom';
+import './login.css'
 
 const Login = () => {
-    // const [credentials, setCredentials] = useState({email: "", password: ""}) 
+
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showMessage, setShowMessage] = useState('');
@@ -42,9 +45,17 @@ const Login = () => {
 
     };
 
+    const registerUser = () => {
+        try {
+            navigate('/users');
+        } catch (err) {
+            console.error(err.message);
+        }
+    }
+
     return <Fragment>
-        <div>
-            <form onSubmit={handleSubmit}>
+        <div className="login-form-container">
+            <form onSubmit={handleSubmit} className="login-form">
                 <div className="mb-3">
                     <label htmlFor="email" className="form-label">Email address</label>
                     <input type="email" className="form-control" value={email} onChange={e => setEmail(e.target.value)} id="email" name="email" aria-describedby="emailHelp" />
@@ -55,6 +66,7 @@ const Login = () => {
                 </div>
 
                 <button type="submit" className="btn btn-primary">Submit</button>
+                <p className="signup-message">Don't have an account? <button type="button" className="btn btn-secondary" onClick={registerUser}>Sign Up</button></p>
             </form>
         </div>
         {showMessage && (

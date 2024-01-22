@@ -7,9 +7,11 @@ import addUserInfo from './routes/addUserInfo';
 import searchUserInfo from './routes/searchUserInfo'
 import trains from './routes/trains'
 import routeDetails from './routes/routeDetails'
+import loginPage from './routes/loginPage'
+import searchTrainInfo from './routes/searchTrainInfo'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import loginPage from './routes/loginPage';
+
 import homepage from './routes/homepage';
 
 
@@ -25,8 +27,7 @@ const App = () => {
                 <Route exact path="/search" Component={searchUserInfo}/>
                 <Route exact path="/train" Component={trains}/>
                 <Route exact path="/train/:id" Component={routeDetails}/>
-                <Route exact path="/booking/train/search" Component={bookTrain} />
-
+                <Route exact path="/booking/train/search" Component={bookTrain} />                <Route exact path="/trains/search" Component={searchTrainInfo}/>
                 <Route exact path="/users/login" Component={loginPage} />
             </Routes>
         </Router>

@@ -1,10 +1,10 @@
 .header-title {
-    font-weight: lighter;
-    font-size: 4rem;
-    text-align: center;
-    margin: 1rem 0;
-  }
-  
+  font-weight: lighter;
+  font-size: 4rem;
+  text-align: center;
+  margin: 1rem 0;
+}
+
 /* SearchUser.css */
 
 .search-container {
@@ -19,7 +19,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative; /* Position relative for positioning the dropdown */
+  position: relative;
+  /* Position relative for positioning the dropdown */
 }
 
 input {
@@ -31,26 +32,26 @@ input {
 
 button {
   padding: 10px 15px;
-  font-size: 16px;
-  background-color: #f44336;
-  color: #fff;
+  font-size: 20px;
+  background-color: #e1f5fe;
+  color: #00008b;
   cursor: pointer;
   border: none;
   border-radius: 4px;
 }
 
 .drop-down {
-  position: absolute;
+  position: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background-color: #fff;
-  border: 1px solid #fdd835;
   max-height: 150px;
   overflow-y: auto;
-  width: calc(100% - 16px); /* Set the width to be the same as the input field */
+  width: 200px;
   border-radius: 4px;
-  top: 100%; /* Position the dropdown beneath the input field */
+  top: 100%;
   left: 0;
 }
+
 
 .drop-down div {
   padding: 10px;
@@ -58,7 +59,7 @@ button {
   transition: background-color 0.3s ease;
 
   &:hover {
-      background-color: #ffe082;
+    background-color: #fff8e1;
   }
 }
 
@@ -68,6 +69,7 @@ button {
   border-top: 1px solid #fdd835;
 }
 
+<<<<<<< HEAD
 
 /* Remove underline and change link color */
 .link-style {
@@ -136,3 +138,12 @@ header {
   height: 100%;
   object-fit: cover;
 }
+=======
+.link-style{
+  text-decoration: none;
+  color: #333;
+}
+.link-style:hover{
+  color: #ac5353;
+}
+>>>>>>> 41fdf5c354edd1cdfc1408e60f54cc7057c1bd43

@@ -54,7 +54,7 @@ function AddUser() {
 
   const goHome = () => {
     try {
-        navigate('/');
+        navigate('/users/login');
     } catch (err) {
         console.error(err.message);
     }
