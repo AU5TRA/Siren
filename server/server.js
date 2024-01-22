@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
-const { body, validationResult } = require('express-validator');
+// const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const app = express();
 
@@ -55,6 +55,9 @@ app.get("/users/:id", async (req, res) => {
 
 app.post("/users", async (req, res) => {
   console.log(req.body);
+  const saltRounds = 10;
+  const salt = await bcrypt.genSalt(saltRounds);
+  const hashedPassword = await bcrypt.hash(req.body.password, salt);
   try {
     const phone_number = req.body.phone_number
     const email = req.body.email;
@@ -103,7 +106,7 @@ app.post("/users", async (req, res) => {
       else {
         const results = await db.query(
           'INSERT INTO "user" (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
-          [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, req.body.password]
+          [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, hashedPassword]
         );
         console.log("row start");
         console.log(results.rows[0].user_id);
@@ -129,7 +132,7 @@ app.post("/users", async (req, res) => {
       else {
         const results = await db.query(
           'INSERT INTO passenger (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
-          [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, req.body.password]
+          [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, hashedPassword]
         );
         //console.log("row start");
         console.log(results.rows[0].user_id);
@@ -148,8 +151,30 @@ app.post("/users", async (req, res) => {
 
 // Update user
 
+
 app.put("/users/:id/update", async (req, res) => {
+
   try {
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedPassword = await bcrypt.hash(req.body.new_password, salt);
+
+    const user = await db.query("SELECT * FROM passenger WHERE user_id = $1", [req.params.id]);
+
+    if (!user.rows.length) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userData = user.rows[0];
+    const isOldPasswordValid = await bcrypt.compare(req.body.password, userData.password);
+
+    if (!isOldPasswordValid) {
+      console.log("Incorrect password");
+      return res.status(401).json({ error: "Invalid old password" });
+    }
+
+
+
     const results = await db.query(
       'UPDATE passenger SET address = $1, post_code = $2, phone_number = $3, email = $4, password = $5, date_of_birth = $6, birth_registration_number = $7 WHERE user_id = $8 returning *',
       [
@@ -157,7 +182,7 @@ app.put("/users/:id/update", async (req, res) => {
         req.body.post_code,
         req.body.phone_number,
         req.body.email,
-        req.body.password,
+        hashedPassword,
         req.body.date_of_birth,
         req.body.birth_registration_number,
         req.params.id
@@ -165,7 +190,7 @@ app.put("/users/:id/update", async (req, res) => {
     );
 
     console.log(results);
-
+    console.log("updated");
     res.status(200).json({
       status: "success",
       data: {
@@ -228,10 +253,37 @@ app.get("/search", async (req, res) => {
 });
 
 //login
-app.post("/users/login", async(req,res))
-{
+app.post("/users/login", async (req, res) => {
+  // const saltRounds = 10;
+  // const salt = await bcrypt.genSalt(saltRounds);
+  //const hashedPassword = await bcrypt.hash(req.body.password, salt);
+  try {
+    console.log(req.body.password)
+    const results = await db.query("SELECT * FROM passenger WHERE email = $1", [req.body.email]);
+    console.log(results.rows[0])
+    const isOldPasswordValid = await bcrypt.compare(req.body.password, results.rows[0].password);
+    console.log(results.rows[0].password);
+    if (!isOldPasswordValid) {
+      //console.log("Incorrect password");
+      return res.status(401).json({ message: "Invalid password" });
+    }
 
-}
+    console.log("login successful");
+    console.log(results);
+    //const firstNames = results.rows.map(row => row.first_name);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        result: results.rows,
+      },
+      message:"Login Successful"
+    });
+  }
+  catch (err) {
+    console.error(err.message);
+  }
+});
 
 const port = process.env.PORT || 3001;        //environ variable -> env // port env te pass na korle default value 3001
 app.listen(port, () => {
