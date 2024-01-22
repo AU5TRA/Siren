@@ -69,76 +69,6 @@ button {
   border-top: 1px solid #fdd835;
 }
 
-<<<<<<< HEAD
-
-/* Remove underline and change link color */
-.link-style {
-  text-decoration: none;
-  color: #333; 
-}
-
-/* Define styles for link when hovered */
-.link-style:hover {
-  color: #ac5353; 
-}
-
-
-/* Styling for the header */
-header {
-  background-color: #ffffff; /* Change to your desired background color */
-  color: rgb(0, 0, 0); /* Text color for the header */
-  padding: 10px; /* Adjust the padding as needed */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Styling for the Siren text on the top left */
-.top-left h1 {
-  margin: 0; /* Remove default margin */
-  font-size: 24px; /* Adjust the font size as needed */
-}
-
-/* Styling for the Login link on the top right */
-.top-right a {
-  text-decoration: none; /* Remove underline from the link */
-  color: #000000; /* Text color for the link */
-  font-weight: bold; /* Make the text bold if desired */
-  font-size: 18px; /* Adjust the font size as needed */
-  padding: 8px 16px; /* Adjust padding to create a button-like appearance */
-  background-color: #ffffff; /* Button background color */
-  border-radius: 4px; /* Add rounded corners to the button */
-}
-
-/* Style the Login link on hover */
-.top-right a:hover {
-  color: #a36969; /* Change the background color on hover */
-}
-
-
-.image-slider {
-  width: 100%;
-  max-width: 600px;
-  overflow: hidden;
-  position: relative;
-}
-
-.image-slide {
-  width: 100%;
-  height: 300px;
-  transition: transform 1s ease-in-out;
-}
-
-.active {
-  transform: translateX(0%);
-}
-
-.image-slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-=======
 .link-style{
   text-decoration: none;
   color: #333;
@@ -146,4 +76,3 @@ header {
 .link-style:hover{
   color: #ac5353;
 }
->>>>>>> 41fdf5c354edd1cdfc1408e60f54cc7057c1bd43

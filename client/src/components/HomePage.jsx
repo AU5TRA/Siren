@@ -18,7 +18,7 @@ const HomePage = () => {
             </main>
             <footer>
                 <div className="bottom-left">
-                    <Link to="/train">Train Information</Link>
+                    <Link to="/trains">Train Information</Link>
                 </div>
             </footer>
             <footer>
