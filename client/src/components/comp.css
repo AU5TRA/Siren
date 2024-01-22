@@ -1,10 +1,10 @@
 .header-title {
-    font-weight: lighter;
-    font-size: 4rem;
-    text-align: center;
-    margin: 1rem 0;
-  }
-  
+  font-weight: lighter;
+  font-size: 4rem;
+  text-align: center;
+  margin: 1rem 0;
+}
+
 /* SearchUser.css */
 
 .search-container {
@@ -19,7 +19,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative; /* Position relative for positioning the dropdown */
+  position: relative;
+  /* Position relative for positioning the dropdown */
 }
 
 input {
@@ -46,9 +47,11 @@ button {
   border: 1px solid #fdd835;
   max-height: 150px;
   overflow-y: auto;
-  width: calc(100% - 16px); /* Set the width to be the same as the input field */
+  width: calc(100% - 16px);
+  /* Set the width to be the same as the input field */
   border-radius: 4px;
-  top: 100%; /* Position the dropdown beneath the input field */
+  top: 100%;
+  /* Position the dropdown beneath the input field */
   left: 0;
 }
 
@@ -58,7 +61,7 @@ button {
   transition: background-color 0.3s ease;
 
   &:hover {
-      background-color: #ffe082;
+    background-color: #ffe082;
   }
 }
 
@@ -67,5 +70,3 @@ button {
   border: 0;
   border-top: 1px solid #fdd835;
 }
-
-
