@@ -9,6 +9,7 @@ import trains from './routes/trains'
 import routeDetails from './routes/routeDetails'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import loginPage from './routes/loginPage';
 
 
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
                 <Route exact path="/train/:id" Component={routeDetails}/>
 
 
+                <Route exact path="/users/login" Component={loginPage} />
             </Routes>
         </Router>
     </div>;

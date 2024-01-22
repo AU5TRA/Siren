@@ -1,13 +1,13 @@
 import React, { Fragment, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import './comp.css'
 
-
-const Login = (props) => {
+const Login = () => {
     // const [credentials, setCredentials] = useState({email: "", password: ""}) 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showMessage, setShowMessage] = useState('');
+    const [isModalOpen, setModalOpen] = useState(false);
 
-    let history = useHistory();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -15,20 +15,16 @@ const Login = (props) => {
             const body = { email, password }
             const response = await fetch("http://localhost:3001/users/login", {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)
+
             });
             const json = await response.json()
-            console.log(json);
-            if (json.success) {
-                localStorage.setItem('token', json.authtoken);
-                history.push("/");
+            console.log(json.message);
+            setShowMessage(json.message);
 
-            }
-            else {
-                alert("Invalid credentials");
+            if (json.success) {
+                setModalOpen(true);
             }
         }
         catch (err) {
@@ -36,7 +32,15 @@ const Login = (props) => {
         }
     }
 
+    // const loginStatus = () => {
+    //     //alert(showMessage);
 
+    // };
+    const closeMessage = () => {
+        setShowMessage(false);
+        //window.location = "/";
+
+    };
 
     return <Fragment>
         <div>
@@ -44,7 +48,6 @@ const Login = (props) => {
                 <div className="mb-3">
                     <label htmlFor="email" className="form-label">Email address</label>
                     <input type="email" className="form-control" value={email} onChange={e => setEmail(e.target.value)} id="email" name="email" aria-describedby="emailHelp" />
-                    <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
                 </div>
                 <div className="mb-3">
                     <label htmlFor="password" className="form-label">Password</label>
@@ -54,6 +57,26 @@ const Login = (props) => {
                 <button type="submit" className="btn btn-primary">Submit</button>
             </form>
         </div>
+        {showMessage && (
+            <div className="modal" style={{ display: 'block' }}>
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">Login Status</h5>
+                            <button type="button" className="close" onClick={closeMessage}>
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <p>{showMessage}</p>
+                            <button type="button" className="btn btn-primary" onClick={closeMessage}>
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
     </Fragment>
 }
 
