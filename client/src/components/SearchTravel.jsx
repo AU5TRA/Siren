@@ -119,7 +119,8 @@ const SearchTravel = () => {
   return (
     <Fragment>
       <div>
-        <label htmlFor="from">From station</label>
+        <div class="input-container">
+        <label htmlFor="from" class="label">From station</label>
         <input
           type="text"
           id="from"
@@ -128,7 +129,9 @@ const SearchTravel = () => {
           style={{ width: '300px', marginRight: '10px' }}
           placeholder="From station"
         />
-        <label htmlFor="to">To station</label>
+        </div>
+        <div class="input-container">
+        <label htmlFor="to" class="label">To station</label>
         <input
           type="text"
           id="to"
@@ -137,6 +140,7 @@ const SearchTravel = () => {
           style={{ width: '300px', marginRight: '10px' }}
           placeholder="To station"
         />
+        </div>
         <div className="drop-down-from">
           {
             suggestionsFrom.map((item, index) => (

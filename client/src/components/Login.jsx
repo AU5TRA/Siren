@@ -28,7 +28,14 @@ const Login = ({ setAuth }) => {
                 console.log(json.data.res);
             }
             console.log(json.message);
+<<<<<<< HEAD
             //console.log(json.data.res);
+=======
+            if(json.status === 200){
+                console.log(json.data.res);
+            }
+            
+>>>>>>> 848646d248dba364e187a05673674257a0f3f958
             setShowMessage(json.message);
         
             
