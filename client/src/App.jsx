@@ -21,13 +21,13 @@ const App = () => {
             <Routes>
                 
                 <Route exact path="/" Component={homepage} />
+                <Route exact path="/users/login" Component={loginPage} />
                 <Route exact path="/users/:id/update" Component={updateUserInfo} />
                 <Route exact path="/users/:id" Component={showUserInfo} />
                 <Route exact path="/users" Component={addUserInfo} />
                 <Route exact path="/search" Component={searchUserInfo}/>
                 <Route exact path="/trains" Component={searchTrainInfo}/>
                 <Route exact path="/train/:id" Component={routeDetails}/>
-                <Route exact path="/users/login" Component={loginPage} />
                 <Route exact path="/booking/train/search" Component={bookTrain} />
 
             </Routes>

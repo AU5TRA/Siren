@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
+const jwtGenerator = require("./utils/jwtGenerator");
 // const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const app = express();
@@ -14,29 +15,6 @@ app.get("/book/search", async (req, res) => {
     const fromS = req.query.from;
     const toS = req.query.to;
     console.log(fromS);
-<<<<<<< HEAD
-    const r1= await db.query('SELECT station_id FROM station WHERE station_name = $1', [fromS.toUpperCase()]);
-    const r2= await db.query('SELECT station_id FROM station WHERE station_name = $1', [toS.toUpperCase()]);
-    //console.log(r1.rows[0]);
-    const fromStationId = parseInt(r1.rows[0].station_id); // Parse to integer
-    const toStationId = parseInt(r2.rows[0].station_id);     // Parse to integer
-    console.log(toStationId);
-    const query = `
-      SELECT train_id
-      FROM Schedule
-      WHERE station_id = $1
-        AND train_id IN (
-          SELECT train_id
-          FROM Schedule
-          WHERE station_id = $2
-            AND sequence > ANY(
-              SELECT s.sequence
-              FROM Schedule s
-              WHERE train_id = s.train_id
-                AND station_id = $1
-            )
-        )`;
-=======
     const r1 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [fromS.toUpperCase()]);
     const r2 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [toS.toUpperCase()]);
     console.log(r1.rows[0]);
@@ -76,7 +54,6 @@ app.get("/book/search", async (req, res) => {
 
 
 
->>>>>>> c9987c6aa781a20cf090dcd0cb3f774c50ccc8b0
 
     const results = await db.query(query, [fromStationId, toStationId]);
     console.log(results);
@@ -229,13 +206,16 @@ app.post("/users", async (req, res) => {
           'INSERT INTO passenger (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
           [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, req.body.password]
         );
-        console.log("row start");
+        //console.log("row start");
+        const jwtToken = jwtGenerator(results.rows[0].user_id);
         console.log(results.rows[0].user_id);
-        console.log("row end");
-        res.status(201).json({
+        return res.json({ jwtToken });
+
+        /*res.status(201).json({
           status: "succes",
-          "userID": results.rows[0].user_id
-        });
+          "userID": results.rows[0].user_id,
+          
+        });*/
       }
     }
     else if (!phone_number && email) {
@@ -254,13 +234,13 @@ app.post("/users", async (req, res) => {
           'INSERT INTO "user" (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
           [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, hashedPassword]
         );
-        console.log("row start");
+        const jwtToken = jwtGenerator(results.rows[0].user_id);
         console.log(results.rows[0].user_id);
-        console.log("row end");
-        res.status(201).json({
+        return res.json({ jwtToken });
+        /*res.status(201).json({
           status: "succes",
           "userID": results.rows[0].user_id
-        });
+        });*/
       }
     }
     else {
@@ -433,24 +413,26 @@ app.post("/users/login", async (req, res) => {
   // const salt = await bcrypt.genSalt(saltRounds);
   //const hashedPassword = await bcrypt.hash(req.body.password, salt);
   try {
-    console.log(req.body.password)
+    //console.log(req.body.password)
     const results = await db.query("SELECT * FROM passenger WHERE email = $1", [req.body.email]);
-    console.log(results.rows[0])
+    //console.log(results.rows[0])
     const isOldPasswordValid = await bcrypt.compare(req.body.password, results.rows[0].password);
-    console.log(results.rows[0].password);
+    //console.log(results.rows[0].password);
     if (!isOldPasswordValid) {
       //console.log("Incorrect password");
       return res.status(401).json({ message: "Invalid password" });
     }
 
     console.log("login successful");
-    console.log(results);
+    //console.log(results);
     //const firstNames = results.rows.map(row => row.first_name);
-
+    const jwtToken = jwtGenerator(results.rows[0].user_id);
+    //return res.json({ jwtToken });
     res.status(200).json({
       status: "success",
       data: {
         result: results.rows,
+        res: { jwtToken }
       },
       message: "Login Successful"
     });
