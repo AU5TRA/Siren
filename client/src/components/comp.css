@@ -41,49 +41,32 @@ button {
 }
 
 .drop-down-from {
-  position: relative;
+  position: absolute;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
+  background-color: #e2d0d0;
   max-height: 150px;
   overflow-y: auto;
-  width: 200px;
+  width: 300px;
   border-radius: 4px;
-  top: 100%;
-  left: 0;
+  top: 38%;
+  left: 50;
 }
-
-
-.drop-down-from div {
-  padding: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #fff8e1;
-  }
-}
-
-.drop-down-from hr {
-  margin: 5px 0;
-  border: 0;
-  border-top: 1px solid #e1d5a1;
-}
-
 
 .drop-down-to {
-  position: relative;
+  position: absolute;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
+  background-color: #e2d0d0;
   max-height: 150px;
   overflow-y: auto;
-  width: 200px;
+  width: 300px;
   border-radius: 4px;
-  top: 100%;
-  left: 0;
+  top: 57%;
+  left: 100;
 }
 
 
-.drop-down-to div {
+
+.drop-down-from div, .drop-down-to div {
   padding: 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -93,11 +76,15 @@ button {
   }
 }
 
-.drop-down-to hr {
+.drop-down-from hr, .drop-down-to hr {
   margin: 5px 0;
   border: 0;
   border-top: 1px solid #e1d5a1;
 }
+
+
+
+
 
 .link-style{
   text-decoration: none;
@@ -116,4 +103,36 @@ button {
 .hoverable:hover {
   background-color: #f0f0f0; /* Add your desired background color on hover */
   cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.input-container {
+  position: relative;
+  margin-bottom: 20px; /* adjust as needed for spacing */
+}
+
+
+.input-field {
+  width: 300px;
+  margin-right: 10px;
+  padding: 8px; /* adjust padding for better text field height */
+  border: 1px solid #ccc; /* a light grey border */
+  border-radius: 4px; /* slightly rounded corners */
+}
+
+.select-field {
+  width: 300px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  -webkit-appearance: none; /* Removes default styling of dropdown in WebKit browsers */
+  -moz-appearance: none; /* Removes default styling of dropdown in Mozilla browsers */
+  appearance: none; /* Removes default styling of dropdown */
+  /* You can add a background image for a custom dropdown arrow */
+}
+
+.label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
 }

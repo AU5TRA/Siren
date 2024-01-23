@@ -25,7 +25,10 @@ const Login = ({ setAuth }) => {
             });
             const json = await response.json()
             console.log(json.message);
-            console.log(json.data.res);
+            if(json.status === 200){
+                console.log(json.data.res);
+            }
+            
             setShowMessage(json.message);
         
             if (json.jwtToken) {
