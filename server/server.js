@@ -11,38 +11,67 @@ app.use(cors());
 
 app.get("/book/search", async (req, res) => {
   try {
-    const fromS= req.query.from;
+    const fromS = req.query.from;
     const toS = req.query.to;
     console.log(fromS);
-    const r1= await db.query('SELECT station_id FROM station WHERE station_name = $1', [fromS.toUpperCase()]);
-    const r2= await db.query('SELECT station_id FROM station WHERE station_name = $1', [toS.toUpperCase()]);
+    const r1 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [fromS.toUpperCase()]);
+    const r2 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [toS.toUpperCase()]);
     console.log(r1.rows[0]);
     const fromStationId = parseInt(r1.rows[0].station_id); // Parse to integer
     const toStationId = parseInt(r2.rows[0].station_id);     // Parse to integer
     console.log(fromStationId);
-    const query = `
-      SELECT train_id
-      FROM Schedule
-      WHERE station_id = $1
-        AND train_id IN (
-          SELECT train_id
-          FROM Schedule
-          WHERE station_id = $2
-            AND sequence > ANY(
-              SELECT s.sequence
-              FROM Schedule s
-              WHERE train_id = s.train_id
-                AND station_id = $1
-            )
-        )`;
+    const query = `SELECT s.train_id, t.train_name
+    FROM Schedule s
+    JOIN train t ON s.train_id = t.train_id
+    WHERE s.station_id = $1
+      AND s.train_id IN (
+        SELECT s2.train_id
+        FROM Schedule s2
+        WHERE s2.station_id = $2
+          AND s2.sequence > ANY (
+            SELECT s3.sequence
+            FROM Schedule s3
+            WHERE s3.train_id = s2.train_id
+              AND s3.station_id = $1
+          )
+      )`;
+
+    const query2 = `SELECT c.class_name, f.fare
+    FROM class c
+    JOIN fareList f ON c.class_id = f.class_id
+    WHERE f.source = $1
+      AND f.destination = $2;`;
+
+
+    const queryFrom = `SELECT station_name from station
+    WHERE LOWER(station_name) LIKE LOWER($1);`
+
+
+
+    const queryTo = `SELECT station_name from station
+    WHERE LOWER(station_name) LIKE LOWER($1);`
+
+
+
 
     const results = await db.query(query, [fromStationId, toStationId]);
     console.log(results);
+
+    const results2 = await db.query(query2, [fromStationId, toStationId]);
+    console.log(results2);
+
+    const fromStation = await db.query(queryFrom, [fromS]);
+    console.log(fromStation);
+    const toStation = await db.query(queryFrom, [toS]);
+    console.log(toStation);
 
     res.status(200).json({
       status: "success",
       data: {
         result: results.rows,
+        result2: results2.rows,
+        from: fromStation.rows,
+        to: toStation.rows
       },
     });
   } catch (error) {
@@ -53,6 +82,9 @@ app.get("/book/search", async (req, res) => {
     });
   }
 });
+
+
+
 
 
 
@@ -396,7 +428,7 @@ app.post("/users/login", async (req, res) => {
       data: {
         result: results.rows,
       },
-      message:"Login Successful"
+      message: "Login Successful"
     });
   }
   catch (err) {
