@@ -16,10 +16,10 @@ app.get("/book/search", async (req, res) => {
     console.log(fromS);
     const r1= await db.query('SELECT station_id FROM station WHERE station_name = $1', [fromS.toUpperCase()]);
     const r2= await db.query('SELECT station_id FROM station WHERE station_name = $1', [toS.toUpperCase()]);
-    console.log(r1.rows[0]);
+    //console.log(r1.rows[0]);
     const fromStationId = parseInt(r1.rows[0].station_id); // Parse to integer
     const toStationId = parseInt(r2.rows[0].station_id);     // Parse to integer
-    console.log(fromStationId);
+    console.log(toStationId);
     const query = `
       SELECT train_id
       FROM Schedule
