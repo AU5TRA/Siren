@@ -45,6 +45,29 @@ app.get("/book/search", async (req, res) => {
     const fromS = req.query.from;
     const toS = req.query.to;
     console.log(fromS);
+<<<<<<< HEAD
+    const r1= await db.query('SELECT station_id FROM station WHERE station_name = $1', [fromS.toUpperCase()]);
+    const r2= await db.query('SELECT station_id FROM station WHERE station_name = $1', [toS.toUpperCase()]);
+    //console.log(r1.rows[0]);
+    const fromStationId = parseInt(r1.rows[0].station_id); // Parse to integer
+    const toStationId = parseInt(r2.rows[0].station_id);     // Parse to integer
+    console.log(toStationId);
+    const query = `
+      SELECT train_id
+      FROM Schedule
+      WHERE station_id = $1
+        AND train_id IN (
+          SELECT train_id
+          FROM Schedule
+          WHERE station_id = $2
+            AND sequence > ANY(
+              SELECT s.sequence
+              FROM Schedule s
+              WHERE train_id = s.train_id
+                AND station_id = $1
+            )
+        )`;
+=======
     const r1 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [fromS.toUpperCase()]);
     const r2 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [toS.toUpperCase()]);
     console.log(r1.rows[0]);
@@ -84,6 +107,7 @@ app.get("/book/search", async (req, res) => {
 
 
 
+>>>>>>> c9987c6aa781a20cf090dcd0cb3f774c50ccc8b0
 
     const results = await db.query(query, [fromStationId, toStationId]);
     console.log(results);
