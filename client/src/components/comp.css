@@ -40,8 +40,8 @@ button {
   border-radius: 4px;
 }
 
-.drop-down {
-  position: center;
+.drop-down-from {
+  position: relative;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background-color: #fff;
   max-height: 150px;
@@ -53,7 +53,7 @@ button {
 }
 
 
-.drop-down div {
+.drop-down-from div {
   padding: 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -63,10 +63,40 @@ button {
   }
 }
 
-.drop-down hr {
+.drop-down-from hr {
   margin: 5px 0;
   border: 0;
-  border-top: 1px solid #fdd835;
+  border-top: 1px solid #e1d5a1;
+}
+
+
+.drop-down-to {
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  max-height: 150px;
+  overflow-y: auto;
+  width: 200px;
+  border-radius: 4px;
+  top: 100%;
+  left: 0;
+}
+
+
+.drop-down-to div {
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #fff8e1;
+  }
+}
+
+.drop-down-to hr {
+  margin: 5px 0;
+  border: 0;
+  border-top: 1px solid #e1d5a1;
 }
 
 .link-style{

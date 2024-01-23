@@ -39,7 +39,7 @@ const SearchUser = () => {
 
     const onSearch = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/search?name=${selectedSuggestion}`, {
+            const response = await fetch(`http://localhost:3001/trains/name/search?name=${selectedSuggestion}`, {
                 method: "GET",
             });
 
