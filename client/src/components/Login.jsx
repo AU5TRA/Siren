@@ -11,7 +11,7 @@ const Login = ({ setAuth }) => {
     const [password, setPassword] = useState('');
     const [showMessage, setShowMessage] = useState('');
     const [isModalOpen, setModalOpen] = useState(false);
-
+    const [userID, setUserID] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,18 +24,15 @@ const Login = ({ setAuth }) => {
 
             });
             const json = await response.json()
+            setUserID(json.data.result[0].user_id);
             if(json.status === 200){
                 console.log(json.data.res);
             }
             console.log(json.message);
-<<<<<<< HEAD
-            //console.log(json.data.res);
-=======
             if(json.status === 200){
                 console.log(json.data.res);
             }
             
->>>>>>> 848646d248dba364e187a05673674257a0f3f958
             setShowMessage(json.message);
         
             
@@ -63,7 +60,7 @@ const Login = ({ setAuth }) => {
     const closeMessage = () => {
         setShowMessage(false);
         try {
-            navigate('/');
+            navigate(`/users/${userID}`);
         } catch (err) {
             console.error(err.message);
         }
