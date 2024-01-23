@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import { useParams } from 'react-router-dom';
 
 const ShowUser = () => {
@@ -21,7 +21,7 @@ const ShowUser = () => {
     fetchUserData();
   }, [id]);
 
-  return (
+  return (<Fragment>
     <div>
       {userData ? (
         <div className="user-container">
@@ -44,6 +44,7 @@ const ShowUser = () => {
         <p>Loading...</p>
       )}
     </div>
+    </Fragment>
   );
 };
 
