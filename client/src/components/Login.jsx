@@ -24,10 +24,15 @@ const Login = ({ setAuth }) => {
 
             });
             const json = await response.json()
+            if(json.status === 200){
+                console.log(json.data.res);
+            }
             console.log(json.message);
-            console.log(json.data.res);
+            //console.log(json.data.res);
             setShowMessage(json.message);
         
+            
+            
             if (json.jwtToken) {
                 localStorage.setItem("token", json.data.res);
                 setAuth(true);
@@ -39,6 +44,7 @@ const Login = ({ setAuth }) => {
               if (json.success) {
                 setModalOpen(true);
             }
+            
 
         }
         catch (err) {
