@@ -76,3 +76,14 @@ button {
 .link-style:hover{
   color: #ac5353;
 }
+
+.search-button:hover {
+  background-color: #206d8e; /* Green background on hover */
+  color: white; /* White text on hover */
+  cursor: pointer; /* Add a pointer cursor on hover */
+}
+
+.hoverable:hover {
+  background-color: #f0f0f0; /* Add your desired background color on hover */
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
