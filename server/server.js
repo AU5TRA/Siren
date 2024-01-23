@@ -10,6 +10,37 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+/// suggestive search booking
+app.get("/book/station/search", async (req, res) => {
+  try {
+    const st = req.query.name;
+    console.log(st);
+    const results = await db.query(
+      'SELECT station_name FROM station WHERE LOWER(station_name) LIKE LOWER($1)',
+      [`%${st.toLowerCase()}%`]
+    );
+    console.log(results);
+    //const firstNames = results.rows.map(row => row.first_name);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        result: results.rows,
+        //names : firstNames 
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+});
+
+
+///
+
 app.get("/book/search", async (req, res) => {
   try {
     const fromS = req.query.from;
@@ -350,8 +381,38 @@ app.delete("/users/:id", async (req, res) => {
 
 
 
-// Search User
+// Search User // dummy
 app.get("/search", async (req, res) => {
+  try {
+    const userName = req.query.name;
+    console.log(userName);
+    const results = await db.query(
+      'SELECT * FROM train WHERE LOWER(train_name) LIKE LOWER($1)',
+      [`%${userName.toLowerCase()}%`]
+    );
+    console.log(results);
+    //const firstNames = results.rows.map(row => row.first_name);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        result: results.rows,
+        //names : firstNames 
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+});
+// dummy end
+
+
+//suggestive search train
+app.get("/trains/name/search", async (req, res) => {
   try {
     const userName = req.query.name;
     console.log(userName);
