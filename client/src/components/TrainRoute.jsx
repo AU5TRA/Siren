@@ -50,6 +50,7 @@ const TrainRoute = () => {
                         <span style={{ marginLeft: '30px' }}></span>
                         <b>{route.station_name}</b>
                     </li>
+                    
                     {route.arrival !== null && route.departure !== null && (
                         <li className="list-group-item">
                             Arrival: {convertTo12HourFormat(route.arrival)}

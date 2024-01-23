@@ -1,8 +1,9 @@
 import React, { Fragment, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
 import './login.css'
 
-const Login = () => {
+const Login = ({ setAuth }) => {
 
     const navigate = useNavigate();
 
@@ -24,23 +25,35 @@ const Login = () => {
             });
             const json = await response.json()
             console.log(json.message);
+            console.log(json.data.res);
             setShowMessage(json.message);
-
-            if (json.success) {
+        
+            if (json.jwtToken) {
+                localStorage.setItem("token", json.data.res);
+                setAuth(true);
+                toast.success("Logged in Successfully");
+              } else {
+                setAuth(false);
+                toast.error(json);
+              }
+              if (json.success) {
                 setModalOpen(true);
             }
+
         }
         catch (err) {
             console.log(err.message);
         }
     }
 
-    // const loginStatus = () => {
-    //     //alert(showMessage);
-
-    // };
+   
     const closeMessage = () => {
         setShowMessage(false);
+        try {
+            navigate('/');
+        } catch (err) {
+            console.error(err.message);
+        }
         //window.location = "/";
 
     };
