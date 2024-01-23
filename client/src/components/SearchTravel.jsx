@@ -7,7 +7,7 @@ const SearchTravel = () => {
   const [fares, setFare] = useState([]);
   const [selectedTrain, setSelectedTrain] = useState(null);
 
-  const onChangeFunc = async () => {
+  const onSearchFunc = async () => {
     try {
       const response = await fetch(
         `http://localhost:3001/book/search?from=${inputValueFrom}&to=${inputValueTo}`,
@@ -58,7 +58,7 @@ const SearchTravel = () => {
           style={{ width: '300px', marginRight: '10px' }}
           placeholder="To station"
         />
-        <button onClick={onChangeFunc} className="search-button">Search</button>
+        <button onClick={onSearchFunc} className="search-button">Search</button>
       </div>
       <table className="table mt-5 text-container">
         <thead>
