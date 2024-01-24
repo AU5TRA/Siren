@@ -1,14 +1,20 @@
-import React from 'react'
-import Login from '../components/Login'
-import Header from '../components/Header'
+import React, { useState } from 'react';
+import Login from '../components/Login';
+import Header from '../components/Header';
 
-const loginPage = () => {
+const LoginPage = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleAuthentication = (status) => {
+    setIsAuthenticated(status);
+  };
+
   return (
     <div>
-        <center><Header/></center>
-        <Login/>
+        <center><Header /></center>
+        <Login setAuth={handleAuthentication} />
     </div>
-  )
+  );
 }
 
-export default loginPage
+export default LoginPage;

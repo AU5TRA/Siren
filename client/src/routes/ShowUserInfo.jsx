@@ -5,7 +5,7 @@ import Header from '../components/Header'
 const showUserInfo = () => {
   return (
     <div>
-      <center><Header /></center>
+      <center><b><h1>Dashboard</h1></b></center>
       <ShowUser/>
     </div>
   )
