@@ -9,6 +9,17 @@ const HomePage = () => {
                 <h1>Siren</h1>
                 <nav>
                     <Link to="users/login">Login</Link>
+<<<<<<< HEAD
+                </div>
+                
+            </header>
+            <main>
+                {}
+            </main>
+            <footer>
+                <div className="bottom-left">
+=======
+>>>>>>> e8ea98a21e64a879a3baa05138b99f4ed6bee7a9
                     <Link to="/trains">Train Information</Link>
                     <Link to="/booking/train/search">Book a SEAT!</Link>
                 </nav>

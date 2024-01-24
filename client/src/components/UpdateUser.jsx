@@ -1,8 +1,8 @@
 import React, { Fragment, useState } from 'react'
 
 const UpdateUser = ({ user }) => {
-    const [address, setAddress] = useState(user.address);
-    const [post_code, setPostcode] = useState(user.post_code);
+    const [address, setAddress] = useState(user ? user.address : '');
+    const [post_code, setPostcode] = useState(user ? user.post_code : '');
     const [phone_number, setPhone] = useState(user.phone_number);
     const [email, setEmail] = useState(user.email);
     const [password, setPassword] = useState('');

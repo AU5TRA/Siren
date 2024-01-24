@@ -14,40 +14,44 @@ const Login = ({ setAuth }) => {
     const [showMessage, setShowMessage] = useState('');
     const [isModalOpen, setModalOpen] = useState(false);
     const [userID, setUserID] = useState('');
-
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const body = { email, password }
             const response = await fetch("http://localhost:3001/users/login", {
                 method: 'POST',
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", jwtToken: localStorage.token},
                 body: JSON.stringify(body)
 
             });
-            const json = await response.json();
-            console.log(json);
+            const json = await response.json()
             
-            setShowMessage(json.message);
-            setModalOpen(true);
-            if(json.status === 401)
-            {
-                setModalOpen(true);
-                setShowMessage(json.message);
-            }
             setUserID(json.data.result[0].user_id);
-            //setUserID(json.data.result[0].user_id);
-            // if(json.status === 200){
-            //     console.log(json.data.res);
-            // }
-            // console.log(json.message);
-            // if(json.status === 200){
-            //     console.log(json.data.res);
-            // }
-            // setShowMessage(json.message);
-            // setModalOpen(true);
+            
+            console.log(json.message);
+            if (json.status === 200) {
+                console.log(json.data.res);
+                json === true ? setIsAuthenticated(true) : setIsAuthenticated(false);
+            }
 
+            setShowMessage(json.message);
+        
+            
+            
 
+            if (json.jwtToken) {
+                localStorage.setItem("token", json.data.res);
+                setAuth(true);
+                toast.success("Logged in Successfully");
+            } else {
+                setAuth(false);
+                toast.error(json);
+            }
+            if (json.success) {
+                setModalOpen(true);
+            }
+            
 
         }
         catch (err) {
@@ -57,16 +61,21 @@ const Login = ({ setAuth }) => {
 
 
     const closeMessage = () => {
+        setShowMessage(false);
         try {
-            setShowMessage(false);
-            if(userID)navigate(`/users/${userID}`);
-            else navigate('/');
+            navigate(`/users/${userID}`);
         } catch (err) {
             console.error(err.message);
         }
         //window.location = "/";
 
     };
+
+
+    const setAuth = boolean =>{
+        setIsAuthenticated(boolean);
+    }
+
 
     const registerUser = () => {
         try {

@@ -1,5 +1,17 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { useParams } from 'react-router-dom';
+import UpdateUser from './UpdateUser';
+import { useNavigate } from 'react-router-dom';
+
+const updateUser = async (user) => {
+  try {
+    UpdateUser(user);
+      
+  }
+  catch (err) {
+      console.error(err.message)
+  }
+}
 
 const ShowUser = () => {
     const { id } = useParams();
@@ -38,7 +50,9 @@ const ShowUser = () => {
           <p>Details: {userData.address}</p>
           <p>Postcode: {userData.postcode}</p>
         </div>
+        
       </div>
+      
       
       ) : (
         <p>Loading...</p>
