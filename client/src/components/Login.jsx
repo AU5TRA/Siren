@@ -23,32 +23,29 @@ const Login = ({ setAuth }) => {
                 body: JSON.stringify(body)
 
             });
-            const json = await response.json()
-            setUserID(json.data.result[0].user_id);
-            if(json.status === 200){
-                console.log(json.data.res);
-            }
-            console.log(json.message);
-            if(json.status === 200){
-                console.log(json.data.res);
-            }
+            const json = await response.json();
+            console.log(json);
             
             setShowMessage(json.message);
-        
-            
-            
-            if (json.jwtToken) {
-                localStorage.setItem("token", json.data.res);
-                setAuth(true);
-                toast.success("Logged in Successfully");
-              } else {
-                setAuth(false);
-                toast.error(json);
-              }
-              if (json.success) {
+            setModalOpen(true);
+            if(json.status === 401)
+            {
                 setModalOpen(true);
+                setShowMessage(json.message);
             }
-            
+            setUserID(json.data.result[0].user_id);
+            //setUserID(json.data.result[0].user_id);
+            // if(json.status === 200){
+            //     console.log(json.data.res);
+            // }
+            // console.log(json.message);
+            // if(json.status === 200){
+            //     console.log(json.data.res);
+            // }
+            // setShowMessage(json.message);
+            // setModalOpen(true);
+
+
 
         }
         catch (err) {
@@ -56,11 +53,12 @@ const Login = ({ setAuth }) => {
         }
     }
 
-   
+
     const closeMessage = () => {
-        setShowMessage(false);
         try {
-            navigate(`/users/${userID}`);
+            setShowMessage(false);
+            if(userID)navigate(`/users/${userID}`);
+            else navigate('/');
         } catch (err) {
             console.error(err.message);
         }

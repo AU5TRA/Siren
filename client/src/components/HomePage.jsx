@@ -1,30 +1,23 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './home.css';
 
 const HomePage = () => {
     return (
         <div>
-            <header>
-
-                <div className="top-left">
-                    <h1 style={{ marginBottom: '50px', marginTop:'50px' }}>Siren</h1>
-                </div>
-                <div className="top-right" >
+            <header className="header">
+                <h1>Siren</h1>
+                <nav>
                     <Link to="users/login">Login</Link>
-                </div>
-            </header>
-            <main>
-                {}
-            </main>
-            <footer>
-                <div className="bottom-left">
                     <Link to="/trains">Train Information</Link>
-                </div>
-            </footer>
-            <footer>
-                <div className="bottom-left">
                     <Link to="/booking/train/search">Book a SEAT!</Link>
-                </div>
+                </nav>
+            </header>
+            <main className="main">
+                {/* Main content goes here */}
+            </main>
+            <footer className="footer">
+                {/* Footer content if any */}
             </footer>
         </div>
     );
