@@ -25,6 +25,14 @@ const Login = ({ setAuth }) => {
                 body: JSON.stringify(body)
 
             });
+            const json = await response.json();
+            console.log(json);
+            
+            setShowMessage(json.message);
+            setModalOpen(true);
+            if(json.status === 401)
+            {
+=======
             const json = await response.json()
             
             setUserID(json.data.result[0].user_id);
@@ -49,9 +57,23 @@ const Login = ({ setAuth }) => {
                 toast.error(json);
             }
             if (json.success) {
+>>>>>>> 1002dd9db85d01cc80ddd46936732db7fa131d97
                 setModalOpen(true);
+                setShowMessage(json.message);
             }
-            
+            setUserID(json.data.result[0].user_id);
+            //setUserID(json.data.result[0].user_id);
+            // if(json.status === 200){
+            //     console.log(json.data.res);
+            // }
+            // console.log(json.message);
+            // if(json.status === 200){
+            //     console.log(json.data.res);
+            // }
+            // setShowMessage(json.message);
+            // setModalOpen(true);
+
+
 
         }
         catch (err) {
@@ -61,9 +83,10 @@ const Login = ({ setAuth }) => {
 
 
     const closeMessage = () => {
-        setShowMessage(false);
         try {
-            navigate(`/users/${userID}`);
+            setShowMessage(false);
+            if(userID)navigate(`/users/${userID}`);
+            else navigate('/');
         } catch (err) {
             console.error(err.message);
         }
