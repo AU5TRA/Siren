@@ -25,15 +25,6 @@ const Login = ({ setAuth }) => {
                 body: JSON.stringify(body)
 
             });
-<<<<<<< HEAD
-            const json = await response.json();
-            console.log(json);
-            
-            setShowMessage(json.message);
-            setModalOpen(true);
-            if(json.status === 401)
-            {
-=======
             const json = await response.json()
             
             setUserID(json.data.result[0].user_id);
@@ -58,7 +49,6 @@ const Login = ({ setAuth }) => {
                 toast.error(json);
             }
             if (json.success) {
->>>>>>> c8d74e74c746260576c168f962df775845c26536
                 setModalOpen(true);
                 setShowMessage(json.message);
             }
