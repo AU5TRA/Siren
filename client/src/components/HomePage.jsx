@@ -12,6 +12,7 @@ const HomePage = () => {
                 <div className="top-right" >
                     <Link to="users/login">Login</Link>
                 </div>
+                
             </header>
             <main>
                 {}

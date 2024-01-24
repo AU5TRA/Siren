@@ -14,29 +14,25 @@ const Login = ({ setAuth }) => {
     const [showMessage, setShowMessage] = useState('');
     const [isModalOpen, setModalOpen] = useState(false);
     const [userID, setUserID] = useState('');
-
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const body = { email, password }
             const response = await fetch("http://localhost:3001/users/login", {
                 method: 'POST',
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", jwtToken: localStorage.token},
                 body: JSON.stringify(body)
 
             });
             const json = await response.json()
+            
             setUserID(json.data.result[0].user_id);
-            if(json.status === 200){
-                console.log(json.data.res);
-            }
+            
             console.log(json.message);
             if (json.status === 200) {
                 console.log(json.data.res);
-            }
-            console.log(json.message);
-            if (json.status === 200) {
-                console.log(json.data.res);
+                json === true ? setIsAuthenticated(true) : setIsAuthenticated(false);
             }
 
             setShowMessage(json.message);
@@ -74,6 +70,12 @@ const Login = ({ setAuth }) => {
         //window.location = "/";
 
     };
+
+
+    const setAuth = boolean =>{
+        setIsAuthenticated(boolean);
+    }
+
 
     const registerUser = () => {
         try {
