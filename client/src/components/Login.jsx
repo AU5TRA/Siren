@@ -25,7 +25,6 @@ const Login = ({ setAuth }) => {
                 body: JSON.stringify(body)
 
             });
-<<<<<<< HEAD
             const json = await response.json();
             console.log(json);
             
@@ -33,36 +32,6 @@ const Login = ({ setAuth }) => {
             setModalOpen(true);
             if(json.status === 401)
             {
-=======
-            const json = await response.json()
-            setUserID(json.data.result[0].user_id);
-            if(json.status === 200){
-                console.log(json.data.res);
-            }
-            console.log(json.message);
-            if (json.status === 200) {
-                console.log(json.data.res);
-            }
-            console.log(json.message);
-            if (json.status === 200) {
-                console.log(json.data.res);
-            }
-
-            setShowMessage(json.message);
-        
-            
-            
-
-            if (json.jwtToken) {
-                localStorage.setItem("token", json.data.res);
-                setAuth(true);
-                toast.success("Logged in Successfully");
-            } else {
-                setAuth(false);
-                toast.error(json);
-            }
-            if (json.success) {
->>>>>>> c8d74e74c746260576c168f962df775845c26536
                 setModalOpen(true);
                 setShowMessage(json.message);
             }
