@@ -6,7 +6,8 @@ const HomePage = () => {
     return (
         <div>
             <header className="header">
-                <h1>Siren</h1>
+                <img src="../../siren_home.png" style={{ width: '100px', height: '30px', marginLeft: '10px' }} />
+
                 <nav>
                     <Link to="users/login">Login</Link>
                     <Link to="/trains">Train Information</Link>

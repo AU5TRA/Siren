@@ -3,14 +3,13 @@ const express = require("express");
 const cors = require("cors");
 const db = require("./db");
 const jwtGenerator = require("./utils/jwtGenerator");
-// const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 
-/// suggestive search booking
+/// suggestive search train
 app.get("/book/station/search", async (req, res) => {
   try {
     const st = req.query.name;
@@ -23,7 +22,7 @@ app.get("/book/station/search", async (req, res) => {
     //const firstNames = results.rows.map(row => row.first_name);
 
     res.status(200).json({
-      status: "success",
+      status: "success", 
       data: {
         result: results.rows,
         //names : firstNames 
@@ -39,7 +38,7 @@ app.get("/book/station/search", async (req, res) => {
 });
 
 
-///
+///train search booking
 
 app.get("/book/search", async (req, res) => {
   try {
@@ -314,8 +313,9 @@ app.put("/users/:id/update", async (req, res) => {
   try {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
-    const hashedPassword = await bcrypt.hash(req.body.new_password, salt);
-
+    console.log("here"+ req.body.new_password+" here" + req.body.password);
+    var hashedPassword = await bcrypt.hash(req.body.new_password, salt);
+    
     const user = await db.query("SELECT * FROM passenger WHERE user_id = $1", [req.params.id]);
 
     if (!user.rows.length) {
@@ -330,17 +330,17 @@ app.put("/users/:id/update", async (req, res) => {
       return res.status(401).json({ error: "Invalid old password" });
     }
 
-
+    if(req.body.new_password === ''){
+      hashedPassword= userData.password;
+    }
 
     const results = await db.query(
-      'UPDATE passenger SET address = $1, post_code = $2, phone_number = $3, email = $4, password = $5, date_of_birth = $6, birth_registration_number = $7 WHERE user_id = $8 returning *',
+      'UPDATE passenger SET address = $1, post_code = $2, phone_number = $3, password = $4, birth_registration_number = $5 WHERE user_id = $6 returning *',
       [
         req.body.address,
         req.body.post_code,
         req.body.phone_number,
-        req.body.email,
         hashedPassword,
-        req.body.date_of_birth,
         req.body.birth_registration_number,
         req.params.id
       ]
@@ -470,9 +470,6 @@ app.get("/trains/search", async (req, res) => {
 
 //login
 app.post("/users/login", async (req, res) => {
-  // const saltRounds = 10;
-  // const salt = await bcrypt.genSalt(saltRounds);
-  //const hashedPassword = await bcrypt.hash(req.body.password, salt);
   try {
     //console.log(req.body.password)
     const results = await db.query("SELECT * FROM passenger WHERE email = $1", [req.body.email]);
