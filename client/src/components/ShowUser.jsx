@@ -163,7 +163,11 @@ const ShowUser = () => {
             <input
               type="password"
               className="form-control mb-2"
+<<<<<<< HEAD
               placeholder="Enter password to confirm"
+=======
+              placeholder="Old password"
+>>>>>>> 762fdb7d089df30373bdf56f9fc2bab557d09f81
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
