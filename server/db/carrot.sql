@@ -158,3 +158,8 @@ CREATE TABLE refund (
     refund_time TIMESTAMP,
     refund_amount DECIMAL(10, 2) NOT NULL
 );
+CREATE TABLE train_class(
+    train_id INTEGER REFERENCES train(train_id),
+    class_id INTEGER REFERENCES class(class_id),
+    PRIMARY KEY (train_id, class_id)
+)
