@@ -27,9 +27,6 @@ const Login = ({ setAuth }) => {
 <<<<<<< HEAD
 
 =======
-<<<<<<< HEAD
-
-=======
             const json = await response.json();
             console.log(json);
             
@@ -39,7 +36,6 @@ const Login = ({ setAuth }) => {
             {
 =======
 >>>>>>> b7ee70657b4720c53cb6b38bc50c31185be41428
->>>>>>> 762fdb7d089df30373bdf56f9fc2bab557d09f81
             const json = await response.json()
             
             if(json.status === "success"){
@@ -68,9 +64,6 @@ const Login = ({ setAuth }) => {
             
 
 <<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 762fdb7d089df30373bdf56f9fc2bab557d09f81
             // if (json.jwtToken) {
             //     localStorage.setItem("token", json.data.res);
             //     setAuth(true);
@@ -84,8 +77,6 @@ const Login = ({ setAuth }) => {
             //     setShowMessage(json.message);
             // }
             // setUserID(json.data.result[0].user_id);
-<<<<<<< HEAD
-=======
 =======
             if (json.jwtToken) {
                 localStorage.setItem("token", json.data.res);
@@ -102,7 +93,6 @@ const Login = ({ setAuth }) => {
             }
             setUserID(json.data.result[0].user_id);
 >>>>>>> b7ee70657b4720c53cb6b38bc50c31185be41428
->>>>>>> 762fdb7d089df30373bdf56f9fc2bab557d09f81
             //setUserID(json.data.result[0].user_id);
             // if(json.status === 200){
             //     console.log(json.data.res);
