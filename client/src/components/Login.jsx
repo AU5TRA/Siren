@@ -24,9 +24,7 @@ const Login = ({ setAuth }) => {
                 body: JSON.stringify(body)
 
             });
-<<<<<<< HEAD
 
-=======
             const json = await response.json();
             console.log(json);
             
@@ -34,8 +32,6 @@ const Login = ({ setAuth }) => {
             setModalOpen(true);
             if(json.status === 401)
             {
-=======
->>>>>>> b7ee70657b4720c53cb6b38bc50c31185be41428
             const json = await response.json()
             
             if(json.status === "success"){
@@ -63,7 +59,6 @@ const Login = ({ setAuth }) => {
             
             
 
-<<<<<<< HEAD
             // if (json.jwtToken) {
             //     localStorage.setItem("token", json.data.res);
             //     setAuth(true);
@@ -77,7 +72,6 @@ const Login = ({ setAuth }) => {
             //     setShowMessage(json.message);
             // }
             // setUserID(json.data.result[0].user_id);
-=======
             if (json.jwtToken) {
                 localStorage.setItem("token", json.data.res);
                 setAuth(true);
@@ -87,12 +81,10 @@ const Login = ({ setAuth }) => {
                 toast.error(json);
             }
             if (json.success) {
->>>>>>> 1002dd9db85d01cc80ddd46936732db7fa131d97
                 setModalOpen(true);
                 setShowMessage(json.message);
             }
             setUserID(json.data.result[0].user_id);
->>>>>>> b7ee70657b4720c53cb6b38bc50c31185be41428
             //setUserID(json.data.result[0].user_id);
             // if(json.status === 200){
             //     console.log(json.data.res);
@@ -106,7 +98,7 @@ const Login = ({ setAuth }) => {
 
 
 
-        }
+        }}
         catch (err) {
             console.log(err.message);
         }
@@ -129,7 +121,7 @@ const Login = ({ setAuth }) => {
         }
         //window.location = "/";
         // setShowMessage(false);
-    };
+    }};
 
 
 
@@ -177,7 +169,7 @@ const Login = ({ setAuth }) => {
         </div>
     )}
 </Fragment>
-}
+
 
 export default Login
 
