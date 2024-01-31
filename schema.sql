@@ -70,8 +70,6 @@ CREATE TABLE train_routes(
 -- a train can have multiple routes, and a route can have multiple trains (M to M)
 
 
-
-
 CREATE TABLE fareList (
     class_id INTEGER REFERENCES class(class_id),
     source INTEGER REFERENCES station(station_id),
