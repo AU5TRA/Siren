@@ -6,10 +6,8 @@ function convertTo12HourFormat(time24) {
     const [hours, minutes] = time24.split(":");
     const parsedHours = parseInt(hours, 10);
 
-    // Determine AM or PM
     const period = parsedHours >= 12 ? "PM" : "AM";
 
-    // Convert to 12-hour format
     const hours12 = parsedHours % 12 || 12;
 
     return `${hours12}:${minutes} ${period}`;

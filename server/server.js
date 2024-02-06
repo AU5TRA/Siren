@@ -22,7 +22,7 @@ app.get("/book/station/search", async (req, res) => {
     //const firstNames = results.rows.map(row => row.first_name);
 
     res.status(200).json({
-      status: "success", 
+      status: "success",
       data: {
         result: results.rows,
         //names : firstNames 
@@ -48,24 +48,21 @@ app.get("/book/search", async (req, res) => {
     const r1 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [fromS.toUpperCase()]);
     const r2 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [toS.toUpperCase()]);
     console.log(r1.rows[0]);
-    const fromStationId = parseInt(r1.rows[0].station_id); // Parse to integer
-    const toStationId = parseInt(r2.rows[0].station_id);     // Parse to integer
+    const fromStationId = parseInt(r1.rows[0].station_id);
+    const toStationId = parseInt(r2.rows[0].station_id);
     console.log(fromStationId);
-    const query = `SELECT s.train_id, t.train_name
-    FROM Schedule s
-    JOIN train t ON s.train_id = t.train_id
-    WHERE s.station_id = $1
-      AND s.train_id IN (
-        SELECT s2.train_id
-        FROM Schedule s2
-        WHERE s2.station_id = $2
-          AND s2.sequence > ANY (
-            SELECT s3.sequence
-            FROM Schedule s3
-            WHERE s3.train_id = s2.train_id
-              AND s3.station_id = $1
-          )
-      )`;
+    const query = (`
+    SELECT DISTINCT t.train_id, t.train_name
+FROM train t
+JOIN train_routes tr ON t.train_id = tr.train_id
+JOIN route_stations rs_from ON tr.route_id = rs_from.route_id
+JOIN route_stations rs_to ON tr.route_id = rs_to.route_id
+JOIN station s_from ON rs_from.station_id = s_from.station_id
+JOIN station s_to ON rs_to.station_id = s_to.station_id
+WHERE s_from.station_id = $1
+AND s_to.station_id = $2
+AND rs_from.sequence_number < rs_to.sequence_number;
+    `);
 
     const query2 = `SELECT c.class_name, f.fare
     FROM class c
@@ -163,10 +160,38 @@ app.get("/trains/:id", async (req, res) => {
 
   try {
     const trainID = parseInt(req.params.id);
-    const results = await db.query(
-      'SELECT (SELECT s.station_name FROM station s WHERE s.station_id = q.station_id) AS station_name, q.arrival, q.departure, (SELECT t.train_name from train t where t.train_id= q.train_id) as train_name FROM schedule q WHERE q.train_id = $1 ORDER BY q.sequence',
-      [trainID]
-    );
+    // const results = await db.query(
+    // 'SELECT (SELECT s.station_name FROM station s WHERE s.station_id = q.station_id) AS station_name, q.arrival, q.departure, (SELECT t.train_name from train t where t.train_id= q.train_id) as train_name FROM schedule q WHERE q.train_id = $1 ORDER BY q.sequence',
+    // [trainID]
+    // );
+
+    const results = await db.query(`SELECT 
+      tr.train_id,
+      tr.train_name,
+      r.route_id,
+      r.route_name,
+      rs.sequence_number,
+      s.station_id,
+      s.station_name,
+      sch.arrival,
+      sch.departure
+  FROM 
+      train_routes trr
+  JOIN 
+      train tr ON trr.train_id = tr.train_id
+  JOIN 
+      route r ON trr.route_id = r.route_id
+  JOIN 
+      route_stations rs ON r.route_id = rs.route_id
+  JOIN 
+      station s ON rs.station_id = s.station_id
+  JOIN 
+      Schedule sch ON tr.train_id = sch.train_id AND s.station_id = sch.station_id AND r.route_id = sch.route_id
+  WHERE 
+      tr.train_id = $1
+  ORDER BY 
+      tr.train_id, r.route_id, rs.sequence_number;
+  `, [trainID]);
 
     res.status(200).json({
       status: "success",
@@ -208,6 +233,7 @@ app.get("/users/:id", async (req, res) => {
 
 app.post("/users", async (req, res) => {
   console.log(req.body);
+  const { email, phone_number, password } = req.body;
   const saltRounds = 10;
   const salt = await bcrypt.genSalt(saltRounds);
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -313,9 +339,9 @@ app.put("/users/:id/update", async (req, res) => {
   try {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
-    console.log("here"+ req.body.new_password+" here" + req.body.password);
+    console.log("here" + req.body.new_password + " here" + req.body.password);
     var hashedPassword = await bcrypt.hash(req.body.new_password, salt);
-    
+
     const user = await db.query("SELECT * FROM passenger WHERE user_id = $1", [req.params.id]);
 
     if (!user.rows.length) {
@@ -330,8 +356,8 @@ app.put("/users/:id/update", async (req, res) => {
       return res.status(401).json({ error: "Invalid old password" });
     }
 
-    if(req.body.new_password === ''){
-      hashedPassword= userData.password;
+    if (req.body.new_password === '') {
+      hashedPassword = userData.password;
     }
 
     const results = await db.query(

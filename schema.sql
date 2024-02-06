@@ -98,6 +98,8 @@ CREATE TABLE seat (
     seat_number VARCHAR(10),
     UNIQUE (train_id, class_id, route_id, seat_number)
 );
+
+
 -- holds the seat information
 CREATE TABLE seat_availability (
     seat_id INTEGER REFERENCES seat(seat_id),
@@ -122,6 +124,7 @@ CREATE TABLE transaction (
     offer_id INTEGER REFERENCES offer(offer_id),
     transaction_time TIMESTAMP,
     amount DECIMAL(10, 2) NOT NULL
+    received BOOLEAN 
 );
 
 
@@ -149,7 +152,6 @@ CREATE TABLE review (
 );
 
 
-
 CREATE TABLE refund (
     refund_id SERIAL PRIMARY KEY,
     transaction_id INTEGER REFERENCES transaction(transaction_id),
@@ -157,4 +159,8 @@ CREATE TABLE refund (
     refund_amount DECIMAL(10, 2) NOT NULL
 );
 
-
+CREATE TABLE train_class(
+    train_id INTEGER REFERENCES train(train_id),
+    class_id INTEGER REFERENCES class(class_id),
+    PRIMARY KEY (train_id, class_id)
+)

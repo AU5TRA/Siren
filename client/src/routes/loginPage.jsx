@@ -17,8 +17,5 @@ const LoginPage = () => {
   );
 }
 
-<<<<<<< HEAD
 export default LoginPage;
-=======
-export default LoginPage;
->>>>>>> 762fdb7d089df30373bdf56f9fc2bab557d09f81
+
