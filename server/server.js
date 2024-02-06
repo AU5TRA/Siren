@@ -51,6 +51,7 @@ app.get("/book/search", async (req, res) => {
     const fromStationId = parseInt(r1.rows[0].station_id);
     const toStationId = parseInt(r2.rows[0].station_id);
     console.log(fromStationId);
+    console.log(toStationId);
     const query = (`
     SELECT DISTINCT t.train_id, t.train_name
 FROM train t
@@ -64,11 +65,19 @@ AND s_to.station_id = $2
 AND rs_from.sequence_number < rs_to.sequence_number;
     `);
 
-    const query2 = `SELECT c.class_name, f.fare
-    FROM class c
-    JOIN fareList f ON c.class_id = f.class_id
-    WHERE f.source = $1
-      AND f.destination = $2;`;
+    const query2 = `SELECT t.train_id, c.class_name, f.fare
+    FROM train t
+    JOIN train_routes tr ON t.train_id = tr.train_id
+    JOIN route_stations rs_from ON tr.route_id = rs_from.route_id
+    JOIN route_stations rs_to ON tr.route_id = rs_to.route_id
+    JOIN station s_from ON rs_from.station_id = s_from.station_id
+    JOIN station s_to ON rs_to.station_id = s_to.station_id
+    JOIN fareList f ON f.source = s_from.station_id AND f.destination = s_to.station_id
+    JOIN class c ON c.class_id = f.class_id
+    WHERE s_from.station_id = $1
+    AND s_to.station_id = $2
+    AND rs_from.sequence_number < rs_to.sequence_number;
+    `;
 
 
     const queryFrom = `SELECT station_name from station
