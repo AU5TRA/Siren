@@ -87,7 +87,7 @@ const SearchTravel = () => {
 
   const onSearchFunc = async () => {
     try {
-      console.log("from " + inputValueFrom + "to " + inputValueTo )
+      console.log("from " + inputValueFrom + "to " + inputValueTo)
       const response = await fetch(
         `http://localhost:3001/book/search?from=${inputValueFrom}&to=${inputValueTo}`,
         {
@@ -96,13 +96,14 @@ const SearchTravel = () => {
       );
 
       const res = await response.json();
-      const received = res.data.result;
-      const received2 = res.data.result2;
+      const received = res.data.result;  // trains
+      const received2 = res.data.result2;  //  trains with class and fare
       console.log(received);
       console.log(received2);
       if (Array.isArray(received)) {
         setTrains(received);
         setFare(received2);
+        console.log(received2);
       } else {
         setTrains([]);
         setFare([]);
@@ -120,26 +121,26 @@ const SearchTravel = () => {
     <Fragment>
       <div>
         <div class="input-container">
-        <label htmlFor="from" class="label">From station</label>
-        <input
-          type="text"
-          id="from"
-          onChange={onChangeFrom}
-          value={inputValueFrom}
-          style={{ width: '300px', marginRight: '10px' }}
-          placeholder="From station"
-        />
+          <label htmlFor="from" class="label">From station</label>
+          <input
+            type="text"
+            id="from"
+            onChange={onChangeFrom}
+            value={inputValueFrom}
+            style={{ width: '300px', marginRight: '10px' }}
+            placeholder="From station"
+          />
         </div>
         <div class="input-container">
-        <label htmlFor="to" class="label">To station</label>
-        <input
-          type="text"
-          id="to"
-          onChange={onChangeTo}
-          value={inputValueTo}
-          style={{ width: '300px', marginRight: '10px' }}
-          placeholder="To station"
-        />
+          <label htmlFor="to" class="label">To station</label>
+          <input
+            type="text"
+            id="to"
+            onChange={onChangeTo}
+            value={inputValueTo}
+            style={{ width: '300px', marginRight: '10px' }}
+            placeholder="To station"
+          />
         </div>
         <div className="drop-down-from">
           {
@@ -190,12 +191,14 @@ const SearchTravel = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {fares.map((f, index) => (
-                          <tr key={index}>
-                            <td style={{ fontSize: '18px' }}>{f.class_name}</td>
-                            <td style={{ fontSize: '18px' }}>{f.fare}</td>
-                          </tr>
-                        ))}
+                        {fares
+                          .filter(f => f.train_id === train.train_id) 
+                          .map((f, index) => (
+                            <tr key={index}>
+                              <td style={{ fontSize: '18px' }}>{f.class_name}</td>
+                              <td style={{ fontSize: '18px' }}>{f.fare}</td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </td>

@@ -63,13 +63,32 @@ WHERE s_from.station_id = $1
 AND s_to.station_id = $2
 AND rs_from.sequence_number < rs_to.sequence_number;
     `);
-
-    const query2 = `SELECT c.class_name, f.fare
-    FROM class c
-    JOIN fareList f ON c.class_id = f.class_id
-    WHERE f.source = $1
-      AND f.destination = $2;`;
-
+    const results = await db.query(query, [fromStationId, toStationId]);
+    console.log(results);
+    console.log('....................');
+    const trainIds = results.rows.map(row => row.train_id);
+    const trainIdsString = trainIds.join(',');
+    const query2 = `SELECT 
+    t.train_id, 
+    t.train_name, 
+    c.class_name, 
+    f.fare
+FROM 
+    train t
+JOIN 
+    train_class tc ON t.train_id = tc.train_id
+JOIN 
+    class c ON tc.class_id = c.class_id
+JOIN 
+    fareList f ON c.class_id = f.class_id
+WHERE 
+    t.train_id IN (${trainIdsString})
+    AND f.source = $1        
+    AND f.destination = $2 
+ ;`;
+    const results2 = await db.query(query2, [fromStationId, toStationId]);
+    console.log(results2);
+    console.log('....................');
 
     const queryFrom = `SELECT station_name from station
     WHERE LOWER(station_name) LIKE LOWER($1);`
@@ -82,22 +101,21 @@ AND rs_from.sequence_number < rs_to.sequence_number;
 
 
 
-    const results = await db.query(query, [fromStationId, toStationId]);
-    console.log(results);
-
-    const results2 = await db.query(query2, [fromStationId, toStationId]);
-    console.log(results2);
-
     const fromStation = await db.query(queryFrom, [fromS]);
     console.log(fromStation);
-    const toStation = await db.query(queryFrom, [toS]);
+    console.log('....................');
+
+    const toStation = await db.query(queryTo, [toS]);
     console.log(toStation);
+    console.log('....................');
+
+
 
     res.status(200).json({
       status: "success",
       data: {
-        result: results.rows,
-        result2: results2.rows,
+        result: results.rows,  // returns the trains
+        result2: results2.rows,  // 
         from: fromStation.rows,
         to: toStation.rows
       },
