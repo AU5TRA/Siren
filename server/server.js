@@ -51,6 +51,7 @@ app.get("/book/search", async (req, res) => {
     const fromStationId = parseInt(r1.rows[0].station_id);
     const toStationId = parseInt(r2.rows[0].station_id);
     console.log(fromStationId);
+    console.log(toStationId);
     const query = (`
     SELECT DISTINCT t.train_id, t.train_name
 FROM train t
