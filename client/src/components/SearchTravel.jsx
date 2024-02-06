@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
+import './comp.css'
 
 const SearchTravel = () => {
   const [inputValueFrom, setInputValueFrom] = useState('');
@@ -120,26 +121,24 @@ const SearchTravel = () => {
   return (
     <Fragment>
       <div>
-        <div class="input-container">
-          <label htmlFor="from" class="label">From station</label>
+        <div className="input-container">
+          <label htmlFor="from" className="label">From: </label>
           <input
             type="text"
             id="from"
             onChange={onChangeFrom}
             value={inputValueFrom}
             style={{ width: '300px', marginRight: '10px' }}
-            placeholder="From station"
           />
         </div>
-        <div class="input-container">
-          <label htmlFor="to" class="label">To station</label>
+        <div className="input-container">
+          <label htmlFor="to" className="label">To: </label>
           <input
             type="text"
             id="to"
             onChange={onChangeTo}
             value={inputValueTo}
             style={{ width: '300px', marginRight: '10px' }}
-            placeholder="To station"
           />
         </div>
         <div className="drop-down-from">
@@ -164,52 +163,35 @@ const SearchTravel = () => {
         </div>
         <button onClick={onSearchFunc} className="search-button">Search</button>
       </div>
-      <table className="table mt-5 text-container">
-        <thead>
-          <tr>
-            <th className="hoverable">Train ID</th>
-            <th>Train Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          {trains.map((train, index) => (
-            <Fragment key={index}>
-              <tr>
-                <td style={{ fontSize: '18px' }}>{train.train_id}</td>
-                <td className="hoverable" style={{ fontSize: '18px', cursor: 'pointer' }} onClick={() => handleTrainClick(train)}>
-                  {train.train_name}
-                </td>
-              </tr>
-              {selectedTrain === train && (
-                <tr>
-                  <td colSpan="2" style={{ fontSize: '18px' }}>
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Class</th>
-                          <th>Fare</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {fares
-                          .filter(f => f.train_id === train.train_id) 
-                          .map((f, index) => (
-                            <tr key={index}>
-                              <td style={{ fontSize: '18px' }}>{f.class_name}</td>
-                              <td style={{ fontSize: '18px' }}>{f.fare}</td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
-              )}
-            </Fragment>
-          ))}
-        </tbody>
-      </table>
+      <div className="train-container mt-5">
+        {trains.map((train, index) => (
+          <Fragment key={index}>
+            <div
+              className="train hoverable"
+              style={{ cursor: 'pointer', padding: '10px', marginBottom: '5px' }}
+              onClick={() => handleTrainClick(train)}
+            >
+              <div><h4> {train.train_id} <span style={{ margin: '0 25px' }}></span>  {train.train_name}</h4></div>
+            </div>
+            {selectedTrain === train && (
+              <div className="class-cards-container">
+                {fares
+                  .filter(f => f.train_id === train.train_id)
+                  .map((f, index) => (
+                    <div key={index} className="class-card">
+                      <div>{f.class_name}</div>
+                      <div><strong>Fare:</strong> {f.fare} Tk.</div>
+                    </div>
+                  ))}
+              </div>
+
+            )}
+          </Fragment>
+        ))}
+      </div>
     </Fragment>
   );
+
 };
 
 export default SearchTravel;
