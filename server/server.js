@@ -293,6 +293,7 @@ app.post("/users", async (req, res) => {
         });*/
       }
     }
+
     else if (!phone_number && email) {
       const result2 = await db.query('SELECT * FROM passenger WHERE email = $1', [req.body.email]);
 
@@ -304,6 +305,7 @@ app.post("/users", async (req, res) => {
           }
         )
       }
+
       else {
         const results = await db.query(
           'INSERT INTO "user" (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
@@ -530,6 +532,7 @@ app.post("/users/login", async (req, res) => {
     //console.log(results);
     //const firstNames = results.rows.map(row => row.first_name);
     const jwtToken = jwtGenerator(results.rows[0].user_id);
+    console.log(jwtToken);
     //return res.json({ jwtToken });
     res.status(200).json({
       status: "success",

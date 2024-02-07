@@ -17,24 +17,27 @@ const Login = ({ setAuth }) => {
             const body = { email, password };
             const response = await fetch("http://localhost:3001/users/login", {
                 method: 'POST',
-                headers: { "Content-Type": "application/json"},
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)
             });
             const json = await response.json();
             setShowMessage(json.message);
             setModalOpen(true);
-            if (json.status === 401) {
-                if (json.status === "success") {
-                    localStorage.setItem("token", json.jwtToken);
-                    setAuth(true);
-                    toast.success("Logged in Successfully");
-                    setUserID(json.data.result[0].user_id);
-                } else {
-                    setAuth(false);
-                    toast.error(json);
-                }
-                setModalOpen(true);
+            console.log(json.status);
+
+            if (json.status === "success") {
+                localStorage.setItem("token", json.data.res);
+                console.log(localStorage.getItem);
+                setAuth(true);
+                toast.success("Logged in Successfully");
+                setUserID(json.data.result[0].user_id);
+
+            } else {
+                setAuth(false);
+                toast.error(json);
             }
+            setModalOpen(true);
+
         } catch (err) {
             console.log(err.message);
         }
@@ -43,7 +46,7 @@ const Login = ({ setAuth }) => {
     const closeMessage = () => {
         try {
             setShowMessage(false);
-            if(userID) navigate(`/users/${userID}`);
+            if (userID) navigate(`/users/${userID}`);
             else {
                 navigate('/users/login');
                 setEmail('');
