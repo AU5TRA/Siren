@@ -27,7 +27,9 @@ const Login = ({ setAuth }) => {
 
             if (json.status === "success") {
                 localStorage.setItem("token", json.data.res);
-                console.log(localStorage.getItem);
+                localStorage.setItem("userId", json.data.result[0].user_id);
+                console.log(json.data.res);
+               // console.log(localStorage.getItem);
                 setAuth(true);
                 toast.success("Logged in Successfully");
                 setUserID(json.data.result[0].user_id);

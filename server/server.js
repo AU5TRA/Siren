@@ -5,7 +5,6 @@ const db = require("./db");
 const jwtGenerator = require("./utils/jwtGenerator");
 const bcrypt = require('bcryptjs');
 const app = express();
-
 app.use(express.json());
 app.use(cors());
 
@@ -518,27 +517,21 @@ app.get("/trains/search", async (req, res) => {
 //login
 app.post("/users/login", async (req, res) => {
   try {
-    //console.log(req.body.password)
     const results = await db.query("SELECT * FROM passenger WHERE email = $1", [req.body.email]);
-    //console.log(results.rows[0])
     const isOldPasswordValid = await bcrypt.compare(req.body.password, results.rows[0].password);
-    //console.log(results.rows[0].password);
     if (!isOldPasswordValid) {
-      //console.log("Incorrect password");
+
       return res.status(401).json({ message: "Invalid password" });
     }
 
     console.log("login successful");
-    //console.log(results);
-    //const firstNames = results.rows.map(row => row.first_name);
     const jwtToken = jwtGenerator(results.rows[0].user_id);
     console.log(jwtToken);
-    //return res.json({ jwtToken });
     res.status(200).json({
       status: "success",
       data: {
         result: results.rows,
-        res: { jwtToken }
+        res:  jwtToken 
       },
       message: "Login Successful"
     });
