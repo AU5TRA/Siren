@@ -39,3 +39,19 @@
     color: #fff; /* White text color on hover */
   }
   
+  .header {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    height: 200px; 
+}
+
+.logo-container {
+    text-align: center; 
+    margin-top: 190px;
+}
+
+.logo {
+    width: 180px;
+    height: 100px;
+}

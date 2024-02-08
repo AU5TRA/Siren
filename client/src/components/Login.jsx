@@ -29,7 +29,7 @@ const Login = ({ setAuth }) => {
                 localStorage.setItem("token", json.data.res);
                 localStorage.setItem("userId", json.data.result[0].user_id);
                 console.log(json.data.res);
-               // console.log(localStorage.getItem);
+                // console.log(localStorage.getItem);
                 setAuth(true);
                 toast.success("Logged in Successfully");
                 setUserID(json.data.result[0].user_id);
@@ -69,6 +69,11 @@ const Login = ({ setAuth }) => {
 
     return (
         <Fragment>
+            <header className="header">
+                <div className="logo">
+                    <img src="../../siren_home.png" style={{ width: '150px', height: '50px', marginLeft: '10px' }} />
+                </div>
+            </header>
             <div className="login-form-container">
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="mb-3">

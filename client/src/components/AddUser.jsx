@@ -66,7 +66,7 @@ function AddUser() {
     }
   };
 
-
+  
   return (
     <Fragment>
       <div className='top-spacing mb-3'>
@@ -112,11 +112,13 @@ function AddUser() {
                 <option value='3'>Other</option>
               </select>
             </div>
-            <button className="btn btn-primary">Register</button>
+          </div>
+          <div className="form-row">
+            <button className="btn btn-primary btn-block">Register</button>
           </div>
         </form>
-
-        <button className='btn btn-success ' onClick={() => goHome()}>back</button>
+  
+        <button className='btn btn-success float-right mt-3' onClick={() => goHome()}>Back</button>
       </div>
       {showMessage && (
         <div className="modal" style={{ display: 'block' }}>
@@ -139,7 +141,8 @@ function AddUser() {
         </div>
       )}
     </Fragment>
-  )
+  );
+  
 }
 
 export default AddUser;

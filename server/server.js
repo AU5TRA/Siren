@@ -8,6 +8,22 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+
+// review
+app.get("/review", async (req, res) => {
+  try {
+    const trainID = req.query.trainID;
+    const classType = req.query.classType;
+    const results = await db.query('SELECT * FROM review WHERE train_id = $1 AND class_id = $2', [trainID, classType]);
+    res.status(200).json({
+      status: "success",
+      result: results.rows,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 /// suggestive search train
 app.get("/book/station/search", async (req, res) => {
   try {
@@ -71,7 +87,8 @@ AND rs_from.sequence_number < rs_to.sequence_number;
     const query2 = `SELECT 
     t.train_id, 
     t.train_name, 
-    c.class_name, 
+    c.class_name,
+    c.class_id,
     f.fare
 FROM 
     train t
@@ -109,6 +126,8 @@ WHERE
     console.log(toStation);
     console.log('....................');
 
+
+    console.log(results2.rows);
 
 
     res.status(200).json({
@@ -531,7 +550,7 @@ app.post("/users/login", async (req, res) => {
       status: "success",
       data: {
         result: results.rows,
-        res:  jwtToken 
+        res: jwtToken
       },
       message: "Login Successful"
     });
