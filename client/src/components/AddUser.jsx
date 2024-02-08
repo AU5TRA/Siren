@@ -1,6 +1,7 @@
-import React, { Fragment, useState} from 'react'
+import React, { Fragment, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-
+import DatePicker from 'react-datepicker'; // Import DatePicker component
+import 'react-datepicker/dist/react-datepicker.css';
 
 function AddUser() {
   let navigate = useNavigate();
@@ -10,9 +11,9 @@ function AddUser() {
   const [birth_registration_number, setBirthRFeg] = useState('');
   const [phone_number, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [date_of_birth, setDob] = useState('');
+  const [date_of_birth, setDob] = useState(null);
   const [password, setPassword] = useState('');
-  const [gender, setGender] = useState('Other');
+  const [gender, setGender] = useState('Male');
   const [message, setMessage] = useState('');
   const [showMessage, setShowMessage] = useState(false);
   const [userID, setUserID] = useState('not available');
@@ -20,24 +21,23 @@ function AddUser() {
   const onSubmitForm = async (e) => {
     e.preventDefault();
     try {
-      const body = { first_name, last_name, nid_number, birth_registration_number, phone_number, email, date_of_birth, password, gender };
+      const body = { first_name, last_name, nid_number, birth_registration_number, phone_number, email, date_of_birth: date_of_birth && new Date(date_of_birth.getFullYear(), date_of_birth.getMonth(), date_of_birth.getDate()+1),  password, gender };
       const response = await fetch("http://localhost:3001/users/", {    // fetch get req kore post set kore over write
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
       });
       //window.location = "/";
-      const data = await response.json(); 
+      const data = await response.json();
       const userIDfromRes = data.userID;
       console.log(data);
-      setUserID(userIDfromRes); 
+      setUserID(userIDfromRes);
 
       console.log();
       if (response.status === 400) {
         setMessage(`User with this contact information already exists! User ID ${userIDfromRes}`);
       }
-      else if(response.status === 300)
-      {
+      else if (response.status === 300) {
         setMessage('Both Email and Phone number can not be empty')
       }
       else {
@@ -54,11 +54,11 @@ function AddUser() {
 
   const goHome = () => {
     try {
-        navigate('/users/login');
+      navigate('/users/login');
     } catch (err) {
-        console.error(err.message);
+      console.error(err.message);
     }
-}
+  }
   const closeMessage = () => {
     setShowMessage(false);
     if (message === `Account is created successfully! Your user ID id ${userID}`) {
@@ -91,10 +91,18 @@ function AddUser() {
               <input type="text" className='form-control' placeholder='E-mail' value={email} onChange={e => setEmail(e.target.value)} />
             </div>
             <div className='col-md-6 mb-2 '>
-              <input type="text" className='form-control' placeholder='Date of birth' value={date_of_birth} onChange={e => setDob(e.target.value)} />
+              {/* <input type="text" className='form-control' placeholder='Date of birth' value={date_of_birth} onChange={e => setDob(e.target.value)} /> */}
+              {/* <DatePicker selected={date_of_birth} onChange={(e) => setDob(e.target.value)} /> */}
+              
+              <DatePicker className='form-control' placeholderText='Date of birth'
+                showIcon
+                selected={date_of_birth}
+                onChange={(date) => setDob(date)}
+                dateFormat='dd/MM/yyyy'
+              />
             </div>
             <div className='col-md-6 mb-2'>
-              <input type="text" className='form-control' placeholder='Password' value={password} onChange={e => setPassword(e.target.value)} />
+              <input type="password" className='form-control' placeholder='Password' value={password} onChange={e => setPassword(e.target.value)} />
             </div>
             <div className='col-md-6 mb-2'>
               <h5>Gender:</h5>
@@ -108,7 +116,7 @@ function AddUser() {
           </div>
         </form>
 
-        <button className='btn btn-success ' onClick={ ()=> goHome()}>back</button>
+        <button className='btn btn-success ' onClick={() => goHome()}>back</button>
       </div>
       {showMessage && (
         <div className="modal" style={{ display: 'block' }}>

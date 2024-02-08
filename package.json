@@ -1,7 +1,12 @@
 {
   "dependencies": {
+    "create": "^0.0.2",
     "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.0.3",
-    "react-toastify": "^10.0.4"
+    "react-calendar": "^4.8.0",
+    "react-class": "^3.2.2",
+    "react-datepicker": "^6.1.0",
+    "react-toastify": "^10.0.4",
+    "useref": "^1.4.4"
   }
 }

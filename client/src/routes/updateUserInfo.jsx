@@ -1,5 +1,4 @@
 import React from 'react'
-import Header from "../components/Header"
 import UpdateUser from "../components/UpdateUser"
 
 function updateUserInfo({user_id}) {
