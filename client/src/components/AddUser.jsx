@@ -1,13 +1,7 @@
 import React, { Fragment, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
-import DatePicker from "react-datepicker";
-import 'react-datepicker/dist/react-datepicker.css';
-
-=======
 import DatePicker from 'react-datepicker'; // Import DatePicker component
 import 'react-datepicker/dist/react-datepicker.css';
->>>>>>> 45e072c282b83445cc3902ecd3a53e9e65fd53eb
 
 function AddUser() {
   let navigate = useNavigate();
@@ -17,13 +11,7 @@ function AddUser() {
   const [birth_registration_number, setBirthReg] = useState('');
   const [phone_number, setPhone] = useState('');
   const [email, setEmail] = useState('');
-<<<<<<< HEAD
-
-  const [date_of_birth, setDob] = useState(new Date());
-
-=======
   const [date_of_birth, setDob] = useState(null);
->>>>>>> 45e072c282b83445cc3902ecd3a53e9e65fd53eb
   const [password, setPassword] = useState('');
   const [gender, setGender] = useState('Male');
   const [message, setMessage] = useState('');
@@ -103,15 +91,6 @@ function AddUser() {
               <input type="text" className='form-control' placeholder='E-mail' value={email} onChange={e => setEmail(e.target.value)} />
             </div>
             <div className='col-md-6 mb-2 '>
-<<<<<<< HEAD
-              <label>Date of birth</label>
-              <DatePicker
-                className='form-control'
-                selected={date_of_birth}
-                onChange={(date) => setDob(date)}
-                
-                
-=======
               {/* <input type="text" className='form-control' placeholder='Date of birth' value={date_of_birth} onChange={e => setDob(e.target.value)} /> */}
               {/* <DatePicker selected={date_of_birth} onChange={(e) => setDob(e.target.value)} /> */}
               
@@ -120,7 +99,6 @@ function AddUser() {
                 selected={date_of_birth}
                 onChange={(date) => setDob(date)}
                 dateFormat='dd/MM/yyyy'
->>>>>>> 45e072c282b83445cc3902ecd3a53e9e65fd53eb
               />
             </div>
             <div className='col-md-6 mb-2'>
