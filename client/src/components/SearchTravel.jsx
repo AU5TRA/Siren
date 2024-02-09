@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './comp.css'
 
 const SearchTravel = () => {
@@ -7,14 +8,11 @@ const SearchTravel = () => {
   const [trains, setTrains] = useState([]);
   const [fares, setFare] = useState([]);
   const [selectedTrain, setSelectedTrain] = useState(null);
+  const [searchClicked, setSearchClicked] = useState(false);
 
   const [inputValue, setInputValue] = useState('');
-  //const [data, setData] = useState([]);
   const [suggestionsFrom, setSuggestionsFrom] = useState([]);
   const [selectedSuggestionFrom, setSelectedSuggestionFrom] = useState(null);
-  //const [showInfoData, setInfoData] = useState([]);
-
-
   const [suggestionsTo, setSuggestionsTo] = useState([]);
   const [selectedSuggestionTo, setSelectedSuggestionTo] = useState([]);
 
@@ -30,18 +28,15 @@ const SearchTravel = () => {
       const received = res.data.result;
       console.log(received);
       if (Array.isArray(received)) {
-        //setData(received);
-        // setSuggestions(received.map((item) => item.train_name));
         setSuggestionsFrom(received.map((item) => item.station_name));
       } else {
-        //setData([]);
-        //setSuggestions([]);
         setSuggestionsFrom([]);
       }
     } catch (err) {
       console.error(err.message);
     }
   };
+
   const onChangeTo = async (e) => {
     const value = e.target.value;
     setInputValueTo(value);
@@ -54,10 +49,8 @@ const SearchTravel = () => {
       const received = res.data.result;
       console.log(received);
       if (Array.isArray(received)) {
-        //setData(received);
         setSuggestionsTo(received.map((item) => item.station_name));
       } else {
-        //setData([]);
         setSuggestionsTo([]);
       }
     } catch (err) {
@@ -65,30 +58,21 @@ const SearchTravel = () => {
     }
   };
 
-
-  // const onSelectSuggestion = (selectedSuggestion) => {
-  //   setInputValue(selectedSuggestion);
-  //   setSelectedSuggestion(selectedSuggestion);
-  //   setSuggestions([]);
-  // }
-
   const onSelectSuggestionFrom = (selectedSuggestion) => {
     setInputValueFrom(selectedSuggestion);
-    console.log(inputValueFrom + "from")
     setSelectedSuggestionFrom(selectedSuggestion);
     setSuggestionsFrom([]);
-  }
+  };
 
   const onSelectSuggestionTo = (selectedSuggestion) => {
     setInputValueTo(selectedSuggestion);
-    console.log(inputValueFrom + "to");
     setSelectedSuggestionTo(selectedSuggestion);
     setSuggestionsTo([]);
-  }
+  };
 
   const onSearchFunc = async () => {
     try {
-      console.log("from " + inputValueFrom + "to " + inputValueTo)
+      setSearchClicked(true);
       const response = await fetch(
         `http://localhost:3001/book/search?from=${inputValueFrom}&to=${inputValueTo}`,
         {
@@ -97,10 +81,10 @@ const SearchTravel = () => {
       );
 
       const res = await response.json();
-      const received = res.data.result;  // trains
-      const received2 = res.data.result2;  //  trains with class and fare
-      console.log(received);
-      console.log(received2);
+      const received = res.data.result;
+      const received2 = res.data.result2;
+      // console.log(received);
+      // console.log(received2);
       if (Array.isArray(received)) {
         setTrains(received);
         setFare(received2);
@@ -117,6 +101,12 @@ const SearchTravel = () => {
   const handleTrainClick = (train) => {
     setSelectedTrain(selectedTrain === train ? null : train);
   };
+
+  const ReviewButton = ({ trainId, classId }) => (
+    <Link to={`/review?trainId=${trainId}&classId=${classId}`} className="review-button">
+      Review
+    </Link>
+  );
 
   return (
     <Fragment>
@@ -161,34 +151,42 @@ const SearchTravel = () => {
             ))
           }
         </div>
-        <button onClick={onSearchFunc} className="search-button">Search</button>
+        <button onClick={onSearchFunc} className="search-button">search</button>
+        {searchClicked && fares.length === 0 && (
+          <div className='not found mt-5'>
+            <h5>No trains found !</h5>
+          </div>
+        )}
       </div>
-      <div className="train-container mt-5">
-        {trains.map((train, index) => (
-          <Fragment key={index}>
-            <div
-              className="train hoverable"
-              style={{ cursor: 'pointer', padding: '10px', marginBottom: '5px' }}
-              onClick={() => handleTrainClick(train)}
-            >
-              <div><h4> {train.train_id} <span style={{ margin: '0 25px' }}></span>  {train.train_name}</h4></div>
-            </div>
-            {selectedTrain === train && (
-              <div className="class-cards-container">
-                {fares
-                  .filter(f => f.train_id === train.train_id)
-                  .map((f, index) => (
-                    <div key={index} className="class-card">
-                      <div>{f.class_name}</div>
-                      <div><strong>Fare:</strong> {f.fare} Tk.</div>
-                    </div>
-                  ))}
+      {fares.length > 0 && (
+        <div className="train-container mt-5">
+          {trains.map((train, index) => (
+            <Fragment key={index}>
+              <div
+                className="train hoverable"
+                style={{ cursor: 'pointer', padding: '10px', marginBottom: '5px' }}
+                onClick={() => handleTrainClick(train)}
+              >
+                <div><h4> {train.train_id} <span style={{ margin: '0 25px' }}></span>  {train.train_name}</h4></div>
+                <ReviewButton trainId={train.train_id} classId={train.class_id} />
               </div>
+              {selectedTrain === train && (
+                <div className="class-cards-container">
+                  {fares
+                    .filter(f => f.train_id === train.train_id)
+                    .map((f, index) => (
+                      <div key={index} className="class-card">
+                        <div>{f.class_name}</div>
+                        <div><strong>Fare:</strong> {f.fare} Tk.</div>
+                      </div>
+                    ))}
+                </div>
 
-            )}
-          </Fragment>
-        ))}
-      </div>
+              )}
+            </Fragment>
+          ))}
+        </div>
+      )}
     </Fragment>
   );
 

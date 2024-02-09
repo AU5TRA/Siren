@@ -11,7 +11,7 @@ const LoginPage = () => {
 
   return (
     <div>
-        <center><Header /></center>
+        {/* <center><Header /></center> */}
         <Login setAuth={handleAuthentication} />
     </div>
   );

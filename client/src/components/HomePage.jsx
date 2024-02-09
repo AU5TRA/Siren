@@ -1,6 +1,8 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import './hp.css';
+import { BsFillPersonFill } from "react-icons/bs";
+
 // import './home.css';
 
 const HomePage = () => {
@@ -49,6 +51,11 @@ const HomePage = () => {
             <footer className="footer">
                 {/* Footer content if any */}
             </footer>
+        </div>
+        <div className="icon">
+            {/* <Link to={`http://localhost:3001/users/${id}`}> */}
+                <BsFillPersonFill />
+            {/* </Link> */}
         </div>
     </Fragment>
 };

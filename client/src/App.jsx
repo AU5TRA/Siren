@@ -8,6 +8,7 @@ import searchUserInfo from './routes/searchUserInfo'
 import routeDetails from './routes/routeDetails'
 import LoginPage from './routes/loginPage'
 import searchTrainInfo from './routes/searchTrainInfo'
+import reviewPage from './routes/reviewPage';
 import bookTrain from './routes/bookTrain'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -30,7 +31,7 @@ const App = () => {
                 <Route exact path="/trains" Component={searchTrainInfo}/>
                 <Route exact path="/train/:id" Component={routeDetails}/>
                 <Route exact path="/booking/train/search" Component={bookTrain} />
-
+                <Route exact path="/review" Component={reviewPage} />
             </Routes>
         </Router>
     </div>;
