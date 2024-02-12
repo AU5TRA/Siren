@@ -103,6 +103,7 @@ WHERE
     AND f.source = $1        
     AND f.destination = $2 
  ;`;
+ 
     const results2 = await db.query(query2, [fromStationId, toStationId]);
     console.log(results2);
     console.log('....................');
