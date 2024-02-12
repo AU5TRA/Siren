@@ -1,5 +1,9 @@
 {
   "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.10",
+    "@mui/material": "^5.15.10",
     "create": "^0.0.2",
     "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.0.3",
