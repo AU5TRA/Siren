@@ -72,3 +72,16 @@ WITH RECURSIVE StationSequence AS (
 
 SELECT DISTINCT * FROM StationSequence
 ORDER BY sequence_number;
+
+
+
+SELECT DISTINCT tr.route_id, t.train_id, t.train_name
+FROM train t
+JOIN train_routes tr ON t.train_id = tr.train_id
+JOIN route_stations rs_from ON tr.route_id = rs_from.route_id
+JOIN route_stations rs_to ON tr.route_id = rs_to.route_id
+JOIN station s_from ON rs_from.station_id = s_from.station_id
+JOIN station s_to ON rs_to.station_id = s_to.station_id
+WHERE s_from.station_id = $1
+AND s_to.station_id = $2
+AND rs_from.sequence_number < rs_to.sequence_number;

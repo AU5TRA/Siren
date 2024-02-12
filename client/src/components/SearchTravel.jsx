@@ -1,6 +1,8 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './comp.css'
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const SearchTravel = () => {
   const [inputValueFrom, setInputValueFrom] = useState('');
@@ -9,24 +11,30 @@ const SearchTravel = () => {
   const [fares, setFare] = useState([]);
   const [selectedTrain, setSelectedTrain] = useState(null);
   const [searchClicked, setSearchClicked] = useState(false);
-
+  const [dateSearched, setDate] = useState(null)
   const [inputValue, setInputValue] = useState('');
   const [suggestionsFrom, setSuggestionsFrom] = useState([]);
   const [selectedSuggestionFrom, setSelectedSuggestionFrom] = useState(null);
   const [suggestionsTo, setSuggestionsTo] = useState([]);
   const [selectedSuggestionTo, setSelectedSuggestionTo] = useState([]);
+  const [seat, setSeat] = useState([]);
 
   const onChangeFrom = async (e) => {
     const value = e.target.value;
     setInputValueFrom(value);
     try {
-      const response = await fetch(`http://localhost:3001/book/station/search?name=${value}`, {
+      // const dateSend = dateSearched ? dateSearched : new Date();
+      const dateReceived = new Date('dateSearched');
+
+      const response = await fetch(`http://localhost:3001/book/station/search?name=${value}&date=${dateReceived}`, {
         method: "GET",
       });
 
       const res = await response.json();
       const received = res.data.result;
-      console.log(received);
+      // console.log(received);
+      // const allInfo = res.data;
+      // console.log(allInfo);
       if (Array.isArray(received)) {
         setSuggestionsFrom(received.map((item) => item.station_name));
       } else {
@@ -46,8 +54,12 @@ const SearchTravel = () => {
       });
 
       const res = await response.json();
+      const r = res.data.info;
+      console.log(r);
       const received = res.data.result;
-      console.log(received);
+      // console.log(received);
+      const allInfo = res.data.info;
+      console.log(allInfo);
       if (Array.isArray(received)) {
         setSuggestionsTo(received.map((item) => item.station_name));
       } else {
@@ -74,7 +86,7 @@ const SearchTravel = () => {
     try {
       setSearchClicked(true);
       const response = await fetch(
-        `http://localhost:3001/book/search?from=${inputValueFrom}&to=${inputValueTo}`,
+        `http://localhost:3001/book/search?from=${inputValueFrom}&to=${inputValueTo}&date=${dateSearched}`,
         {
           method: 'GET',
         }
@@ -83,12 +95,15 @@ const SearchTravel = () => {
       const res = await response.json();
       const received = res.data.result;
       const received2 = res.data.result2;
+      const allInfo = res.data.info;
+      console.log(allInfo);
       // console.log(received);
       // console.log(received2);
       if (Array.isArray(received)) {
         setTrains(received);
         setFare(received2);
-        console.log(received2);
+        setSeat(allInfo);
+        // console.log(received2);
       } else {
         setTrains([]);
         setFare([]);
@@ -118,7 +133,13 @@ const SearchTravel = () => {
             id="from"
             onChange={onChangeFrom}
             value={inputValueFrom}
-            style={{ width: '300px', marginRight: '10px' }}
+            style={{
+              width: '300px',
+              marginRight: '10px',
+              height: '40px',
+              borderRadius: '5px', // Adjust this value to increase or decrease the corner roundness
+              border: '2px solid darkgreen' // Specifies the border width, style, and color
+            }}
           />
         </div>
         <div className="input-container">
@@ -128,7 +149,13 @@ const SearchTravel = () => {
             id="to"
             onChange={onChangeTo}
             value={inputValueTo}
-            style={{ width: '300px', marginRight: '10px' }}
+            style={{
+              width: '300px',
+              marginRight: '10px',
+              height: '40px',
+              borderRadius: '5px', // Adjust this value to increase or decrease the corner roundness
+              border: '2px solid darkgreen' // Specifies the border width, style, and color
+            }}
           />
         </div>
         <div className="drop-down-from">
@@ -151,6 +178,19 @@ const SearchTravel = () => {
             ))
           }
         </div>
+        <div className="input-container" >
+          {/* <input type="text" className='form-control' placeholder='Date of birth' value={date_of_birth} onChange={e => setDob(e.target.value)} /> */}
+          {/* <DatePicker selected={date_of_birth} onChange={(e) => setDob(e.target.value)} /> */}
+          <label htmlFor="from" className="label">Pick Date: </label>
+          <DatePicker wrapperClassName="datePicker" className='form-control' placeholderText='Date of Journey'
+            showIcon
+            selected={dateSearched}
+            onChange={(date) => setDate(date)}
+            dateFormat='dd/MM/yyyy'
+
+          />
+        </div>
+
         <button onClick={onSearchFunc} className="search-button">search</button>
         {searchClicked && fares.length === 0 && (
           <div className='not found mt-5'>
@@ -178,15 +218,16 @@ const SearchTravel = () => {
                       <div key={index} className="class-card">
                         <div>{f.class_name}</div>
                         <div><strong>Fare:</strong> {f.fare} Tk.</div>
+                        <div><strong>Seat Count:</strong> {seat.find(seatInfo => seatInfo.train_id === train.train_id && seatInfo.class_id === f.class_id)?.available_seats_count}</div>
                       </div>
                     ))}
                 </div>
-
               )}
             </Fragment>
           ))}
         </div>
       )}
+
     </Fragment>
   );
 
