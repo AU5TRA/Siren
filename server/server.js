@@ -80,7 +80,9 @@ AND s_to.station_id = $2
 AND rs_from.sequence_number < rs_to.sequence_number;
     `);
     const results = await db.query(query, [fromStationId, toStationId]);
-    console.log(results);
+    // console.log(results);
+    console.log('....................');
+    console.log(results.rows);
     console.log('....................');
     const trainIds = results.rows.map(row => row.train_id);
     const trainIdsString = trainIds.join(',');
@@ -103,7 +105,7 @@ WHERE
     AND f.source = $1        
     AND f.destination = $2 
  ;`;
- 
+
     const results2 = await db.query(query2, [fromStationId, toStationId]);
     console.log(results2);
     console.log('....................');
