@@ -20,7 +20,11 @@
   flex-direction: column;
   align-items: center;
   position: relative;
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
 }
 
 input {
@@ -66,8 +70,12 @@ button {
 
 
 
+<<<<<<< HEAD
 .drop-down-from div,
 .drop-down-to div {
+=======
+.drop-down-from div, .drop-down-to div {
+>>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
   padding: 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -77,8 +85,12 @@ button {
   }
 }
 
+<<<<<<< HEAD
 .drop-down-from hr,
 .drop-down-to hr {
+=======
+.drop-down-from hr, .drop-down-to hr {
+>>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
   margin: 5px 0;
   border: 0;
   border-top: 1px solid #e1d5a1;
@@ -88,16 +100,25 @@ button {
 
 
 
+<<<<<<< HEAD
 .link-style {
   text-decoration: none;
   color: #333;
 }
 
 .link-style:hover {
+=======
+.link-style{
+  text-decoration: none;
+  color: #333;
+}
+.link-style:hover{
+>>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
   color: #ac5353;
 }
 
 .search-button:hover {
+<<<<<<< HEAD
   background-color: #206d8e;
   /* Green background on hover */
   color: white;
@@ -111,25 +132,45 @@ button {
   /* Add your desired background color on hover */
   cursor: pointer;
   /* Change cursor to pointer on hover */
+=======
+  background-color: #206d8e; /* Green background on hover */
+  color: white; /* White text on hover */
+  cursor: pointer; /* Add a pointer cursor on hover */
+}
+
+.hoverable:hover {
+  background-color: #f0f0f0; /* Add your desired background color on hover */
+  cursor: pointer; /* Change cursor to pointer on hover */
+>>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
 }
 
 .input-container {
   position: relative;
+<<<<<<< HEAD
   margin-bottom: 20px;
   /* adjust as needed for spacing */
 
+=======
+  margin-bottom: 20px; /* adjust as needed for spacing */
+>>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
 }
 
 
 .input-field {
   width: 300px;
   margin-right: 10px;
+<<<<<<< HEAD
   padding: 8px;
   /* adjust padding for better text field height */
   border: 1px solid #ccc;
   /* a light grey border */
   border-radius: 4px;
   /* slightly rounded corners */
+=======
+  padding: 8px; /* adjust padding for better text field height */
+  border: 1px solid #ccc; /* a light grey border */
+  border-radius: 4px; /* slightly rounded corners */
+>>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
 }
 
 .select-field {
@@ -138,12 +179,18 @@ button {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: white;
+<<<<<<< HEAD
   -webkit-appearance: none;
   /* Removes default styling of dropdown in WebKit browsers */
   -moz-appearance: none;
   /* Removes default styling of dropdown in Mozilla browsers */
   appearance: none;
   /* Removes default styling of dropdown */
+=======
+  -webkit-appearance: none; /* Removes default styling of dropdown in WebKit browsers */
+  -moz-appearance: none; /* Removes default styling of dropdown in Mozilla browsers */
+  appearance: none; /* Removes default styling of dropdown */
+>>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
   /* You can add a background image for a custom dropdown arrow */
 }
 
@@ -207,4 +254,8 @@ button {
   margin-right: 10px; /* Corrected: CSS uses kebab-case, not camelCase */
   height: 42px;
   border-radius: 5px; /* Corrected: CSS uses kebab-case */
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
