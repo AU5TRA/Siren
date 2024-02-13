@@ -1,8 +1,5 @@
 require("dotenv").config();
-<<<<<<< HEAD
 const authorization = require("./middleware/authorize");
-=======
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
@@ -13,7 +10,6 @@ app.use(express.json());
 app.use(cors());
 
 
-<<<<<<< HEAD
 
 // app.get("/is-verify", authorization, async (req, res) => {
 //   try {
@@ -26,8 +22,6 @@ app.use(cors());
 // });
 
 
-=======
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
 // review
 app.get("/review", async (req, res) => {
   try {
@@ -78,8 +72,6 @@ app.get("/book/search", async (req, res) => {
   try {
     const fromS = req.query.from;
     const toS = req.query.to;
-<<<<<<< HEAD
-=======
     // const dateReceived = req.query.date;
     // console.log(dateReceived);
     const dateString = req.query.date;
@@ -96,7 +88,6 @@ app.get("/book/search", async (req, res) => {
 
 
 
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
     console.log(fromS);
     const r1 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [fromS.toUpperCase()]);
     const r2 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [toS.toUpperCase()]);
@@ -105,10 +96,6 @@ app.get("/book/search", async (req, res) => {
     const toStationId = parseInt(r2.rows[0].station_id);
     console.log(fromStationId);
     console.log(toStationId);
-<<<<<<< HEAD
-    const query = (`
-    SELECT DISTINCT t.train_id, t.train_name
-=======
         const queryforTrain = (`
         SELECT DISTINCT t.train_id, t.train_name
     FROM train t
@@ -133,7 +120,6 @@ app.get("/book/search", async (req, res) => {
 
     const query = `
 SELECT DISTINCT tr.route_id, t.train_id, t.train_name
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
 FROM train t
 JOIN train_routes tr ON t.train_id = tr.train_id
 JOIN route_stations rs_from ON tr.route_id = rs_from.route_id
@@ -142,37 +128,6 @@ JOIN station s_from ON rs_from.station_id = s_from.station_id
 JOIN station s_to ON rs_to.station_id = s_to.station_id
 WHERE s_from.station_id = $1
 AND s_to.station_id = $2
-<<<<<<< HEAD
-AND rs_from.sequence_number < rs_to.sequence_number;
-    `);
-    const results = await db.query(query, [fromStationId, toStationId]);
-    console.log(results);
-    console.log('....................');
-    const trainIds = results.rows.map(row => row.train_id);
-    const trainIdsString = trainIds.join(',');
-    const query2 = `SELECT 
-    t.train_id, 
-    t.train_name, 
-    c.class_name,
-    c.class_id,
-    f.fare
-FROM 
-    train t
-JOIN 
-    train_class tc ON t.train_id = tc.train_id
-JOIN 
-    class c ON tc.class_id = c.class_id
-JOIN 
-    fareList f ON c.class_id = f.class_id
-WHERE 
-    t.train_id IN (${trainIdsString})
-    AND f.source = $1        
-    AND f.destination = $2 
- ;`;
-    const results2 = await db.query(query2, [fromStationId, toStationId]);
-    console.log(results2);
-    console.log('....................');
-=======
 AND rs_from.sequence_number < rs_to.sequence_number;`;
     // const results = await db.query(query, [fromStationId, toStationId]);
     // // console.log(results);
@@ -241,7 +196,6 @@ AND rs_from.sequence_number < rs_to.sequence_number;`;
 
     // const routeIDs = results2.rows.map(row => row.route_id);
     // console.log(routeIDs);
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
 
     const queryFrom = `SELECT station_name from station
     WHERE LOWER(station_name) LIKE LOWER($1);`
@@ -263,9 +217,6 @@ AND rs_from.sequence_number < rs_to.sequence_number;`;
     console.log('....................');
 
 
-<<<<<<< HEAD
-    console.log(results2.rows);
-=======
     // console.log(results2.rows);
 
 
@@ -362,25 +313,17 @@ AND rs_from.sequence_number < rs_to.sequence_number;`;
     console.log("RESULTS4");
     console.log(results4.rows);
 
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
 
 
     res.status(200).json({
       status: "success",
       data: {
-<<<<<<< HEAD
-        result: results.rows,  // returns the trains
-        result2: results2.rows,  // 
-        from: fromStation.rows,
-        to: toStation.rows
-=======
         // result: results.rows,  // returns the trains
         result : resForTrain.rows,
         result2: results2.rows,  // 
         from: fromStation.rows,
         to: toStation.rows,
         info: results4.rows
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
       },
     });
   } catch (error) {

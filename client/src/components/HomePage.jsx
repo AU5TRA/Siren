@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 import { Link } from 'react-router-dom';
 import './hp.css';
@@ -8,13 +7,6 @@ import NavBar2 from './NavBar2'
 import React, { useState, useEffect, Fragment } from 'react';
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-=======
-import React, { Fragment } from 'react';
-import { Link } from 'react-router-dom';
-import './hp.css';
-import { BsFillPersonFill } from "react-icons/bs";
-
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
 // import './home.css';
 
 const HomePage = () => {
@@ -37,7 +29,6 @@ const HomePage = () => {
     //         </footer>
     //     </div>
     // );
-<<<<<<< HEAD
 
     // const [isAuthenticated, setAuthenticated] = useState(false);
 
@@ -61,10 +52,6 @@ const HomePage = () => {
     return <Fragment>
          {/*isAuthenticated ? <NavBar2 /> : <NavBar />}
        {/* <div className="sidebar">
-=======
-    return <Fragment>
-        <div className="sidebar">
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
             <header className="header">
                 <div className="logo">
                     <img src="../../siren_home.png" style={{ width: '150px', height: '50px', marginLeft: '10px' }} />
@@ -84,7 +71,6 @@ const HomePage = () => {
                 </ul>
             </nav>
             <main className="main">
-<<<<<<< HEAD
                 {Main content goes here }
             </main>
             <footer className="footer">
@@ -96,19 +82,6 @@ const HomePage = () => {
                 <BsFillPersonFill />
             { </Link> }
         </div>*/}
-=======
-                {/* Main content goes here */}
-            </main>
-            <footer className="footer">
-                {/* Footer content if any */}
-            </footer>
-        </div>
-        <div className="icon">
-            {/* <Link to={`http://localhost:3001/users/${id}`}> */}
-                <BsFillPersonFill />
-            {/* </Link> */}
-        </div>
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
     </Fragment>
 };
 

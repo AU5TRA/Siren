@@ -1,11 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './comp.css'
-<<<<<<< HEAD
 import DatePicker from 'react-datepicker'; // Import DatePicker component
-=======
-import DatePicker from 'react-datepicker';
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
 import 'react-datepicker/dist/react-datepicker.css';
 
 const SearchTravel = () => {
@@ -21,35 +17,19 @@ const SearchTravel = () => {
   const [selectedSuggestionFrom, setSelectedSuggestionFrom] = useState(null);
   const [suggestionsTo, setSuggestionsTo] = useState([]);
   const [selectedSuggestionTo, setSelectedSuggestionTo] = useState([]);
-<<<<<<< HEAD
-=======
-  const [seat, setSeat] = useState([]);
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
+  const [seat, setSeat] = useState([])
 
   const onChangeFrom = async (e) => {
     const value = e.target.value;
     setInputValueFrom(value);
     try {
-<<<<<<< HEAD
       const response = await fetch(`http://localhost:3001/book/station/search?name=${value}`, {
-=======
-      // const dateSend = dateSearched ? dateSearched : new Date();
-      const dateReceived = new Date('dateSearched');
-
-      const response = await fetch(`http://localhost:3001/book/station/search?name=${value}&date=${dateReceived}`, {
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
         method: "GET",
       });
 
       const res = await response.json();
       const received = res.data.result;
-<<<<<<< HEAD
       console.log(received);
-=======
-      // console.log(received);
-      // const allInfo = res.data;
-      // console.log(allInfo);
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
       if (Array.isArray(received)) {
         setSuggestionsFrom(received.map((item) => item.station_name));
       } else {
@@ -69,17 +49,12 @@ const SearchTravel = () => {
       });
 
       const res = await response.json();
-<<<<<<< HEAD
-      const received = res.data.result;
-      console.log(received);
-=======
       const r = res.data.info;
       console.log(r);
       const received = res.data.result;
       // console.log(received);
       const allInfo = res.data.info;
       console.log(allInfo);
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
       if (Array.isArray(received)) {
         setSuggestionsTo(received.map((item) => item.station_name));
       } else {
@@ -115,14 +90,6 @@ const SearchTravel = () => {
       const res = await response.json();
       const received = res.data.result;
       const received2 = res.data.result2;
-<<<<<<< HEAD
-      // console.log(received);
-      // console.log(received2);
-      if (Array.isArray(received)) {
-        setTrains(received);
-        setFare(received2);
-        console.log(received2);
-=======
       const allInfo = res.data.info;
     //  console.log(allInfo);
       // console.log(received);
@@ -134,7 +101,6 @@ const SearchTravel = () => {
         setFare(received2);
         setSeat(allInfo);
         // console.log(received2);
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
       } else {
         setTrains([]);
         setFare([]);
@@ -239,46 +205,26 @@ const SearchTravel = () => {
                 onClick={() => handleTrainClick(train)}
               >
                 <div><h4> {train.train_id} <span style={{ margin: '0 25px' }}></span>  {train.train_name}</h4></div>
-<<<<<<< HEAD
 
               </div>
               {selectedTrain === train && (
                 <div className="class-cards-container">
 
-=======
-                <ReviewButton trainId={train.train_id} classId={train.class_id} />
-              </div>
-              {selectedTrain === train && (
-                <div className="class-cards-container">
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
                   {fares
                     .filter(f => f.train_id === train.train_id)
                     .map((f, index) => (
                       <div key={index} className="class-card">
-<<<<<<< HEAD
                         <div>{f.class_name}<span style={{ margin: '0 25px' }}></span>  <ReviewButton trainId={train.train_id} classId={f.class_id} /></div>
                         <div><strong>Fare:</strong> {f.fare} Tk.</div>
                       </div>
                     ))}
                 </div>
 
-=======
-                        <div>{f.class_name}</div>
-                        <div><strong>Fare:</strong> {f.fare} Tk.</div>
-                        <div><strong>Seat Count:</strong> {seat.find(seatInfo => seatInfo.train_id === train.train_id && seatInfo.class_id === f.class_id)?.available_seats_count}</div>
-                      </div>
-                    ))}
-                </div>
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
               )}
             </Fragment>
           ))}
         </div>
       )}
-<<<<<<< HEAD
-=======
-
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
     </Fragment>
   );
 

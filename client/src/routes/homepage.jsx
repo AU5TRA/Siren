@@ -4,16 +4,11 @@ import Header from '../components/Header'
 import HomePage from '../components/HomePage'
 
 const homepage = () => {
-<<<<<<< HEAD
   
 
   return (
     <div>
      
-=======
-  return (
-    <div>
->>>>>>> 881bc7959a99de164279c0afabbb9d961c19994f
       <HomePage />
     </div>
   )
