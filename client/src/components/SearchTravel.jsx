@@ -96,11 +96,13 @@ const SearchTravel = () => {
       const received = res.data.result;
       const received2 = res.data.result2;
       const allInfo = res.data.info;
-      console.log(allInfo);
+    //  console.log(allInfo);
       // console.log(received);
       // console.log(received2);
       if (Array.isArray(received)) {
+        console.log(received+".......................");
         setTrains(received);
+        console.log(trains.length);
         setFare(received2);
         setSeat(allInfo);
         // console.log(received2);

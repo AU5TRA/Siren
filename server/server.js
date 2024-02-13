@@ -83,18 +83,28 @@ app.get("/book/search", async (req, res) => {
     const toStationId = parseInt(r2.rows[0].station_id);
     console.log(fromStationId);
     console.log(toStationId);
-    //     const query = (`
-    //     SELECT DISTINCT t.train_id, t.train_name
-    // FROM train t
-    // JOIN train_routes tr ON t.train_id = tr.train_id
-    // JOIN route_stations rs_from ON tr.route_id = rs_from.route_id
-    // JOIN route_stations rs_to ON tr.route_id = rs_to.route_id
-    // JOIN station s_from ON rs_from.station_id = s_from.station_id
-    // JOIN station s_to ON rs_to.station_id = s_to.station_id
-    // WHERE s_from.station_id = $1
-    // AND s_to.station_id = $2
-    // AND rs_from.sequence_number < rs_to.sequence_number;
-    //     `);
+        const queryforTrain = (`
+        SELECT DISTINCT t.train_id, t.train_name
+    FROM train t
+    JOIN train_routes tr ON t.train_id = tr.train_id
+    JOIN route_stations rs_from ON tr.route_id = rs_from.route_id
+    JOIN route_stations rs_to ON tr.route_id = rs_to.route_id
+    JOIN station s_from ON rs_from.station_id = s_from.station_id
+    JOIN station s_to ON rs_to.station_id = s_to.station_id
+    WHERE s_from.station_id = $1
+    AND s_to.station_id = $2
+    AND rs_from.sequence_number < rs_to.sequence_number;
+        `);
+
+        const resForTrain = await db.query(queryforTrain, [fromStationId, toStationId]);
+        console.log(resForTrain.rows);
+        console.log('////////////');
+        // const trainIds = resForTrain.rows.map(row => row.train_id);
+        const trainIds = resForTrain.rows.map(row => row.train_id);
+        const trainIdsString = trainIds.join(',');
+        console.log(trainIdsString);
+
+
     const query = `
 SELECT DISTINCT tr.route_id, t.train_id, t.train_name
 FROM train t
@@ -118,9 +128,10 @@ AND rs_from.sequence_number < rs_to.sequence_number;`;
     console.log("TRAINS");
     console.log(results);
 
-    const trainIds = results.rows.map(row => row.train_id);
-    const trainIdsString = trainIds.join(',');
-    console.log(trainIdsString);
+
+
+    // const trainIDs = new Set();
+    
 
     console.log('....................');
     // console.log(Object.keys(results2).length);
@@ -282,6 +293,8 @@ AND rs_from.sequence_number < rs_to.sequence_number;`;
         AND f.destination = $${stations.length + 4};
     `;
 
+    console.log(" " + dateReceived + " " + stations + " " + station_cnt + " " + fromStationId + " " + toStationId);
+
     const values = [dateReceived, ...stations, station_cnt, fromStationId, toStationId];
     const results4 = await db.query(query4, values);
     console.log("RESULTS4");
@@ -292,7 +305,8 @@ AND rs_from.sequence_number < rs_to.sequence_number;`;
     res.status(200).json({
       status: "success",
       data: {
-        result: results.rows,  // returns the trains
+        // result: results.rows,  // returns the trains
+        result : resForTrain.rows,
         result2: results2.rows,  // 
         from: fromStation.rows,
         to: toStation.rows,

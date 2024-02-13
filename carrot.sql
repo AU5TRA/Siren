@@ -85,3 +85,11 @@ JOIN station s_to ON rs_to.station_id = s_to.station_id
 WHERE s_from.station_id = $1
 AND s_to.station_id = $2
 AND rs_from.sequence_number < rs_to.sequence_number;
+
+
+
+
+
+-- individual seat count for specific train class
+
+	
