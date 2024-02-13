@@ -179,7 +179,7 @@ const SearchTravel = () => {
           {/* <input type="text" className='form-control' placeholder='Date of birth' value={date_of_birth} onChange={e => setDob(e.target.value)} /> */}
           {/* <DatePicker selected={date_of_birth} onChange={(e) => setDob(e.target.value)} /> */}
           <label htmlFor="from" className="label">Pick Date: </label>
-          <DatePicker wrapperClassName="datePicker" className='form-control' placeholderText='Date of Journey'
+          <DatePicker wrapperClassName="datePicker"  className='form-control' placeholderText='Date of Journey'
             showIcon
             selected={dateSearched}
             onChange={(date) => setDate(date)}
