@@ -6,6 +6,7 @@ module.exports = function(req, res, next) {
   const token = req.header("jwt_token");
 
   if (!token) {
+    console.log("aurthorization denied");
     return res.status(403).json({ msg: "authorization denied" });
   }
 
@@ -13,7 +14,7 @@ module.exports = function(req, res, next) {
   try {
     //it is going to give use the user id (user:{id: user.id})
     const verify = jwt.verify(token, process.env.jwtSecret);
-
+    console.log("aurthorization success");
     req.user = verify.user;
     
   } catch (err) {

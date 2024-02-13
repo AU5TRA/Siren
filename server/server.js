@@ -1,4 +1,5 @@
 require("dotenv").config();
+const authorization = require("./middleware/authorize");
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
@@ -7,6 +8,18 @@ const bcrypt = require('bcryptjs');
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+
+
+// app.get("/is-verify", authorization, async (req, res) => {
+//   try {
+//     console.log("aurthorization successful")
+//       res.json(true);
+//   } catch (err) {
+//       console.log(err.message);
+//       res.status(500).json("Server Error");
+//   }
+// });
 
 
 // review

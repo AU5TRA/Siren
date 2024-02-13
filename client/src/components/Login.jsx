@@ -1,10 +1,13 @@
 import React, { Fragment, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useAppContext } from './AppContext';
 import './login.css';
 
 const Login = ({ setAuth }) => {
+
     const navigate = useNavigate();
+    //const { loginUser } = useAppContext(); 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showMessage, setShowMessage] = useState('');
@@ -28,9 +31,11 @@ const Login = ({ setAuth }) => {
             if (json.status === "success") {
                 localStorage.setItem("token", json.data.res);
                 localStorage.setItem("userId", json.data.result[0].user_id);
+                localStorage.setItem("name", json.data.result[0].last_name);
                 console.log(json.data.res);
                 // console.log(localStorage.getItem);
                 setAuth(true);
+               // loginUser(json.data.result[0]);
                 toast.success("Logged in Successfully");
                 setUserID(json.data.result[0].user_id);
 
@@ -48,7 +53,8 @@ const Login = ({ setAuth }) => {
     const closeMessage = () => {
         try {
             setShowMessage(false);
-            if (userID) navigate(`/users/${userID}`);
+            //if (userID) navigate(`/users/${userID}`);
+            if(userID) navigate(`/`);
             else {
                 navigate('/users/login');
                 setEmail('');

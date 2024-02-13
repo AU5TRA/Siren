@@ -20,7 +20,7 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  
+
 }
 
 input {
@@ -66,7 +66,8 @@ button {
 
 
 
-.drop-down-from div, .drop-down-to div {
+.drop-down-from div,
+.drop-down-to div {
   padding: 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -76,7 +77,8 @@ button {
   }
 }
 
-.drop-down-from hr, .drop-down-to hr {
+.drop-down-from hr,
+.drop-down-to hr {
   margin: 5px 0;
   border: 0;
   border-top: 1px solid #e1d5a1;
@@ -86,37 +88,48 @@ button {
 
 
 
-.link-style{
+.link-style {
   text-decoration: none;
   color: #333;
 }
-.link-style:hover{
+
+.link-style:hover {
   color: #ac5353;
 }
 
 .search-button:hover {
-  background-color: #206d8e; /* Green background on hover */
-  color: white; /* White text on hover */
-  cursor: pointer; /* Add a pointer cursor on hover */
+  background-color: #206d8e;
+  /* Green background on hover */
+  color: white;
+  /* White text on hover */
+  cursor: pointer;
+  /* Add a pointer cursor on hover */
 }
 
 .hoverable:hover {
-  background-color: #f0f0f0; /* Add your desired background color on hover */
-  cursor: pointer; /* Change cursor to pointer on hover */
+  background-color: #f0f0f0;
+  /* Add your desired background color on hover */
+  cursor: pointer;
+  /* Change cursor to pointer on hover */
 }
 
 .input-container {
   position: relative;
-  margin-bottom: 20px; /* adjust as needed for spacing */
+  margin-bottom: 20px;
+  /* adjust as needed for spacing */
+
 }
 
 
 .input-field {
   width: 300px;
   margin-right: 10px;
-  padding: 8px; /* adjust padding for better text field height */
-  border: 1px solid #ccc; /* a light grey border */
-  border-radius: 4px; /* slightly rounded corners */
+  padding: 8px;
+  /* adjust padding for better text field height */
+  border: 1px solid #ccc;
+  /* a light grey border */
+  border-radius: 4px;
+  /* slightly rounded corners */
 }
 
 .select-field {
@@ -125,9 +138,12 @@ button {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: white;
-  -webkit-appearance: none; /* Removes default styling of dropdown in WebKit browsers */
-  -moz-appearance: none; /* Removes default styling of dropdown in Mozilla browsers */
-  appearance: none; /* Removes default styling of dropdown */
+  -webkit-appearance: none;
+  /* Removes default styling of dropdown in WebKit browsers */
+  -moz-appearance: none;
+  /* Removes default styling of dropdown in Mozilla browsers */
+  appearance: none;
+  /* Removes default styling of dropdown */
   /* You can add a background image for a custom dropdown arrow */
 }
 
@@ -185,3 +201,10 @@ button {
   font-size: 14px;
 }
 
+.datePicker {
+  width: 300px; /* Corrected: Removed the duplicate width declaration */
+  border: 2px solid darkgreen;
+  margin-right: 10px; /* Corrected: CSS uses kebab-case, not camelCase */
+  height: 42px;
+  border-radius: 5px; /* Corrected: CSS uses kebab-case */
+}

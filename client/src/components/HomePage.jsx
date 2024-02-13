@@ -1,8 +1,12 @@
-import React, { Fragment } from 'react';
+
 import { Link } from 'react-router-dom';
 import './hp.css';
 import { BsFillPersonFill } from "react-icons/bs";
+import NavBar from './NavBar'
+import NavBar2 from './NavBar2'
+import React, { useState, useEffect, Fragment } from 'react';
 
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 // import './home.css';
 
 const HomePage = () => {
@@ -25,8 +29,29 @@ const HomePage = () => {
     //         </footer>
     //     </div>
     // );
+
+    // const [isAuthenticated, setAuthenticated] = useState(false);
+
+    // useEffect(() => {
+    //     const isAuth = async () => {
+    //         try {
+    //             const response = await fetch("http://localhost:3001/is-verify", {
+    //                 method: "GET",
+    //                 headers: { jwt_token: localStorage.getItem("token") }
+    //             });
+    //             const parseRes = await response.json();
+    //             setAuthenticated(parseRes === true);
+    //         } catch (error) {
+    //             console.error(error);
+    //         }
+    //     };
+    
+    //     isAuth();
+    // }, []); 
+
     return <Fragment>
-        <div className="sidebar">
+         {/*isAuthenticated ? <NavBar2 /> : <NavBar />}
+       {/* <div className="sidebar">
             <header className="header">
                 <div className="logo">
                     <img src="../../siren_home.png" style={{ width: '150px', height: '50px', marginLeft: '10px' }} />
@@ -46,17 +71,17 @@ const HomePage = () => {
                 </ul>
             </nav>
             <main className="main">
-                {/* Main content goes here */}
+                {Main content goes here }
             </main>
             <footer className="footer">
-                {/* Footer content if any */}
+                { Footer content if any }
             </footer>
         </div>
         <div className="icon">
-            {/* <Link to={`http://localhost:3001/users/${id}`}> */}
+            { <Link to={`http://localhost:3001/users/${id}`}> *}
                 <BsFillPersonFill />
-            {/* </Link> */}
-        </div>
+            { </Link> }
+        </div>*/}
     </Fragment>
 };
 
