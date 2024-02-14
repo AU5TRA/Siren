@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './comp.css'
-import DatePicker from 'react-datepicker'; // Import DatePicker component
+import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const SearchTravel = () => {
@@ -17,19 +17,24 @@ const SearchTravel = () => {
   const [selectedSuggestionFrom, setSelectedSuggestionFrom] = useState(null);
   const [suggestionsTo, setSuggestionsTo] = useState([]);
   const [selectedSuggestionTo, setSelectedSuggestionTo] = useState([]);
-  const [seat, setSeat] = useState([])
+  const [seat, setSeat] = useState([]);
 
   const onChangeFrom = async (e) => {
     const value = e.target.value;
     setInputValueFrom(value);
     try {
-      const response = await fetch(`http://localhost:3001/book/station/search?name=${value}`, {
+      // const dateSend = dateSearched ? dateSearched : new Date();
+      const dateReceived = new Date('dateSearched');
+
+      const response = await fetch(`http://localhost:3001/book/station/search?name=${value}&date=${dateReceived}`, {
         method: "GET",
       });
 
       const res = await response.json();
       const received = res.data.result;
-      console.log(received);
+      // console.log(received);
+      // const allInfo = res.data;
+      // console.log(allInfo);
       if (Array.isArray(received)) {
         setSuggestionsFrom(received.map((item) => item.station_name));
       } else {
@@ -88,16 +93,13 @@ const SearchTravel = () => {
       );
 
       const res = await response.json();
+      console.log(res.data.result + "  " + res.data.result2 + "  " + res.data.info + "  " + res.data.from + "  " + res.data.to);
       const received = res.data.result;
       const received2 = res.data.result2;
       const allInfo = res.data.info;
-    //  console.log(allInfo);
-      // console.log(received);
-      // console.log(received2);
+
       if (Array.isArray(received)) {
-        console.log(received+".......................");
         setTrains(received);
-        console.log(trains.length);
         setFare(received2);
         setSeat(allInfo);
         // console.log(received2);
@@ -179,7 +181,7 @@ const SearchTravel = () => {
           {/* <input type="text" className='form-control' placeholder='Date of birth' value={date_of_birth} onChange={e => setDob(e.target.value)} /> */}
           {/* <DatePicker selected={date_of_birth} onChange={(e) => setDob(e.target.value)} /> */}
           <label htmlFor="from" className="label">Pick Date: </label>
-          <DatePicker wrapperClassName="datePicker"  className='form-control' placeholderText='Date of Journey'
+          <DatePicker wrapperClassName="datePicker" className='form-control' placeholderText='Date of Journey'
             showIcon
             selected={dateSearched}
             onChange={(date) => setDate(date)}
@@ -204,27 +206,31 @@ const SearchTravel = () => {
                 style={{ cursor: 'pointer', padding: '10px', marginBottom: '5px' }}
                 onClick={() => handleTrainClick(train)}
               >
-                <div><h4> {train.train_id} <span style={{ margin: '0 25px' }}></span>  {train.train_name}</h4></div>
-
+                <div><h4> {train.train_id} <span style={{ margin: '0 25px' }}></span>  {train.train_name}</h4>Route: {train.route_id}</div>
+                
               </div>
               {selectedTrain === train && (
                 <div className="class-cards-container">
-
                   {fares
                     .filter(f => f.train_id === train.train_id)
-                    .map((f, index) => (
-                      <div key={index} className="class-card">
-                        <div>{f.class_name}<span style={{ margin: '0 25px' }}></span>  <ReviewButton trainId={train.train_id} classId={f.class_id} /></div>
-                        <div><strong>Fare:</strong> {f.fare} Tk.</div>
-                      </div>
-                    ))}
+                    .map((f, index) => {
+                      const seatInfo = seat.find(seatInfo => seatInfo.train_id === train.train_id && seatInfo.class_id === f.class_id);
+                      const availableSeatsCount = seatInfo ? seatInfo.available_seats_count : 0; 
+                      return (
+                        <div key={index} className="class-card">
+                          <div>{f.class_name}<span style={{ margin: '0 25px' }}></span>  <ReviewButton trainId={train.train_id} classId={f.class_id} /></div>
+                          <div><strong>Fare:</strong> {f.fare} Tk.</div>
+                          <div><strong>Seat Count:</strong> {availableSeatsCount}</div>
+                        </div>
+                      );
+                    })}
                 </div>
-
               )}
             </Fragment>
           ))}
         </div>
       )}
+
     </Fragment>
   );
 

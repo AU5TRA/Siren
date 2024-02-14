@@ -37,7 +37,7 @@ app.get("/review", async (req, res) => {
   }
 });
 
-/// suggestive search train
+// /// suggestive search train
 app.get("/book/station/search", async (req, res) => {
   try {
     const st = req.query.name;
@@ -72,32 +72,34 @@ app.get("/book/search", async (req, res) => {
   try {
     const fromS = req.query.from;
     const toS = req.query.to;
-    // const dateReceived = req.query.date;
-    // console.log(dateReceived);
     const dateString = req.query.date;
-    // console.log(dateReceived);
+
     const dateReceived = new Date(dateString);
 
     const year = dateReceived.getFullYear();
-    const month = String(dateReceived.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
+    const month = String(dateReceived.getMonth() + 1).padStart(2, '0');
     const day = String(dateReceived.getDate()).padStart(2, '0');
 
     const formattedDate = `${year}-${month}-${day}`;
+    const queryFrom = `SELECT station_name from station WHERE LOWER(station_name) LIKE LOWER($1);`
 
-    console.log(formattedDate);
+    const queryTo = `SELECT station_name from station WHERE LOWER(station_name) LIKE LOWER($1);`
 
 
+    const fromStation = await db.query(queryFrom, [fromS]); // finding the names of the FROM-TO stations
+    const toStation = await db.query(queryTo, [toS]);
 
-    console.log(fromS);
     const r1 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [fromS.toUpperCase()]);
     const r2 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [toS.toUpperCase()]);
-    console.log(r1.rows[0]);
+
+
     const fromStationId = parseInt(r1.rows[0].station_id);
     const toStationId = parseInt(r2.rows[0].station_id);
-    console.log(fromStationId);
-    console.log(toStationId);
-        const queryforTrain = (`
-        SELECT DISTINCT t.train_id, t.train_name
+
+
+
+    const queryforTrain = (`
+        SELECT DISTINCT t.train_id, t.train_name, tr.route_id
     FROM train t
     JOIN train_routes tr ON t.train_id = tr.train_id
     JOIN route_stations rs_from ON tr.route_id = rs_from.route_id
@@ -107,56 +109,15 @@ app.get("/book/search", async (req, res) => {
     WHERE s_from.station_id = $1
     AND s_to.station_id = $2
     AND rs_from.sequence_number < rs_to.sequence_number;
-        `);
+        `);  // returns the unique train, route pairs
 
-        const resForTrain = await db.query(queryforTrain, [fromStationId, toStationId]);
-        console.log(resForTrain.rows);
-        console.log('////////////');
-        // const trainIds = resForTrain.rows.map(row => row.train_id);
-        const trainIds = resForTrain.rows.map(row => row.train_id);
-        const trainIdsString = trainIds.join(',');
-        console.log(trainIdsString);
+    const trainResults = await db.query(queryforTrain, [fromStationId, toStationId]);
+    const trainIdsSet = new Set(trainResults.rows.map(row => row.train_id));
+    const trainIdsArray = Array.from(trainIdsSet); // returns the unique train ids
+    const trainIdsString = trainIdsArray.join(',');
 
-
-    const query = `
-SELECT DISTINCT tr.route_id, t.train_id, t.train_name
-FROM train t
-JOIN train_routes tr ON t.train_id = tr.train_id
-JOIN route_stations rs_from ON tr.route_id = rs_from.route_id
-JOIN route_stations rs_to ON tr.route_id = rs_to.route_id
-JOIN station s_from ON rs_from.station_id = s_from.station_id
-JOIN station s_to ON rs_to.station_id = s_to.station_id
-WHERE s_from.station_id = $1
-AND s_to.station_id = $2
-AND rs_from.sequence_number < rs_to.sequence_number;`;
-    // const results = await db.query(query, [fromStationId, toStationId]);
-    // // console.log(results);
-    // console.log('....................');
-    // console.log(results.rows);
-    // console.log('....................');
-    // const trainIds = results.rows.map(row => row.train_id);
-    // const trainIdsString = trainIds.join(',');
-
-    const results = await db.query(query, [fromStationId, toStationId]);
-    console.log("TRAINS");
-    console.log(results);
-
-
-
-    // const trainIDs = new Set();
-    
-
-    console.log('....................');
-    // console.log(Object.keys(results2).length);
-    // console.log('Number of rows in results2:', results2.length);
-    // console.log('....................');
-
-    const routeIDSet = new Set();
-    results.rows.forEach(row => routeIDSet.add(row.route_id));
-    const distinctRouteIDs = Array.from(routeIDSet);
-
-    console.log(distinctRouteIDs);
-
+    const routeIDSet = new Set(trainResults.rows.map(row => row.route_id));
+    const distinctRouteIDs = Array.from(routeIDSet);  // returns the unique routes to exist
 
     const query2 = `SELECT 
         t.train_id, 
@@ -176,154 +137,86 @@ AND rs_from.sequence_number < rs_to.sequence_number;`;
         t.train_id IN (${trainIdsString})
         AND f.source = $1        
         AND f.destination = $2 
-     ;`;
+     `;// returns the fares of those trains to go from FROM to TO for each of their classes
 
-    const results2 = await db.query(query2, [fromStationId, toStationId]);
-    console.log(results2.rows);
-
-    // const query2 = `
-    // SELECT DISTINCT tr.route_id, t.train_id, t.train_name
-    // FROM train t
-    // JOIN train_routes tr ON t.train_id = tr.train_id
-    // JOIN route_stations rs_from ON tr.route_id = rs_from.route_id
-    // JOIN route_stations rs_to ON tr.route_id = rs_to.route_id
-    // JOIN station s_from ON rs_from.station_id = s_from.station_id
-    // JOIN station s_to ON rs_to.station_id = s_to.station_id
-    // WHERE s_from.station_id = $1
-    // AND s_to.station_id = $2
-    // AND rs_from.sequence_number < rs_to.sequence_number;`;
-
-
-    // const routeIDs = results2.rows.map(row => row.route_id);
-    // console.log(routeIDs);
-
-    const queryFrom = `SELECT station_name from station
-    WHERE LOWER(station_name) LIKE LOWER($1);`
-
-
-
-    const queryTo = `SELECT station_name from station
-    WHERE LOWER(station_name) LIKE LOWER($1);`
-
-
-
-
-    const fromStation = await db.query(queryFrom, [fromS]);
-    console.log(fromStation);
-    console.log('....................');
-
-    const toStation = await db.query(queryTo, [toS]);
-    console.log(toStation);
-    console.log('....................');
-
-
-    // console.log(results2.rows);
-
-
+    const trainFares = await db.query(query2, [fromStationId, toStationId]);
     const query3 = `
-    WITH RECURSIVE StationSequence AS (
-      SELECT 
-          rs.route_id,
-          rs.station_id,
-          rs.sequence_number,
-          s.station_name
-      FROM 
-          route_stations rs
-      JOIN 
-          station s ON rs.station_id = s.station_id
-      WHERE 
-          rs.route_id = $1
-      UNION ALL
-      SELECT 
-          rs.route_id,
-          rs.station_id,
-          rs.sequence_number,
-          s.station_name
-      FROM 
-          route_stations rs
-      JOIN 
-          StationSequence ss ON rs.route_id = ss.route_id AND rs.sequence_number = ss.sequence_number + 1
-      JOIN 
-          station s ON rs.station_id = s.station_id
+        WITH RECURSIVE StationSequence AS (
+          SELECT 
+              rs.route_id,
+              rs.station_id,
+              rs.sequence_number,
+              s.station_name
+          FROM 
+              route_stations rs
+          JOIN 
+              station s ON rs.station_id = s.station_id
+          WHERE 
+              rs.route_id = $1
+          UNION ALL
+          SELECT 
+              rs.route_id,
+              rs.station_id,
+              rs.sequence_number,
+              s.station_name
+          FROM 
+              route_stations rs
+          JOIN 
+              StationSequence ss ON rs.route_id = ss.route_id AND rs.sequence_number = ss.sequence_number + 1
+          JOIN 
+              station s ON rs.station_id = s.station_id
+
+        )
+
+        SELECT DISTINCT * FROM StationSequence
+        ORDER BY sequence_number;`;   // for a given route_id, extracts the stations and their sequence
+
+    let routeStations = []; // This will hold routeIDs and their stations
+    for (const routeID of distinctRouteIDs) {
+      const result = await db.query(query3, [routeID]);
+      routeStations.push({ routeID: routeID, results: result.rows });
+    }
+    const queryForAvailableSeats = `
+      SELECT sa.seat_id
+      FROM seat_availability sa
+      JOIN seat s ON sa.seat_id = s.seat_id
+      WHERE s.train_id = $1
+      AND s.class_id = $2
+      AND s.route_id = $3
+      AND sa.travel_date = $4
+      AND sa.station_id = ANY($5)
+      AND sa.available = TRUE
+      GROUP BY sa.seat_id
+      HAVING COUNT(DISTINCT sa.station_id) = $6;
+      `;
+    
+    const result4 = [];
+
+    for (const train of trainResults.rows) {  // train_id, train_name, route_id
+      const t_id = train.train_id;
+      const r_id = train.route_id;
+      const t_name = train.train_name;
+      const stations_in_route = routeStations.find(r => r.routeID === r_id).results; // holds the stations
       
-    )
-  
-    SELECT DISTINCT * FROM StationSequence
-    ORDER BY sequence_number;`;
-
-    const results3 = await db.query(query3, [distinctRouteIDs[0]]);
-    console.log("RESULTS3");
-    console.log(results3.rows);
-
-
-    const stations = results3.rows.map(row => row.station_id);
-
-    console.log("STATIONS");
-    console.log(stations);
-    const station_cnt = stations.length;
-    console.log("STATION COUNT");
-    console.log(station_cnt);
-
-    console.log("********************")
-    const v = stations.map((_, index) => `$${index + 2}`).join(',')
-    console.log(v);
-    console.log("********************")
-
-    const query4 = `
-    SELECT 
-        t.train_id, 
-        t.train_name, 
-        c.class_name,
-        c.class_id,
-        f.fare,
-        (
-            SELECT COUNT(*)
-            FROM (
-                SELECT s.seat_id
-                FROM seat s
-                INNER JOIN seat_availability sa ON s.seat_id = sa.seat_id
-                INNER JOIN station st ON sa.station_id = st.station_id
-                WHERE s.train_id = t.train_id
-                AND s.class_id = tc.class_id
-                AND sa.travel_date = $1
-                AND sa.available = TRUE
-                AND st.station_id IN (${stations.map((_, index) => `$${index + 2}`).join(',')})
-                GROUP BY s.seat_id
-                HAVING COUNT(*) = $${stations.length + 2}
-            ) AS seat_count
-        ) AS available_seats_count
-    FROM 
-        train t
-    JOIN 
-        train_class tc ON t.train_id = tc.train_id
-    JOIN 
-        class c ON tc.class_id = c.class_id
-    JOIN 
-        fareList f ON c.class_id = f.class_id
-    WHERE 
-        t.train_id IN (${trainIdsString})
-        AND f.source = $${stations.length + 3}        
-        AND f.destination = $${stations.length + 4};
-    `;
-
-    console.log(" " + dateReceived + " " + stations + " " + station_cnt + " " + fromStationId + " " + toStationId);
-
-    const values = [dateReceived, ...stations, station_cnt, fromStationId, toStationId];
-    const results4 = await db.query(query4, values);
-    console.log("RESULTS4");
-    console.log(results4.rows);
-
+      const classes = await db.query('SELECT class_id FROM train_class where train_id= $1', [t_id]);
+      for (const c of classes.rows) {
+        const class_id = c.class_id;
+        const result2 = await db.query(queryForAvailableSeats, [t_id, class_id, r_id, formattedDate, stations_in_route.map(s => s.station_id), stations_in_route.length]);
+        console.log(result2.rows.length);
+        result4.push({ train_id: t_id, route_id:r_id, class_id: class_id, available_seats_count: result2.rows.length, available_seats: result2.rows.seat_id });
+      }
+     
+    }
 
 
     res.status(200).json({
       status: "success",
       data: {
-        // result: results.rows,  // returns the trains
-        result : resForTrain.rows,
-        result2: results2.rows,  // 
+        result: trainResults.rows,
+        result2: trainFares.rows,  
         from: fromStation.rows,
         to: toStation.rows,
-        info: results4.rows
+        info: result4
       },
     });
   } catch (error) {
@@ -384,11 +277,7 @@ app.get("/trains/:id", async (req, res) => {
 
   try {
     const trainID = parseInt(req.params.id);
-    // const results = await db.query(
-    // 'SELECT (SELECT s.station_name FROM station s WHERE s.station_id = q.station_id) AS station_name, q.arrival, q.departure, (SELECT t.train_name from train t where t.train_id= q.train_id) as train_name FROM schedule q WHERE q.train_id = $1 ORDER BY q.sequence',
-    // [trainID]
-    // );
-
+    
     const results = await db.query(`SELECT 
       tr.train_id,
       tr.train_name,
