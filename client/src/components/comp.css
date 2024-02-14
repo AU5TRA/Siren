@@ -42,7 +42,7 @@ button {
 .drop-down-from {
   position: absolute;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #e2d0d0;
+  background-color: #d4bf79;
   max-height: 150px;
   overflow-y: auto;
   width: 300px;
@@ -54,7 +54,7 @@ button {
 .drop-down-to {
   position: absolute;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #e2d0d0;
+  background-color: #d4bf79;
   max-height: 150px;
   overflow-y: auto;
   width: 300px;
@@ -152,8 +152,24 @@ button {
   font-weight: bold;
 }
 
+.button{
+  padding: 10px 15px;
+  font-size: 20px;
+  background-color: #0e360e;
+  color: #f1f1f1;
+  cursor: pointer;
+  border: none;
+  border-radius: 100px;
 
-/*for the cards*/
+}
+.button:hover {
+  background-color: #1a521b;
+  /* Green background on hover */
+  color: white;
+  /* White text on hover */
+  cursor: pointer;
+  text-decoration: none;
+}
 
 .class-cards-container {
   display: flex;
