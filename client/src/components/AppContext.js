@@ -3,27 +3,34 @@ import React, { createContext, useState, useContext } from 'react';
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [token, setToken] = useState(null);
   const [name, setName] = useState(null);
-
-  const loginUser = (userData) => {
-    setUser(userData);
-    setToken(userData.token); // Assuming the token is within the userData object
-    setName(userData.name); // Assuming the name is within the userData object
-  };
-
-  const logoutUser = () => {
-    setUser(null);
-    setToken(null);
-    setName(null);
-  };
-
+  const [loginState, setLoginState] = useState(false);
+  const [fromStationSearch, setFromStationSearch] = useState(null);
+  const [toStationSearch, setToStationSearch] = useState(null);
+  const [dates, setDates] = useState(null);
   return (
-    <AppContext.Provider value={{ user, token, name, loginUser, logoutUser }}>
+    <AppContext.Provider value=
+    {{
+      userId,
+      setUserId,
+      token,
+      setToken,
+      name,
+      setName,
+      loginState,
+      setLoginState,
+      fromStationSearch,
+      setFromStationSearch,
+      toStationSearch,
+      setToStationSearch,
+      dates,
+      setDates
+    }}>
       {children}
     </AppContext.Provider>
   );
 };
 
-export const useAppContext = () => useContext(AppContext);
+export const useData = () => useContext(AppContext);

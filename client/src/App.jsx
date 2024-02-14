@@ -15,6 +15,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import NavBar from './components/NavBar';
 import NavBar2 from './components/NavBar2';
 import './components/App.css';
+import { AppProvider } from './components/AppContext';
 
 const App = () => {
     const [isAuthenticated, setAuthenticated] = useState(false);
@@ -39,6 +40,7 @@ const App = () => {
 
     return (
         <div className="container">
+            <AppProvider>
             <Router>
                 <NavBar/>
                 <Routes>
@@ -54,6 +56,7 @@ const App = () => {
                     <Route path="/review" element={<ReviewPage />} />
                 </Routes>
             </Router>
+            </AppProvider>
         </div>
     );
 };
