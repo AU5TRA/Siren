@@ -206,7 +206,8 @@ const SearchTravel = () => {
                 style={{ cursor: 'pointer', padding: '10px', marginBottom: '5px' }}
                 onClick={() => handleTrainClick(train)}
               >
-                <div><h4> {train.train_id} <span style={{ margin: '0 25px' }}></span>  {train.train_name}</h4>Route: {train.route_id}</div>
+              <div><h4> {train.train_id} <span style={{ margin: '0 25px' }}></span>  {train.train_name}</h4><Link to={`/train/${train.train_id}`} >Route: {train.route_id}</Link>
+              </div>
                 
               </div>
               {selectedTrain === train && (
@@ -221,6 +222,8 @@ const SearchTravel = () => {
                           <div>{f.class_name}<span style={{ margin: '0 25px' }}></span>  <ReviewButton trainId={train.train_id} classId={f.class_id} /></div>
                           <div><strong>Fare:</strong> {f.fare} Tk.</div>
                           <div><strong>Seat Count:</strong> {availableSeatsCount}</div>
+                          <div><center><Link to={`/trains/${train.train_id}/class/${f.class_id}`} className="button">Book Now</Link></center></div>
+
                         </div>
                       );
                     })}
