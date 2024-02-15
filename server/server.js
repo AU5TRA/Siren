@@ -178,7 +178,9 @@ app.get("/book/search", async (req, res) => {
       routeStations.push({ routeID: routeID, results: result.rows });
     }
     const queryForAvailableSeats = `
-      SELECT sa.seat_id
+      SELECT CAST(seat_number AS INTEGER) AS seat_number
+FROM (
+SELECT sa.seat_id
       FROM seat_availability sa
       JOIN seat s ON sa.seat_id = s.seat_id
       WHERE s.train_id = $1
@@ -188,7 +190,9 @@ app.get("/book/search", async (req, res) => {
       AND sa.station_id = ANY($5)
       AND sa.available = TRUE
       GROUP BY sa.seat_id
-      HAVING COUNT(DISTINCT sa.station_id) = $6;
+      HAVING COUNT(DISTINCT sa.station_id) = $6
+) AS seats
+ORDER BY CAST(seat_number AS INTEGER);
       `;
 
     const result4 = [];
