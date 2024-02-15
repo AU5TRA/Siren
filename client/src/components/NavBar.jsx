@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { BsCart2 } from "react-icons/bs";
 import { BsFillTrainFreightFrontFill } from "react-icons/bs";
 import { Link } from 'react-router-dom';
@@ -21,9 +21,20 @@ import { useNavigate } from 'react-router-dom';
 import './App.css';
 import { BsFillPersonFill } from "react-icons/bs";
 import { useData } from './AppContext';
-const NavBar = () => {
-  const { loginState, name, userId } = useData();
-  
+const NavBar = ({isAuthenticated, name1, id1}) => {
+  const { loginState, name, userId , setLoginState} = useData();
+  console.log(isAuthenticated+".----------------.");
+  console.log('name: '+ name);
+
+  // useEffect(() => {
+  //   setLoginState(isAuthenticated);
+  // }, [isAuthenticated]);
+
+
+  // const [n, setN]= useState(false);
+  // const[i, setI]= useState(false);
+  // setN(localStorage.getItem("name"));
+  // setI(localStorage.getItem("userId"));
   return (
     <nav>
       

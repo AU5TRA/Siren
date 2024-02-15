@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useData } from './AppContext';
-
+import { Link } from 'react-router-dom';
 const ShowUser = () => {
   const modalRef = React.createRef();
   const navigate = useNavigate();
@@ -18,11 +18,15 @@ const ShowUser = () => {
   const [date_of_birth, setDOB] = useState('');
   const [birth_registration_number, setBirthReg] = useState('');
   useEffect(() => {
-    if (!loginState || userId.toString() !== id) {
+    if (!loginState  || userId === null  || userId.toString() !== id ) {
       
-      navigate(`/`);
-      console.log(userId+"......"+id);
-      return;
+      // navigate(`/`);
+      // // console.log(userId+"......"+id);
+      // return
+      // ;
+      <Fragment>
+        <div><Link to = {`/`}></Link></div>
+      </Fragment>
     }
     const fetchUserData = async () => {
       try {

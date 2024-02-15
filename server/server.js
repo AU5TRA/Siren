@@ -11,15 +11,15 @@ app.use(cors());
 
 
 
-// app.get("/is-verify", authorization, async (req, res) => {
-//   try {
-//     console.log("aurthorization successful")
-//       res.json(true);
-//   } catch (err) {
-//       console.log(err.message);
-//       res.status(500).json("Server Error");
-//   }
-// });
+app.get("/is-verify", authorization, async (req, res) => {
+  try {
+    console.log("aurthorization successful")
+      res.json(true);
+  } catch (err) {
+      console.log(err.message);
+      res.status(500).json("Server Error");
+  }
+});
 
 
 // review

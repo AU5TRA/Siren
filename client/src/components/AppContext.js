@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+
 
 const AppContext = createContext();
 
@@ -10,6 +11,19 @@ export const AppProvider = ({ children }) => {
   const [fromStationSearch, setFromStationSearch] = useState(null);
   const [toStationSearch, setToStationSearch] = useState(null);
   const [dates, setDates] = useState(null);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      const ID= localStorage.getItem("userId");
+      const NAME= localStorage.getItem("name");
+      setUserId(ID); 
+      setName(NAME); 
+      setLoginState(true);
+    }
+  }, []);
+
+
   return (
     <AppContext.Provider value=
     {{
