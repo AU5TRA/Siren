@@ -37,13 +37,7 @@ const NavBar = ({isAuthenticated, name1, id1}) => {
   // setI(localStorage.getItem("userId"));
   return (
     <nav>
-<<<<<<< HEAD
-      <div className="nav-logo-container">
-        <img src={"/siren_logo.png"} alt="" />
-      </div>
-=======
       
->>>>>>> abdd8929f4c92f1fc0e9645eee5326077e25d6ae
       <div className="navbar-links-container">
 
         <img src={"/siren_logo.png"} alt="" />
@@ -59,7 +53,6 @@ const NavBar = ({isAuthenticated, name1, id1}) => {
           <Link to={`/users/login`} className="primary-button">Login</Link>
         )}
       </div>
-
     </nav>
   )
 }
