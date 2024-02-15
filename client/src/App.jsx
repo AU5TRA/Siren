@@ -34,7 +34,7 @@ const App = () => {
             try {
                 const response = await fetch("http://localhost:3001/is-verify", {
                     method: "GET",
-                    headers: { jwt_token: localStorage.getItem("token") }
+                    headers: { jwt_token: localStorage.getItem("token") || "" }
 
                 });
                 const parseRes = await response.json();

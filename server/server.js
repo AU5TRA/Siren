@@ -13,11 +13,12 @@ app.use(cors());
 
 app.get("/is-verify", authorization, async (req, res) => {
   try {
-    console.log("aurthorization successful")
-      res.json(true);
+    console.log("-----------------");
+    console.log("aurthorization successful");
+    res.json(true);
   } catch (err) {
-      console.log(err.message);
-      res.status(500).json("Server Error");
+    console.log(err.message);
+    res.status(500).json("Server Error");
   }
 });
 
@@ -192,6 +193,8 @@ app.get("/book/search", async (req, res) => {
 
     const result4 = [];
 
+
+
     for (const train of trainResults.rows) {  // train_id, train_name, route_id
       const t_id = train.train_id;
       const r_id = train.route_id;
@@ -203,12 +206,18 @@ app.get("/book/search", async (req, res) => {
         const class_id = c.class_id;
         const result2 = await db.query(queryForAvailableSeats, [t_id, class_id, r_id, formattedDate, stations_in_route.map(s => s.station_id), stations_in_route.length]);
         // console.log(result2.rows.length);
+        // console.log("---------------");
+        const availableSeats = [];
+        for (const r of result2.rows) {
+          availableSeats.push(r.seat_id);
+        }
 
-        result4.push({ train_id: t_id, route_id: r_id, class_id: class_id, available_seats_count: result2.rows.length, available_seats: result2.rows.seat_id });
+        // console.log(result2.rows[0].seat_id + " " + result2.rows[1].seat_id);
+
+        result4.push({ train_id: t_id, route_id: r_id, class_id: class_id, available_seats_count: result2.rows.length, available_seats: availableSeats });
       }
 
     }
-    console.log("---------------");
 
     console.log(result4);
 
