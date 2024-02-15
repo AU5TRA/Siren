@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useAsyncError } from "react-router-dom";
 import HomePage from './routes/homepage'; // Ensure the import names match the file exports
 import LoginPage from './routes/loginPage';
 import UpdateUserInfo from './routes/updateUserInfo';
@@ -15,9 +15,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import NavBar from './components/NavBar';
 import NavBar2 from './components/NavBar2';
 import './components/App.css';
+import { AppProvider } from './components/AppContext';
 
 const App = () => {
     const [isAuthenticated, setAuthenticated] = useState(false);
+    const [name1, setName1]= useState("prof");
+    const [id1, setId1]= useState(0);
+    const setAuth = boolean => {
+        setAuthenticated(boolean);
+        setName1(localStorage.getItem("name"));
+        setId1(localStorage.getItem("userId"));
+        console.log("....."+ id1+".........."+name1+".........."+isAuthenticated+"..........");
+    
+      }
 
     useEffect(() => {
         const isAuth = async () => {
@@ -37,13 +47,15 @@ const App = () => {
         isAuth();
     }, []);
 
+    console.log(isAuthenticated+"....................");
     return (
         <div className="container">
+            <AppProvider>
             <Router>
-                <NavBar/>
+                <NavBar isAuthenticated= {isAuthenticated} name1={name1} id1= {id1}/>
                 <Routes>
                     <Route path="/" element={ <HomePage />} />
-                    <Route path="/users/login" element={<LoginPage />} />
+                    <Route path="/users/login" element={<LoginPage setAuth= {setAuth}/>} />
                     <Route path="/users/:id/update" element={<UpdateUserInfo />} />
                     <Route path="/users/:id" element={<ShowUserInfo />} />
                     <Route path="/users" element={<AddUserInfo />} />
@@ -54,6 +66,7 @@ const App = () => {
                     <Route path="/review" element={<ReviewPage />} />
                 </Routes>
             </Router>
+            </AppProvider>
         </div>
     );
 };

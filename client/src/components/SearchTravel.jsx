@@ -3,21 +3,35 @@ import { Link } from 'react-router-dom';
 import './comp.css'
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import {useData} from './AppContext';
+
 
 const SearchTravel = () => {
-  const [inputValueFrom, setInputValueFrom] = useState('');
-  const [inputValueTo, setInputValueTo] = useState('');
+  const {dates, setDates, fromStationSearch, setFromStationSearch, toStationSearch, setToStationSearch} = useData();
+
+
+
+  const [inputValueFrom, setInputValueFrom] = useState(fromStationSearch  || '');
+  const [inputValueTo, setInputValueTo] = useState(toStationSearch || '');
+  const [dateSearched, setDate] = useState(dates)
+
+
   const [trains, setTrains] = useState([]);
   const [fares, setFare] = useState([]);
   const [selectedTrain, setSelectedTrain] = useState(null);
   const [searchClicked, setSearchClicked] = useState(false);
-  const [dateSearched, setDate] = useState(null)
+  
   const [inputValue, setInputValue] = useState('');
   const [suggestionsFrom, setSuggestionsFrom] = useState([]);
   const [selectedSuggestionFrom, setSelectedSuggestionFrom] = useState(null);
   const [suggestionsTo, setSuggestionsTo] = useState([]);
   const [selectedSuggestionTo, setSelectedSuggestionTo] = useState([]);
   const [seat, setSeat] = useState([]);
+  useEffect(() => {
+    if (inputValueFrom) {
+      onSearchFunc();
+    }
+  }, []);
 
   const onChangeFrom = async (e) => {
     const value = e.target.value;
@@ -32,10 +46,6 @@ const SearchTravel = () => {
 
       const res = await response.json();
       const received = res.data.result;
-
-      // console.log(received);
-      // const allInfo = res.data;
-      // console.log(allInfo);
       if (Array.isArray(received)) {
         setSuggestionsFrom(received.map((item) => item.station_name));
       } else {
@@ -91,6 +101,9 @@ const SearchTravel = () => {
 
   const onSearchFunc = async () => {
     try {
+      setDates(dateSearched);
+      setFromStationSearch(inputValueFrom);
+      setToStationSearch(inputValueTo);
       setSearchClicked(true);
       const response = await fetch(
         `http://localhost:3001/book/search?from=${inputValueFrom}&to=${inputValueTo}&date=${dateSearched}`,
@@ -98,6 +111,7 @@ const SearchTravel = () => {
           method: 'GET',
         }
       );
+      
 
       const res = await response.json();
       console.log(res.data.result + "  " + res.data.result2 + "  " + res.data.info + "  " + res.data.from + "  " + res.data.to);
@@ -188,7 +202,7 @@ const SearchTravel = () => {
           {/* <input type="text" className='form-control' placeholder='Date of birth' value={date_of_birth} onChange={e => setDob(e.target.value)} /> */}
           {/* <DatePicker selected={date_of_birth} onChange={(e) => setDob(e.target.value)} /> */}
           <label htmlFor="from" className="label">Pick Date: </label>
-          <DatePicker wrapperClassName="datePicker2" placeholderText='Date of Journey'
+          <DatePicker wrapperClassName="datePicker" className='form-control' placeholderText='Date of Journey'
             showIcon
             selected={dateSearched}
             onChange={(date) => setDate(date)}

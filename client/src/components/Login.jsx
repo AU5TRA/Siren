@@ -1,13 +1,14 @@
 import React, { Fragment, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useAppContext } from './AppContext';
+import { useData } from './AppContext';
 import './login.css';
 
 const Login = ({ setAuth }) => {
 
     const navigate = useNavigate();
-    //const { loginUser } = useAppContext(); 
+    const{loginState, setLoginState, setUserId, setName} = useData();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showMessage, setShowMessage] = useState('');
@@ -27,11 +28,16 @@ const Login = ({ setAuth }) => {
             setShowMessage(json.message);
             setModalOpen(true);
             console.log(json.status);
+            
+            setLoginState(true);
+            setUserId(json.data.result[0].user_id);
+            setName(json.data.result[0].last_name);
 
             if (json.status === "success") {
                 localStorage.setItem("token", json.data.res);
                 localStorage.setItem("userId", json.data.result[0].user_id);
                 localStorage.setItem("name", json.data.result[0].last_name);
+                
                 console.log(json.data.res);
                 // console.log(localStorage.getItem);
                 setAuth(true);
@@ -77,7 +83,7 @@ const Login = ({ setAuth }) => {
         <Fragment>
             <header className="header">
                 <div className="logo">
-                    <img src="../../siren_home.png" style={{ width: '150px', height: '50px', marginLeft: '10px' }} />
+                    <img src="/siren_home.png" style={{ width: '150px', height: '50px', marginLeft: '10px' }} />
                 </div>
             </header>
             <div className="login-form-container">

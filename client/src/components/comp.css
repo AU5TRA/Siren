@@ -222,4 +222,14 @@ button {
   margin-right: 10px; 
   height: 42px;
   border-radius: 5px; 
+  
+}
+
+.react-datepicker__day--selected {
+  background-color: #1a521b; 
+}
+
+
+.react-datepicker__day--today {
+  background-color: #d9d08f; 
 }
