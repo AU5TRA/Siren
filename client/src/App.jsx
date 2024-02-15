@@ -11,7 +11,7 @@ import SearchTrainInfo from './routes/searchTrainInfo';
 import ReviewPage from './routes/reviewPage';
 import BookTrain from './routes/bookTrain';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import NavBar from './components/NavBar';
 import NavBar2 from './components/NavBar2';
 import './components/App.css';

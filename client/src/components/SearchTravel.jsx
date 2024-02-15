@@ -32,6 +32,7 @@ const SearchTravel = () => {
 
       const res = await response.json();
       const received = res.data.result;
+
       // console.log(received);
       // const allInfo = res.data;
       // console.log(allInfo);
@@ -55,11 +56,17 @@ const SearchTravel = () => {
 
       const res = await response.json();
       const r = res.data.info;
-      console.log(r);
+      // const res2 = JSON.stringify(r.available_seats);
+      // console.log(r);
       const received = res.data.result;
       // console.log(received);
       const allInfo = res.data.info;
-      console.log(allInfo);
+      // console.log(allInfo.available_seats);
+      // console.log(res2);
+      r.forEach(item => {
+        console.log(item.available_seats);
+      });
+
       if (Array.isArray(received)) {
         setSuggestionsTo(received.map((item) => item.station_name));
       } else {
@@ -181,7 +188,7 @@ const SearchTravel = () => {
           {/* <input type="text" className='form-control' placeholder='Date of birth' value={date_of_birth} onChange={e => setDob(e.target.value)} /> */}
           {/* <DatePicker selected={date_of_birth} onChange={(e) => setDob(e.target.value)} /> */}
           <label htmlFor="from" className="label">Pick Date: </label>
-          <DatePicker wrapperClassName="datePicker" className='form-control' placeholderText='Date of Journey'
+          <DatePicker wrapperClassName="datePicker2" placeholderText='Date of Journey'
             showIcon
             selected={dateSearched}
             onChange={(date) => setDate(date)}
@@ -206,9 +213,9 @@ const SearchTravel = () => {
                 style={{ cursor: 'pointer', padding: '10px', marginBottom: '5px' }}
                 onClick={() => handleTrainClick(train)}
               >
-              <div><h4> {train.train_id} <span style={{ margin: '0 25px' }}></span>  {train.train_name}</h4><Link to={`/train/${train.train_id}`} >Route: {train.route_id}</Link>
-              </div>
-                
+                <div><h4> {train.train_id} <span style={{ margin: '0 25px' }}></span>  {train.train_name}</h4><Link to={`/train/${train.train_id}`} >Route: {train.route_id}</Link>
+                </div>
+
               </div>
               {selectedTrain === train && (
                 <div className="class-cards-container">
@@ -216,14 +223,14 @@ const SearchTravel = () => {
                     .filter(f => f.train_id === train.train_id)
                     .map((f, index) => {
                       const seatInfo = seat.find(seatInfo => seatInfo.train_id === train.train_id && seatInfo.class_id === f.class_id);
-                      const availableSeatsCount = seatInfo ? seatInfo.available_seats_count : 0; 
+                      const availableSeatsCount = seatInfo ? seatInfo.available_seats_count : 0;
                       return (
                         <div key={index} className="class-card">
                           <div>{f.class_name}<span style={{ margin: '0 25px' }}></span>  <ReviewButton trainId={train.train_id} classId={f.class_id} /></div>
                           <div><strong>Fare:</strong> {f.fare} Tk.</div>
                           <div><strong>Seat Count:</strong> {availableSeatsCount}</div>
-                          <div><center><Link to={`/trains/${train.train_id}/class/${f.class_id}`} className="button">Book Now</Link></center></div>
-
+                          {/* <div><center><Link to={`/trains/${train.train_id}/class/${f.class_id}`} className="button">Book Now</Link></center></div> */}
+                          <div><center><button className='bookButton'>book now</button></center></div>
                         </div>
                       );
                     })}

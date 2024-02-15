@@ -54,7 +54,7 @@ const NavBar2 = () => {
     return (
         <nav>
             <div className="nav-logo-container">
-                <img src={"C:\\Users\\ASUS\\Desktop\\siren\\Siren\\client\\public\\siren_home.png"} alt="" />
+                <img src={"/siren_home.png"} alt="" />
             </div>
             <div className="navbar-links-container">
                 <a href="">Home</a>

@@ -189,7 +189,7 @@ app.get("/book/search", async (req, res) => {
       GROUP BY sa.seat_id
       HAVING COUNT(DISTINCT sa.station_id) = $6;
       `;
-    
+
     const result4 = [];
 
     for (const train of trainResults.rows) {  // train_id, train_name, route_id
@@ -197,23 +197,27 @@ app.get("/book/search", async (req, res) => {
       const r_id = train.route_id;
       const t_name = train.train_name;
       const stations_in_route = routeStations.find(r => r.routeID === r_id).results; // holds the stations
-      
+
       const classes = await db.query('SELECT class_id FROM train_class where train_id= $1', [t_id]);
       for (const c of classes.rows) {
         const class_id = c.class_id;
         const result2 = await db.query(queryForAvailableSeats, [t_id, class_id, r_id, formattedDate, stations_in_route.map(s => s.station_id), stations_in_route.length]);
-        console.log(result2.rows.length);
-        result4.push({ train_id: t_id, route_id:r_id, class_id: class_id, available_seats_count: result2.rows.length, available_seats: result2.rows.seat_id });
+        // console.log(result2.rows.length);
+
+        result4.push({ train_id: t_id, route_id: r_id, class_id: class_id, available_seats_count: result2.rows.length, available_seats: result2.rows.seat_id });
       }
-     
+
     }
+    console.log("---------------");
+
+    console.log(result4);
 
 
     res.status(200).json({
       status: "success",
       data: {
         result: trainResults.rows,
-        result2: trainFares.rows,  
+        result2: trainFares.rows,
         from: fromStation.rows,
         to: toStation.rows,
         info: result4
@@ -277,7 +281,7 @@ app.get("/trains/:id", async (req, res) => {
 
   try {
     const trainID = parseInt(req.params.id);
-    
+
     const results = await db.query(`SELECT 
       tr.train_id,
       tr.train_name,

@@ -26,7 +26,7 @@ const NavBar = () => {
   return (
     <nav>
       <div className="nav-logo-container">
-        <img src={"C:\\Users\\ASUS\\Desktop\\siren\\Siren\\client\\public\\siren_home.png"} alt="" />
+        <img src={"/siren_logo.png"} alt="" />
       </div>
       <div className="navbar-links-container">
         <Link to={`/`} className="primary-button">Home</Link>
