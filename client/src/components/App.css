@@ -49,12 +49,15 @@
     cursor: pointer;
     font-weight: 600;
     transition: 0.2s;
+    text-decoration: none;
   }
   .navbar-train-icon {
     font-size: 1.5rem;
   }
   .primary-button:hover {
     background-color: rgb(234, 234, 234);
+    text-decoration: none;
+    color: #267326;
   }
   .navbar-menu-container svg {
     font-size: 1.5rem;
@@ -97,7 +100,7 @@
   }
   .secondary-button {
     padding: 1rem 2.5rem;
-    background-color: #fe9e0d;
+    background-color: #fcc200;
     outline: none;
     border: none;
     border-radius: 5rem;
@@ -109,14 +112,44 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    text-decoration: none;
   }
   .secondary-button svg {
     margin-left: 0.75rem;
     font-size: 1.5rem;
   }
   .secondary-button:hover {
-    background-color: #e48f0f;
+    background-color: #DAA520;
+    text-decoration: none;
   }
+
+  .secondary-button2 {
+    padding: 1rem 2.5rem;
+    background-color: #0e360e;
+    outline: none;
+    border: none;
+    border-radius: 5rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: white;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+  .secondary-button2 svg {
+    margin-left: 0.75rem;
+    font-size: 1.5rem;
+  }
+  .secondary-button2:hover {
+    background-color: #1a5e1a;
+    text-decoration: none;
+  }
+
+
+
   .about-section-container {
     margin-top: 20rem;
     position: relative;

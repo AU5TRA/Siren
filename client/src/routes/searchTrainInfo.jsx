@@ -5,7 +5,7 @@ import Header from '../components/Header'
 const searchTrainInfo = () => {
   return (
     <div>
-        <center><Header/></center>
+        {/* <center><Header/></center> */}
         <SearchTrain/>
     </div>
   )

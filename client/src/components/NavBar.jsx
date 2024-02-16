@@ -36,12 +36,11 @@ const NavBar = ({isAuthenticated, name1, id1}) => {
   // setN(localStorage.getItem("name"));
   // setI(localStorage.getItem("userId"));
   return (
-    <nav>
+    <nav >
       
-      <div className="navbar-links-container">
+      <div className="navbar-links-container" >
 
-        <img src={"/siren_logo.png"} alt="" />
-        <span style={{ margin: '0 160px' }}></span> 
+        
         <Link to={`/`} className="primary-button">Home</Link>
 
         <Link to={`/about`} className="primary-button">About</Link>
@@ -52,6 +51,9 @@ const NavBar = ({isAuthenticated, name1, id1}) => {
         ) : (
           <Link to={`/users/login`} className="primary-button">Login</Link>
         )}
+        <span style={{ margin: '0 160px' }}></span> 
+        <img src={"/siren_logo.png"} alt="" style={{marginTop:'20px'}}/>
+        
       </div>
     </nav>
   )
