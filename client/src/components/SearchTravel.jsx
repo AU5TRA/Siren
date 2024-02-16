@@ -1,8 +1,9 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link, json } from 'react-router-dom';
 import './comp.css'
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+
+import DatePicker from 'react-datepicker';
 import { useData } from './AppContext';
 
 
@@ -250,7 +251,7 @@ const SearchTravel = () => {
         </div>
         <div className="input-container" >
           <label htmlFor="from" className="label">Pick Date: </label>
-          <DatePicker wrapperClassName="datePicker" className='form-control' placeholderText='Date of Journey'
+          <DatePicker wrapperClassName="datePicker"  placeholderText='Date of Journey'
             showIcon
             selected={dateSearched}
             onChange={(date) => setDate(date)}
