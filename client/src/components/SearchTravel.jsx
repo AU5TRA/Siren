@@ -34,7 +34,6 @@ const SearchTravel = () => {
   const [suggestionsTo, setSuggestionsTo] = useState([]);
   const [selectedSuggestionTo, setSelectedSuggestionTo] = useState([]);
   const [seat, setSeat] = useState([]);
-  const [availableSeat, setAvailableSeat] = useState([]);
 
   const [availableSeatsMap, setAvailableSeatsMap] = useState({});
 
@@ -57,6 +56,8 @@ const SearchTravel = () => {
 
       const res = await response.json();
       const received = res.data.result;
+      console.log("----------------");
+      console.log(received);
       if (Array.isArray(received)) {
         setSuggestionsFrom(received.map((item) => item.station_name));
       } else {
@@ -83,7 +84,7 @@ const SearchTravel = () => {
 
       if (Array.isArray(received)) {
         setSuggestionsTo(received.map((item) => item.station_name));
-        // setAvailableSeat(received2.map((item) => item.available_seats));
+
 
       }
       else {
@@ -134,26 +135,6 @@ const SearchTravel = () => {
         setTrains(received);
         setFare(received2);
         setSeat(allInfo);
-        // setAvailableSeat(av_seat);
-        // setAvailableSeat(allInfo.map((item) => item.available_seats));
-
-        // console.log(availableSeat);
-
-        // const availableSeatsMap = {};
-        // allInfo.forEach(info => {
-        //   const { train_id, route_id, class_id, available_seats } = info;
-        //   const key = `${train_id}_${route_id}_${class_id}`;
-        //   if (!availableSeatsMap[key]) {
-        //     availableSeatsMap[key] = available_seats;
-        //   } else {
-        //     availableSeatsMap[key] = availableSeatsMap[key].concat(available_seats);
-        //   }
-        // });
-
-
-
-        // setAvailableSeatsMap(availableSeatsMap);
-        // console.log(availableSeatsMap);
 
         const availableSeatsMap = {};
 
@@ -279,40 +260,13 @@ const SearchTravel = () => {
                 </div>
 
               </div>
-
-              {/* {selectedTrain === train && (
-                <div className="class-cards-container">
-                  {fares
-                    .filter(f => f.train_id === train.train_id)
-                    .map((f, index) => {
-                      const seatInfo = seat.find(seatInfo => seatInfo.train_id === train.train_id && seatInfo.class_id === f.class_id);
-                      const availableSeatsCount = seatInfo ? seatInfo.available_seats_count : 0;
-                      return (
-                        <div key={index} className="class-card">
-                          <div>{f.class_name}<span style={{ margin: '0 25px' }}></span>  <ReviewButton trainId={train.train_id} classId={f.class_id} /></div>
-                          <div><strong>Fare:</strong> {f.fare} Tk.</div>
-                          <div><strong>Seat Count:</strong> {availableSeatsCount}</div>
-                          <div><center><button onClick={() => handleBookNow(train.train_id, f.class_id)} className='bookButton'>book now</button></center></div>
-                          {selectedTrainId === train.train_id && selectedClassId === f.class_id && availableSeat[index] && (
-                            <div>
-                              {availableSeat[index].map((seat, idx) => (
-                                <span key={idx}>{seat} </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                </div>
-              )} */}
-
               {selectedTrain === train && (
                 <div className="class-cards-container">
                   {fares
                     .filter((f) => f.train_id === train.train_id)
                     .map((f, index) => {
                       const key = `${train.train_id}_${train.route_id}_${f.class_id}`;
-                      const availableSeats = availableSeatsMap[key] || []; // Default to empty array if no data found
+                      const availableSeats = availableSeatsMap[key] || [];
                       const availableSeatsCount = availableSeats.length;
 
                       return (

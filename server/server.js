@@ -72,8 +72,12 @@ app.get("/book/station/search", async (req, res) => {
 app.get("/book/search", async (req, res) => {
   try {
     const fromS = req.query.from;
+    console.log(fromS);
     const toS = req.query.to;
+    console.log(toS);
+    console.log("******");
     const dateString = req.query.date;
+
 
     const dateReceived = new Date(dateString);
 
@@ -178,7 +182,7 @@ app.get("/book/search", async (req, res) => {
       routeStations.push({ routeID: routeID, results: result.rows });
     }
     const queryForAvailableSeats = `
-      SELECT sa.seat_id
+      SELECT sa.seat_id 
       FROM seat_availability sa
       JOIN seat s ON sa.seat_id = s.seat_id
       WHERE s.train_id = $1
