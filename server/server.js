@@ -185,7 +185,13 @@ app.get("/book/search", async (req, res) => {
 
     const queryForAvailableSeats = `
 <<<<<<< HEAD
+<<<<<<< HEAD
       SELECT sa.seat_id 
+=======
+      SELECT CAST(seat_number AS INTEGER) AS seat_number
+FROM (
+SELECT s.seat_number
+>>>>>>> b0ccb5c031a3efbe86dbdb2c96bed73043ef7806
 =======
       SELECT CAST(seat_number AS INTEGER) AS seat_number
 FROM (
