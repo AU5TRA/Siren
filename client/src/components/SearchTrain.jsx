@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import {Link} from 'react-router-dom';
+import './comp.css';
 
 const TrainInfo = () => {
     const [trains, setTrains] = useState([]);
@@ -46,13 +47,16 @@ const TrainInfo = () => {
     return (
         <Fragment>
             <div>
+                
+                <div style={{marginTop:'40px'}}><h4>Select Your Preferred Train:</h4></div>
                 <label htmlFor="search"></label>
                 <input
                     type="text"
                     id="search"
                     onChange={onChangeFunc} value={inputValue}
                     style={{ width: '300px', marginRight: '10px' }}
-                    placeholder="Search trains"
+                    placeholder="Train Name"
+                    className='search-bar'
                 />
             </div>
             <table className="table mt-5 text-container">

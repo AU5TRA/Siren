@@ -1,8 +1,9 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link, json } from 'react-router-dom';
 import './comp.css'
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import './App.css'
+import DatePicker from 'react-datepicker';
 import { useData } from './AppContext';
 
 
@@ -176,7 +177,11 @@ const SearchTravel = () => {
 
   return (
     <Fragment>
-      <div>
+      
+      
+     
+      <div style={{marginTop:'40px'}}>
+        
         <div className="input-container">
           <label htmlFor="from" className="label">From: </label>
           <input
@@ -191,8 +196,9 @@ const SearchTravel = () => {
               borderRadius: '5px', // Adjust this value to increase or decrease the corner roundness
               border: '2px solid darkgreen' // Specifies the border width, style, and color
             }}
-          />
+          />  
         </div>
+      
         <div className="input-container">
           <label htmlFor="to" className="label">To: </label>
           <input
@@ -231,7 +237,7 @@ const SearchTravel = () => {
         </div>
         <div className="input-container" >
           <label htmlFor="from" className="label">Pick Date: </label>
-          <DatePicker wrapperClassName="datePicker" className='form-control' placeholderText='Date of Journey'
+          <DatePicker className="datePicker2"  placeholderText='Date of Journey'
             showIcon
             selected={dateSearched}
             onChange={(date) => setDate(date)}
@@ -240,7 +246,7 @@ const SearchTravel = () => {
           />
         </div>
 
-        <button onClick={onSearchFunc} className="search-button">search</button>
+        <button onClick={onSearchFunc} className="button">search</button>
         {searchClicked && fares.length === 0 && (
           <div className='not found mt-5'>
             <h5>No trains found !</h5>
@@ -272,18 +278,18 @@ const SearchTravel = () => {
                       return (
                         <div key={index} className="class-card">
                           <div>
-                            <h4>
+                            {/* <h4>
                               {train.train_id}{' '}
                               <span style={{ margin: '0 25px' }}></span> {train.train_name}
-                            </h4>
-                            <Link to={`/train/${train.train_id}`}>Route: {train.route_id}</Link>
+                            </h4> */}
+                            {/* <Link to={`/train/${train.train_id}`}>Route: {train.route_id}</Link> */}
                           </div>
-                          <div>{f.class_name}</div>
+                          <div><strong style={{ fontSize: '24px'}}>{f.class_name}</strong><span style={{ margin: '0 40px' }}></span>  <ReviewButton trainId={train.train_id} classId={f.class_id} /></div>
                           <div><strong>Fare:</strong> {f.fare} Tk.</div>
                           <div><strong>Seat Count:</strong> {availableSeatsCount}</div>
                           <div>
                             <center>
-                              <button onClick={() => handleBookNow(train.train_id, f.class_id, train.route_id)} className='bookButton'>book now</button>
+                              <button onClick={() => handleBookNow(train.train_id, f.class_id, train.route_id)} className='button'>book now</button>
                             </center>
                           </div>
                           {selectedTrainId === train.train_id && selectedClassId === f.class_id && availableSeats.length > 0 && (

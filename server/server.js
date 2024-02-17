@@ -181,8 +181,16 @@ app.get("/book/search", async (req, res) => {
       const result = await db.query(query3, [routeID]);
       routeStations.push({ routeID: routeID, results: result.rows });
     }
+  console.log("m1");
+
     const queryForAvailableSeats = `
+<<<<<<< HEAD
       SELECT sa.seat_id 
+=======
+      SELECT CAST(seat_number AS INTEGER) AS seat_number
+FROM (
+SELECT s.seat_number
+>>>>>>> b0ccb5c031a3efbe86dbdb2c96bed73043ef7806
       FROM seat_availability sa
       JOIN seat s ON sa.seat_id = s.seat_id
       WHERE s.train_id = $1
@@ -191,10 +199,12 @@ app.get("/book/search", async (req, res) => {
       AND sa.travel_date = $4
       AND sa.station_id = ANY($5)
       AND sa.available = TRUE
-      GROUP BY sa.seat_id
-      HAVING COUNT(DISTINCT sa.station_id) = $6;
+      GROUP BY  s.seat_number
+      HAVING COUNT(DISTINCT sa.station_id) = $6
+) AS seats
+ORDER BY CAST(seat_number AS INTEGER);
       `;
-
+  console.log("m2");
     const result4 = [];
 
 
@@ -213,7 +223,7 @@ app.get("/book/search", async (req, res) => {
         // console.log("---------------");
         const availableSeats = [];
         for (const r of result2.rows) {
-          availableSeats.push(r.seat_id);
+          availableSeats.push(r.seat_number);
         }
 
         // console.log(result2.rows[0].seat_id + " " + result2.rows[1].seat_id);
