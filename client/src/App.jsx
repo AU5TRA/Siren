@@ -10,6 +10,7 @@ import RouteDetails from './routes/routeDetails';
 import SearchTrainInfo from './routes/searchTrainInfo';
 import ReviewPage from './routes/reviewPage';
 import BookTrain from './routes/bookTrain';
+import BookSeat from './routes/bookSeat';
 import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import NavBar from './components/NavBar';
@@ -64,6 +65,7 @@ const App = () => {
                     <Route path="/train/:id" element={<RouteDetails />} />
                     <Route path="/booking/train/search" element={<BookTrain />} />
                     <Route path="/review" element={<ReviewPage />} />
+                    <Route path="/bookseat" element={<BookSeat />} />
                 </Routes>
             </Router>
             </AppProvider>
