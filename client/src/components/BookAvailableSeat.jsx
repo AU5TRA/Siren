@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react'
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import './bookSeat.css';
 
 const BookAvailableSeat = () => {
 
@@ -85,8 +85,8 @@ const BookAvailableSeat = () => {
             const isSeatAvailable = availableSeatArr.includes(i);
             seats.push(
                 <li key={i} className="seat">
-                    <input type="checkbox" disabled={!isSeatAvailable} />
-                    {/* <label htmlFor={`seat-${i}`}>{i}</label> */}
+                    <input type="checkbox" id={`seat-${i}`} disabled={!isSeatAvailable} />
+                    <label htmlFor={`seat-${i}`}>{i}</label>
                 </li>
             );
         }
