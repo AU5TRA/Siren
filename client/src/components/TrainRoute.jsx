@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { useParams } from 'react-router-dom';
+import './trainRoute.css';
 
 function convertTo12HourFormat(time24) {
     const [hours, minutes] = time24.split(":");
