@@ -11,6 +11,7 @@ import SearchTrainInfo from './routes/searchTrainInfo';
 import ReviewPage from './routes/reviewPage';
 import BookTrain from './routes/bookTrain';
 import BookSeat from './routes/bookSeat';
+import TicketBooking from './routes/ticketBooking';
 import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import NavBar from './components/NavBar';
@@ -66,6 +67,7 @@ const App = () => {
                     <Route path="/booking/train/search" element={<BookTrain />} />
                     <Route path="/review" element={<ReviewPage />} />
                     <Route path="/bookseat" element={<BookSeat />} />
+                    <Route path="/booking/ticket" element={<TicketBooking />} />
                 </Routes>
             </Router>
             </AppProvider>
