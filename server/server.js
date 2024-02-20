@@ -23,6 +23,17 @@ app.get("/is-verify", authorization, async (req, res) => {
 });
 
 
+// ticket
+app.get("/booking/ticket", async (req, res) => {
+  try {
+    const {trainName, className, routeName, date, from, to} = req.query;
+    console.log(trainName + " " + className + " " + routeName + " " + date + " " + from + " " + to);
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+
 // book a seat
 app.get('/booking/seat', async (req, res) => {
   try {
@@ -53,6 +64,10 @@ app.get('/booking/seat', async (req, res) => {
     const toStationId = parseInt(r2.rows[0].station_id);
     console.log("from station id : " + fromStationId);
     console.log("to station id : " + toStationId);
+
+    const RouteNameQuery = `SELECT route_name FROM route WHERE route_id = $1`;
+    const resultRouteName = await db.query(RouteNameQuery, [routeId]);
+    const routeName = resultRouteName.rows[0].route_name;
 
 
     const query3 = `
@@ -95,6 +110,30 @@ app.get('/booking/seat', async (req, res) => {
     console.log("--------------");
 
 
+    const queryForFare = `SELECT 
+        f.fare, t.train_name, c.class_name
+    FROM 
+        train t
+    JOIN 
+        train_class tc ON t.train_id = tc.train_id
+    JOIN 
+        class c ON tc.class_id = c.class_id
+    JOIN 
+        fareList f ON c.class_id = f.class_id
+    WHERE 
+        t.train_id = $1
+        AND tc.class_id = $2
+     `;
+
+    const resultFare = await db.query(queryForFare, [trainId, classId]);
+    console.log("resultFare : " + resultFare.rows[0].fare);
+    const sendFare = resultFare.rows[0].fare;
+    const trainName = resultFare.rows[0].train_name;
+    const className = resultFare.rows[0].class_name;
+    console.log("train name : " + trainName);
+    console.log("class name : " + className);
+
+
 
     const queryForAvailableSeats = `
     SELECT CAST(seat_number AS INTEGER) AS seat_number
@@ -134,7 +173,11 @@ app.get('/booking/seat', async (req, res) => {
       data: {
         available_seats_count: result.rows.length,
         available_seats: availableSeats,
-        total_seats: total_seat
+        total_seats: total_seat,
+        fare : sendFare,
+        train_name : trainName,
+        class_name : className,
+        route_name : routeName
       }
     });
   }
