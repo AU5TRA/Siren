@@ -10,7 +10,7 @@ const TicketBookingPage = () => {
     // const fetchData = ()
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/booking/ticket?trainName=${trainName}&className=${className}&routeName=${routeName}&date=${date}&from=${from}&to=${to}`);
+        const response = await fetch(`http://localhost:3001/booking/ticket?trainName=${trainName}&className=${className}&routeName=${routeName}&date=${date}&from=${from}&to=${to}&selectedSeats=${selectedSeats.join(',')}&totalFare=${totalFare}`);
           
       } catch (error) {
           console.error(error.message);

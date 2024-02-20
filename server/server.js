@@ -26,8 +26,8 @@ app.get("/is-verify", authorization, async (req, res) => {
 // ticket
 app.get("/booking/ticket", async (req, res) => {
   try {
-    const {trainName, className, routeName, date, from, to} = req.query;
-    console.log(trainName + " " + className + " " + routeName + " " + date + " " + from + " " + to);
+    const {trainName, className, routeName, date, from, to, selectedSeats, totalFare} = req.query;
+    console.log(trainName + " " + className + " " + routeName + " " + date + " " + from + " " + to + " " + selectedSeats + " " + totalFare);
   } catch (error) {
     console.error(error.message);
   }
