@@ -35,7 +35,11 @@ const homepage = () => {
         <div className="home-image-section"><span style={{ marginLeft: '50px' }}></span>
           <img src={'train2.png'} alt="" />
         </div>
+        
       </div>
+      <div className="home-image-section"><span style={{ marginLeft: '50px' }}></span>
+          <img src={'tickets.png'} alt="" />
+        </div>
       <div><About/></div>
     </div>
     

@@ -81,12 +81,12 @@ const Login = ({ setAuth }) => {
 
     return (
         <Fragment>
-            <header className="header">
+            {/* <header className="header">
                 <div className="logo">
                     <img src="/siren_home.png" style={{ width: '150px', height: '50px', marginLeft: '10px' }} />
                 </div>
-            </header>
-            <div className="login-form-container">
+            </header> */}
+            <div className="login-form-container" style={{marginTop:'100px'}}>
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="mb-3">
                         <label htmlFor="email" className="form-label">Email address</label>
