@@ -23,6 +23,171 @@ app.get("/is-verify", authorization, async (req, res) => {
 });
 
 
+// ticket
+app.get("/booking/ticket", async (req, res) => {
+  try {
+    const {trainName, className, routeName, date, from, to} = req.query;
+    console.log(trainName + " " + className + " " + routeName + " " + date + " " + from + " " + to);
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+
+// book a seat
+app.get('/booking/seat', async (req, res) => {
+  try {
+    const { trainId, classId, routeId, date, from, to } = req.query;
+    console.log(trainId + " " + classId + " " + routeId + " " + date + " " + from + " " + to);
+
+
+    const dateReceived = new Date(date);
+    const year = dateReceived.getFullYear();
+    const month = String(dateReceived.getMonth() + 1).padStart(2, '0');
+    const day = String(dateReceived.getDate()).padStart(2, '0');
+
+    const formattedDate = `${year}-${month}-${day}`;
+    const queryFrom = `SELECT station_name from station WHERE LOWER(station_name) LIKE LOWER($1);`
+
+    const queryTo = `SELECT station_name from station WHERE LOWER(station_name) LIKE LOWER($1);`
+
+
+    const fromStation = await db.query(queryFrom, [from]);
+    const toStation = await db.query(queryTo, [to]);
+
+    const r1 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [from.toUpperCase()]);
+    const r2 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [to.toUpperCase()]);
+    console.log(r1.rows[0]);
+    console.log(r2.rows[0]);
+
+    const fromStationId = parseInt(r1.rows[0].station_id);
+    const toStationId = parseInt(r2.rows[0].station_id);
+    console.log("from station id : " + fromStationId);
+    console.log("to station id : " + toStationId);
+
+    const RouteNameQuery = `SELECT route_name FROM route WHERE route_id = $1`;
+    const resultRouteName = await db.query(RouteNameQuery, [routeId]);
+    const routeName = resultRouteName.rows[0].route_name;
+
+
+    const query3 = `
+  WITH RECURSIVE StationSequence AS (
+    SELECT 
+        rs.route_id,
+        rs.station_id,
+        rs.sequence_number,
+        s.station_name
+    FROM 
+        route_stations rs
+    JOIN 
+        station s ON rs.station_id = s.station_id
+    WHERE 
+        rs.route_id = $1
+    UNION ALL
+    SELECT 
+        rs.route_id,
+        rs.station_id,
+        rs.sequence_number,
+        s.station_name
+    FROM 
+        route_stations rs
+    JOIN 
+        StationSequence ss ON rs.route_id = ss.route_id AND rs.sequence_number = ss.sequence_number + 1
+    JOIN 
+        station s ON rs.station_id = s.station_id
+
+  )
+
+  SELECT DISTINCT * FROM StationSequence
+  ORDER BY sequence_number;`;
+
+    const resultForStations = await db.query(query3, [routeId]);
+    console.log("resultForStations : " + resultForStations.rows.length);
+
+    const stations = resultForStations.rows;
+    console.log(stations);
+    console.log(stations.length);
+    console.log("--------------");
+
+
+    const queryForFare = `SELECT 
+        f.fare, t.train_name, c.class_name
+    FROM 
+        train t
+    JOIN 
+        train_class tc ON t.train_id = tc.train_id
+    JOIN 
+        class c ON tc.class_id = c.class_id
+    JOIN 
+        fareList f ON c.class_id = f.class_id
+    WHERE 
+        t.train_id = $1
+        AND tc.class_id = $2
+     `;
+
+    const resultFare = await db.query(queryForFare, [trainId, classId]);
+    console.log("resultFare : " + resultFare.rows[0].fare);
+    const sendFare = resultFare.rows[0].fare;
+    const trainName = resultFare.rows[0].train_name;
+    const className = resultFare.rows[0].class_name;
+    console.log("train name : " + trainName);
+    console.log("class name : " + className);
+
+
+
+    const queryForAvailableSeats = `
+    SELECT CAST(seat_number AS INTEGER) AS seat_number
+    FROM (
+        SELECT s.seat_number
+        FROM seat_availability sa
+        JOIN seat s ON sa.seat_id = s.seat_id
+        WHERE s.train_id = $1
+        AND s.class_id = $2
+        AND s.route_id = $3
+        AND sa.travel_date = $4
+        AND sa.station_id = ANY($5)
+        AND sa.available = TRUE
+        GROUP BY s.seat_number
+        HAVING COUNT(DISTINCT sa.station_id) = $6
+    ) AS seats
+    ORDER BY CAST(seat_number AS INTEGER);
+     `;
+    const result = await db.query(queryForAvailableSeats, [trainId, classId, routeId, formattedDate, stations.map(s => s.station_id), stations.length]);
+    // console.log("res : " + result.rows.length);
+    const availableSeats = [];
+    for (const r of result.rows) {
+      availableSeats.push(r.seat_number);
+    }
+
+    console.log(availableSeats);
+
+    const queryForTotalSeats = `
+      SELECT seat_count FROM train_class WHERE train_id = $1 AND class_id = $2;
+      `;
+    const result3 = await db.query(queryForTotalSeats, [trainId, classId]);
+    const total_seat = result3.rows[0].seat_count;
+    console.log("res3 : " + total_seat);
+    // console.log("res3 : " + result3.rows.length);
+    res.status(200).json({
+      status: "success",
+      data: {
+        available_seats_count: result.rows.length,
+        available_seats: availableSeats,
+        total_seats: total_seat,
+        fare : sendFare,
+        train_name : trainName,
+        class_name : className,
+        route_name : routeName
+      }
+    });
+  }
+  catch (err) {
+    console.log(err);
+  }
+
+});
+
+
 // review
 app.get("/review", async (req, res) => {
   try {
@@ -181,36 +346,31 @@ app.get("/book/search", async (req, res) => {
       const result = await db.query(query3, [routeID]);
       routeStations.push({ routeID: routeID, results: result.rows });
     }
-  console.log("m1");
+    console.log("m1");
 
     const queryForAvailableSeats = `
-<<<<<<< HEAD
-<<<<<<< HEAD
-      SELECT sa.seat_id 
-=======
-      SELECT CAST(seat_number AS INTEGER) AS seat_number
-FROM (
-SELECT s.seat_number
->>>>>>> b0ccb5c031a3efbe86dbdb2c96bed73043ef7806
-=======
-      SELECT CAST(seat_number AS INTEGER) AS seat_number
-FROM (
-SELECT s.seat_number
->>>>>>> b0ccb5c031a3efbe86dbdb2c96bed73043ef7806
-      FROM seat_availability sa
-      JOIN seat s ON sa.seat_id = s.seat_id
-      WHERE s.train_id = $1
-      AND s.class_id = $2
-      AND s.route_id = $3
-      AND sa.travel_date = $4
-      AND sa.station_id = ANY($5)
-      AND sa.available = TRUE
-      GROUP BY  s.seat_number
-      HAVING COUNT(DISTINCT sa.station_id) = $6
-) AS seats
-ORDER BY CAST(seat_number AS INTEGER);
+    SELECT CAST(seat_number AS INTEGER) AS seat_number
+    FROM (
+        SELECT s.seat_number
+        FROM seat_availability sa
+        JOIN seat s ON sa.seat_id = s.seat_id
+        WHERE s.train_id = $1
+        AND s.class_id = $2
+        AND s.route_id = $3
+        AND sa.travel_date = $4
+        AND sa.station_id = ANY($5)
+        AND sa.available = TRUE
+        GROUP BY s.seat_number
+        HAVING COUNT(DISTINCT sa.station_id) = $6
+    ) AS seats
+    ORDER BY CAST(seat_number AS INTEGER);
+     `;
+    console.log("m2");
+
+    const queryForTotalSeats = `
+      SELECT seat_count FROM train_class WHERE train_id = $1 AND class_id = $2;
       `;
-  console.log("m2");
+
     const result4 = [];
 
 
@@ -222,6 +382,7 @@ ORDER BY CAST(seat_number AS INTEGER);
       const stations_in_route = routeStations.find(r => r.routeID === r_id).results; // holds the stations
 
       const classes = await db.query('SELECT class_id FROM train_class where train_id= $1', [t_id]);
+
       for (const c of classes.rows) {
         const class_id = c.class_id;
         const result2 = await db.query(queryForAvailableSeats, [t_id, class_id, r_id, formattedDate, stations_in_route.map(s => s.station_id), stations_in_route.length]);
@@ -232,9 +393,11 @@ ORDER BY CAST(seat_number AS INTEGER);
           availableSeats.push(r.seat_number);
         }
 
+        const result3 = await db.query(queryForTotalSeats, [t_id, class_id]);
+
         // console.log(result2.rows[0].seat_id + " " + result2.rows[1].seat_id);
 
-        result4.push({ train_id: t_id, route_id: r_id, class_id: class_id, available_seats_count: result2.rows.length, available_seats: availableSeats });
+        result4.push({ train_id: t_id, route_id: r_id, class_id: class_id, available_seats_count: result2.rows.length, available_seats: availableSeats, total_seats: result3.rows[0].seat_count });
       }
 
     }

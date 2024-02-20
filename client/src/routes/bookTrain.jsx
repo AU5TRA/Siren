@@ -1,7 +1,5 @@
 import React from 'react'
 import SearchTravel from '../components/SearchTravel'
-import AddUser from '../components/AddUser'
-import Header from '../components/Header'
 import '../components/App.css'
 const bookTrain = () => {
   return (
