@@ -7,10 +7,10 @@ function AddUser() {
   let navigate = useNavigate();
   const [first_name, setFirstName] = useState('');
   const [last_name, setLastName] = useState('');
-  const [nid_number, setNid] = useState('');
-  const [birth_registration_number, setBirthReg] = useState('');
-  const [phone_number, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  const [nid_number, setNid] = useState(null);
+  const [birth_registration_number, setBirthReg] = useState(null);
+  const [phone_number, setPhone] = useState(null);
+  const [email, setEmail] = useState(null);
   const [date_of_birth, setDob] = useState(null);
   const [password, setPassword] = useState('');
   const [gender, setGender] = useState('Male');
@@ -21,7 +21,7 @@ function AddUser() {
   const onSubmitForm = async (e) => {
     e.preventDefault();
     try {
-      const body = { first_name, last_name, nid_number, birth_registration_number, phone_number, email, date_of_birth: date_of_birth && new Date(date_of_birth.getFullYear(), date_of_birth.getMonth(), date_of_birth.getDate()+1),  password, gender };
+      const body = { first_name, last_name, nid_number, birth_registration_number, phone_number, email, date_of_birth: date_of_birth && new Date(date_of_birth.getFullYear(), date_of_birth.getMonth(), date_of_birth.getDate() + 1), password, gender };
       const response = await fetch("http://localhost:3001/users/", {    // fetch get req kore post set kore over write
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -33,15 +33,20 @@ function AddUser() {
       console.log(data);
       setUserID(userIDfromRes);
 
-      console.log();
-      if (response.status === 400) {
-        setMessage(`User with this contact information already exists! User ID ${userIDfromRes}`);
-      }
-      else if (response.status === 300) {
-        setMessage('Both Email and Phone number can not be empty')
-      }
-      else {
-        setMessage(`Account is created successfully! Your user ID id ${userIDfromRes}`)
+      // if (response.status === 400) {
+      //   setMessage(`User with this contact information already exists! User ID ${userIDfromRes}`);
+      // }
+      // else if (response.status === 300) {
+      //   setMessage('Both Email and Phone number can not be empty')
+      // }
+      // else {
+      //   setMessage(`Account is created successfully! Your user ID id ${userIDfromRes}`)
+      // }
+      if (response.status === 201) {
+        setMessage(`Account is created successfully! Your user ID id ${data.userID}`);
+      } else if(response.status === 400) {
+        console.log(data.error);
+        setMessage(data.error);
       }
       setShowMessage(true);
       // console.log(response);
@@ -66,7 +71,7 @@ function AddUser() {
     }
   };
 
-  
+
   return (
     <Fragment>
       <div className='top-spacing mb-3'>
@@ -93,7 +98,7 @@ function AddUser() {
             <div className='col-md-6 mb-2 '>
               {/* <input type="text" className='form-control' placeholder='Date of birth' value={date_of_birth} onChange={e => setDob(e.target.value)} /> */}
               {/* <DatePicker selected={date_of_birth} onChange={(e) => setDob(e.target.value)} /> */}
-              
+
               <DatePicker className='form-control' placeholderText='Date of birth'
                 showIcon
                 selected={date_of_birth}
@@ -117,7 +122,7 @@ function AddUser() {
             <button className="btn btn-primary btn-block">Register</button>
           </div>
         </form>
-  
+
         <button className='btn btn-success float-right mt-3' onClick={() => goHome()}>Back</button>
       </div>
       {showMessage && (
@@ -142,7 +147,7 @@ function AddUser() {
       )}
     </Fragment>
   );
-  
+
 }
 
 export default AddUser;
