@@ -55,7 +55,7 @@ button {
   overflow-y: auto;
   width: 300px;
   border-radius: 4px;
-  top: 33%;
+  top: 25%;
   left: 50;
 }
 
@@ -67,7 +67,7 @@ button {
   overflow-y: auto;
   width: 300px;
   border-radius: 4px;
-  top: 60%;
+  top: 30%;
   left: 100;
 }
 

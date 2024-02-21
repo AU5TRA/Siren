@@ -26,8 +26,8 @@ app.get("/is-verify", authorization, async (req, res) => {
 // ticket
 app.get("/booking/ticket", async (req, res) => {
   try {
-    const {trainName, className, routeName, date, from, to} = req.query;
-    console.log(trainName + " " + className + " " + routeName + " " + date + " " + from + " " + to);
+    const { trainName, className, routeName, date, from, to, selectedSeats, totalFare } = req.query;
+    console.log(trainName + " " + className + " " + routeName + " " + date + " " + from + " " + to + " " + selectedSeats + " " + totalFare);
   } catch (error) {
     console.error(error.message);
   }
@@ -174,10 +174,10 @@ app.get('/booking/seat', async (req, res) => {
         available_seats_count: result.rows.length,
         available_seats: availableSeats,
         total_seats: total_seat,
-        fare : sendFare,
-        train_name : trainName,
-        class_name : className,
-        route_name : routeName
+        fare: sendFare,
+        train_name: trainName,
+        class_name: className,
+        route_name: routeName
       }
     });
   }
@@ -547,97 +547,149 @@ app.post("/users", async (req, res) => {
   const salt = await bcrypt.genSalt(saltRounds);
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
   try {
-    const phone_number = req.body.phone_number
-    const email = req.body.email;
-    console.log(phone_number + " " + email);
+    // const phone_number = req.body.phone_number
+    // const email = req.body.email;
+    const { first_name, last_name, nid_number, birth_registration_number, phone_number, email, date_of_birth, password, gender } = req.body;
+    console.log(first_name + " " + last_name + " " + nid_number + " " + birth_registration_number + " " + phone_number + " " + email + " " + date_of_birth + " " + password + " " + gender);
+    if(password.length < 8)
+    {
+      return res.status(400).json({ error: "Password must be at least 8 characters" });
+    }
+    const results = await db.query(
+      'INSERT INTO passenger (first_name,last_name,nid_number,birth_registration_number,phone_number,email,date_of_birth,password,gender) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [first_name, last_name, nid_number, birth_registration_number, phone_number, email, date_of_birth, hashedPassword, gender]);
+    // console.log(phone_number + " " + email);
+    // //
+    // if (!email && !phone_number) {
+    //   return res.status(300).json({ status: "email and phone_number cannot both be empty" });
+    // }
+    // else if (!email && phone_number) {
+    //   const result1 = await db.query('SELECT * FROM passenger WHERE phone_number = $1', [req.body.phone_number]);
+
+    //   if (result1.rows.length !== 0) {
+    //     // res.send("user already exists")
+    //     res.status(400).json(
+    //       {
+    //         status: "user already exists",
+    //         "userID": result1.rows[0].user_id
+    //       }
+    //     )
+    //   }
+    //   else {
+    //     const results = await db.query(
+    //       'INSERT INTO passenger (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+    //       [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, req.body.password]
+    //     );
+    //     //console.log("row start");
+    //     const jwtToken = jwtGenerator(results.rows[0].user_id);
+    //     console.log(results.rows[0].user_id);
+    //     return res.json({ jwtToken });
+
+    //     /*res.status(201).json({
+    //       status: "succes",
+    //       "userID": results.rows[0].user_id,
+
+    //     });*/
+    //   }
+    // }
+
+    // else if (!phone_number && email) {
+    //   const result2 = await db.query('SELECT * FROM passenger WHERE email = $1', [req.body.email]);
+
+    //   if (result2.rows.length !== 0) {
+    //     res.status(400).json(
+    //       {
+    //         status: "user already exists",
+    //         "userID": result2.rows[0].user_id
+    //       }
+    //     )
+    //   }
+
+    //   else {
+    // const results = await db.query(
+    //   'INSERT INTO "user" (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+    //   [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, hashedPassword]
+    // );
+    // const jwtToken = jwtGenerator(results.rows[0].user_id);
+    // console.log(results.rows[0].user_id);
+    // return res.json({ jwtToken });
+    /*res.status(201).json({
+      status: "succes",
+      "userID": results.rows[0].user_id
+    });*/
+    // }
+    // }
+    // else {
+    //   const check = await db.query('SELECT * FROM passenger WHERE email = $1 OR phone_number = $2', [req.body.email, req.body.phone_number]);
+    //   console.log(check);
+    //   if (check.rows.length !== 0) {
+    //     res.status(400).json(
+    //       {
+    //         status: "user already exists",
+    //         "userID": check.rows[0].user_id
+    //       }
+    //     )
+    //   }
     //
-    if (!email && !phone_number) {
-      return res.status(300).json({ status: "email and phone_number cannot both be empty" });
-    }
-    else if (!email && phone_number) {
-      const result1 = await db.query('SELECT * FROM passenger WHERE phone_number = $1', [req.body.phone_number]);
+    // else {
+    //   const results = await db.query(
+    //     'INSERT INTO passenger (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+    //     [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, hashedPassword]
+    //   );
+    //   //console.log("row start");
+    //   console.log(results.rows[0].user_id);
+    //   //console.log("row end");
+    //   res.status(201).json({
+    //     status: "succes",
+    //     "userID": results.rows[0].user_id
+    //   });
+    // }
+    // }
 
-      if (result1.rows.length !== 0) {
-        // res.send("user already exists")
-        res.status(400).json(
-          {
-            status: "user already exists",
-            "userID": result1.rows[0].user_id
-          }
-        )
+    const jwtToken = jwtGenerator(results.rows[0].user_id);
+    console.log(results.rows[0].user_id);
+    return res.status(201).json({
+      status: "success",
+      data: {
+        status: "Account created successfully",
+        userID: results.rows[0].user_id
       }
-      else {
-        const results = await db.query(
-          'INSERT INTO passenger (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
-          [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, req.body.password]
-        );
-        //console.log("row start");
-        const jwtToken = jwtGenerator(results.rows[0].user_id);
-        console.log(results.rows[0].user_id);
-        return res.json({ jwtToken });
+    });
 
-        /*res.status(201).json({
-          status: "succes",
-          "userID": results.rows[0].user_id,
-          
-        });*/
-      }
-    }
-
-    else if (!phone_number && email) {
-      const result2 = await db.query('SELECT * FROM passenger WHERE email = $1', [req.body.email]);
-
-      if (result2.rows.length !== 0) {
-        res.status(400).json(
-          {
-            status: "user already exists",
-            "userID": result2.rows[0].user_id
-          }
-        )
-      }
-
-      else {
-        const results = await db.query(
-          'INSERT INTO "user" (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
-          [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, hashedPassword]
-        );
-        const jwtToken = jwtGenerator(results.rows[0].user_id);
-        console.log(results.rows[0].user_id);
-        return res.json({ jwtToken });
-        /*res.status(201).json({
-          status: "succes",
-          "userID": results.rows[0].user_id
-        });*/
-      }
-    }
-    else {
-      const check = await db.query('SELECT * FROM passenger WHERE email = $1 OR phone_number = $2', [req.body.email, req.body.phone_number]);
-      console.log(check);
-      if (check.rows.length !== 0) {
-        res.status(400).json(
-          {
-            status: "user already exists",
-            "userID": check.rows[0].user_id
-          }
-        )
-      }
-      //
-      else {
-        const results = await db.query(
-          'INSERT INTO passenger (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
-          [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, hashedPassword]
-        );
-        //console.log("row start");
-        console.log(results.rows[0].user_id);
-        //console.log("row end");
-        res.status(201).json({
-          status: "succes",
-          "userID": results.rows[0].user_id
-        });
-      }
-    }
   } catch (err) {
     console.log(err);
+    if(err.code === 'XX001')
+    {
+      return res.status(400).json({ error: "NID already in use" });
+    }
+    else if(err.code === 'XX002')
+    {
+      return res.status(400).json({ error: "Birth Registration Number already in use" });
+    }
+    else if(err.code === 'XX003')
+    {
+      return res.status(400).json({ error: "NID or Birth Registration Number must be provided" });
+    }
+    else if(err.code === 'XX004') 
+    {
+      return res.status(400).json({ error: "Invalid phone Number" });
+    }
+    else if(err.code === 'XX005')
+    {
+      return res.status(400).json({ error: "First Name and Last Name are required fields" });
+    }
+    else if (err.code === 'XX006') {
+      return res.status(400).json({ error: "Invalid date of Birth" });
+    }
+    else if (err.code === 'XX007') {
+      return res.status(400).json({ error: "Email already in use. Please provide a new email" });
+    }
+    else if (err.code === 'XX008') {
+      return res.status(400).json({ error: "Email is a required field" });
+    }
+    else{
+      console.log("unknown error");
+      return res.status(401).json({ error: err.message });
+    }
   }
 });
 
