@@ -11,6 +11,7 @@ export const AppProvider = ({ children }) => {
   const [fromStationSearch, setFromStationSearch] = useState(null);
   const [toStationSearch, setToStationSearch] = useState(null);
   const [dates, setDates] = useState(null);
+  const [route, setRoute] = useState(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -40,7 +41,9 @@ export const AppProvider = ({ children }) => {
       toStationSearch,
       setToStationSearch,
       dates,
-      setDates
+      setDates, 
+      route,
+      setRoute
     }}>
       {children}
     </AppContext.Provider>

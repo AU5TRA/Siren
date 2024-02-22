@@ -2,7 +2,7 @@ import React from 'react'
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
-
+import {useData} from './AppContext'
 
 import './ticketBook.css';
 
@@ -20,6 +20,7 @@ const customStyles = {
 
 
 const TicketBookingPage = () => {
+  const {userId, route}= useData();
   const location = useLocation();
   const { selectedSeats, totalFare, trainName, className, routeName, date, from, to, selectedStation, selectedStation_d } = location.state;
 
@@ -28,7 +29,7 @@ const TicketBookingPage = () => {
   const [discountedFare, setDiscountedFare] = useState(totalFare);
 
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [transactionId, setTransactionId] = useState('');
+  const [transactionId, setTransactionId] = useState(null);
 
   useEffect(() => {
     // const fetchData = ()
@@ -76,6 +77,11 @@ const TicketBookingPage = () => {
           selectedStation_d,
           selectedOffer,
           discountedFare,
+          transactionId,
+          userId,
+          className,
+          trainName,
+          route
         }),
       });
       const result = await response.json();
