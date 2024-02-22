@@ -27,7 +27,29 @@ app.get("/is-verify", authorization, async (req, res) => {
 app.get("/booking/ticket", async (req, res) => {
   try {
     const { trainName, className, routeName, date, from, to, selectedSeats, totalFare, boarding, destination } = req.query;
-    console.log(trainName + " " + className + " " + routeName + " " + date + " " + from + " " + to + " " + selectedSeats + " " + totalFare + ' '+ boarding+ ' '+ destination);
+    const seatsArray = selectedSeats.split(',').map(seat => seat.trim());
+
+    const offers= await db.query(`SELECT * FROM get_eligible_offers($1)`, [seatsArray.length])
+    console.log(offers.rows[0]);
+    console.log(trainName + " " + className + " " + routeName + " " + date + " " + from + " " + to + " " + seatsArray + " " + totalFare + ' '+ boarding+ ' '+ destination);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        train_name: trainName,
+        class_name: className,
+        route_name: routeName,
+        date: date,
+        from: from,
+        to: to,
+        selected_seats: seatsArray,
+        total_fare: totalFare,
+        boarding_station: boarding,
+        destination_station: destination,
+        offers: offers.rows
+      },
+
+    });
   } catch (error) {
     console.error(error.message);
   }
