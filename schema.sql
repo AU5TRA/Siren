@@ -111,7 +111,7 @@ CREATE TABLE seat_availability (
 
 CREATE TABLE offer (
     offer_id SERIAL PRIMARY KEY,
-    offer_criteria VARCHAR(100) NOT NULL,
+    offer_criteria INTEGER NOT NULL,
     offer_description VARCHAR(255) NOT NULL,
     offer_pct DECIMAL(5, 2) NOT NULL
 );

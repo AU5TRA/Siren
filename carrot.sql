@@ -41,6 +41,11 @@
 -- HAVING COUNT(*) = 10;
 
 
+-- write a function to select which which offer is applicable for the useer
+-- write a function to find out which route will be the fastest
+
+
+
 
 
 WITH RECURSIVE StationSequence AS (

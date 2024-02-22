@@ -10,6 +10,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 // import './home.css';
 
 const HomePage = () => {
+    
     // return (
     //     <div>
     //         <header className="header">

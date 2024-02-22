@@ -2,10 +2,25 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useData } from './AppContext';
 import { Link } from 'react-router-dom';
+import Modal from 'react-modal';
+
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+  },
+};
+
+
+
 const ShowUser = () => {
   const modalRef = React.createRef();
   const navigate = useNavigate();
-  const {loginState, userId}= useData();
+  const { loginState, userId } = useData();
   const { id } = useParams();
   const [userData, setUserData] = useState([]);
 
@@ -17,19 +32,28 @@ const ShowUser = () => {
   const [new_password, setNewPassword] = useState('');
   const [date_of_birth, setDOB] = useState('');
   const [birth_registration_number, setBirthReg] = useState('');
+  const [ticketHistory, setTicketHistory] = useState([]); // Assuming this is an array of ticket objects
+  const [modalIsOpen, setIsOpen] = useState(false);
+
+  const [cardClicked, setCardClicked] = useState(false);
+
+
   useEffect(() => {
-    if (!loginState  || userId === null  || userId.toString() !== id ) {
-      
+    if (!loginState || userId === null || userId.toString() !== id) {
+
       // navigate(`/`);
       // // console.log(userId+"......"+id);
       // return
       // ;
       <Fragment>
-        <div><Link to = {`/`}></Link></div>
+        <div><Link to={`/`}></Link></div>
       </Fragment>
     }
     const fetchUserData = async () => {
       try {
+        if (id == "") {
+          return;
+        }
         const response = await fetch(`http://localhost:3001/users/${id}`);
         const rec = await response.json();
         console.log(rec.data.result);
@@ -53,6 +77,13 @@ const ShowUser = () => {
     fetchUserData();
   }, [id]);
 
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+  }
 
 
   const UpdateInformation = async (e) => {
@@ -96,47 +127,85 @@ const ShowUser = () => {
     setBirthReg(userData.birth_registration_number);
   }
 
-  return (<Fragment>
-    <div>
-      {userData ? (
-        <div className="user-container">
-          <h4>User Information</h4>
-          <div className="user-details">
-            <p>User ID: {userData.user_id}</p>
-            <p>First Name: {userData.first_name}</p>
-            <p>Last Name: {userData.last_name}</p>
-            <p>Date of Birth: {formatDateOfBirth(userData.date_of_birth)}</p>
-            <h4>Contact Information</h4>
-            <p>Email: {userData.email}</p>
-            <p>Phone Number: {userData.phone_number}</p>
-            <h4>Address</h4>
-            <p>Details: {userData.address}</p>
-            <p>Postcode: {userData.post_code}</p>
+  return (
+    <Fragment>
+      <div className="container mt-5">
+        {userData ? (
+          <div className={`card`}>
+            <div className="card-header" >
+              <div className="row">
+                <div className="col-md-6" onClick={() => setCardClicked(!cardClicked)}>
+                  <h2>User Dashboard</h2>
+                </div>
+                <div className="col-md-6" onClick={() => setCardClicked(!cardClicked)}>
+                  <h2>Ticket History</h2>
+                </div>
+              </div>
+            </div>
+            <div className="card-body" >
+              <div className="row">
+                <div className={cardClicked ? "col-md-6 clicked" : "col-md-6"} onClick={() => setCardClicked(!cardClicked)}>
+                  <div className={cardClicked ? "user-information clicked" : "user-information"}>
+                    <p><strong>First Name:</strong> {userData.first_name}</p>
+                    <p><strong>Last Name:</strong> {userData.last_name}</p>
+                    <p><strong>Date of Birth:</strong> {formatDateOfBirth(userData.date_of_birth)}</p>
+                    <h4>Contact Information</h4>
+                    <p><strong>Email:</strong> {userData.email}</p>
+                    <p><strong>Phone Number:</strong> {userData.phone_number}</p>
+                    <h4>Address</h4>
+                    <p><strong>Details:</strong> {userData.address}</p>
+                    <p><strong>Postcode:</strong> {userData.post_code}</p>
+                  </div>
+                </div>
+
+                <div className={cardClicked ? "col-md-6 clicked" : "col-md-6"} onClick={() => setCardClicked(!cardClicked)}>
+                  <div className={cardClicked ? "ticket-history clicked" : "ticket-history"}>
+
+                    {ticketHistory && ticketHistory.length > 0 ? (
+                      ticketHistory.map(ticket => (
+                        <div key={ticket.id} className="ticket-history-entry">
+                          <p><strong>Ticket ID:</strong> {ticket.id}</p>
+                          <p><strong>Status:</strong> {ticket.status}</p>
+                          {/* ticket details here */}
+                        </div>
+                      ))
+                    ) : (
+                      <p>No ticket history available.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="card-footer">
+              <button onClick={openModal} className="btn btn-warning">
+                Edit
+              </button>
+            </div>
           </div>
+        ) : (
+          <p>Loading...</p>
+        )}
+      </div>
 
-        </div>
-
-
-      ) : (
-        <p>Loading...</p>
-      )}
-    </div>
-    <button type="button" className="btn btn-warning" onClick={() => modalRef.current.style.display = 'block'}>
+      {/* <button type="button" className="btn btn-warning" onClick={() => modalRef.current.style.display = 'block'}>
       Edit
-    </button>
+    </button> */}
 
 
 
-    <div className="modal" ref={modalRef}>
-
-      <div className="modal-dialog">
-        <div className="modal-content">
-
-          <div className="modal-header">
-            <h4 className="modal-title">Update your information</h4>
-            <button type="button" className="close" data-dismiss="modal" onClick={() => modalRef.current.style.display = 'none'}>&times;</button>
-          </div>
-
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Edit User Modal"
+      >
+        <div className="modal-header">
+          <h2>Update your information</h2>
+          <button onClick={closeModal} className="close">
+            &times;
+          </button>
+        </div>
+        <form onSubmit={UpdateInformation}>
           <div className="modal-body">
             <input
               type="text"
@@ -161,7 +230,7 @@ const ShowUser = () => {
               onChange={e => setPhone(e.target.value)}
             />
 
-            
+
             <input
               type="text"
               className="form-control mb-2"
@@ -189,15 +258,15 @@ const ShowUser = () => {
             {/*<input type="text" className='form-control' placeholder='First name' value={first_name} onChange={e => setFirstName(e.target.value)} /> */}
           </div>
 
-          <div className="modal-footer">
-            <button type="button" className="btn btn-warning" data-dismiss="modal" onClick={UpdateInformation}>Confirm</button>
-            <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={resetInfo}>Reset</button>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </Fragment>
+          <button type="submit" className="btn btn-warning">
+            Confirm
+          </button>
+          <button type="button" onClick={resetInfo} className="btn btn-danger">
+            Reset
+          </button>
+        </form>
+      </Modal>
+    </Fragment>
   );
 };
 

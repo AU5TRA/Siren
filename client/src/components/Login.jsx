@@ -32,7 +32,7 @@ const Login = ({ setAuth }) => {
             setLoginState(true);
             setUserId(json.data.result[0].user_id);
             setName(json.data.result[0].last_name);
-
+            
             if (json.status === "success") {
                 localStorage.setItem("token", json.data.res);
                 localStorage.setItem("userId", json.data.result[0].user_id);
@@ -70,6 +70,8 @@ const Login = ({ setAuth }) => {
             console.error(err.message);
         }
     };
+    
+
 
     const registerUser = () => {
         try {

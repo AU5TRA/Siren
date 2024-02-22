@@ -26,12 +26,13 @@ app.get("/is-verify", authorization, async (req, res) => {
 // ticket
 app.get("/booking/ticket", async (req, res) => {
   try {
-    const { trainName, className, routeName, date, from, to, selectedSeats, totalFare } = req.query;
-    console.log(trainName + " " + className + " " + routeName + " " + date + " " + from + " " + to + " " + selectedSeats + " " + totalFare);
+    const { trainName, className, routeName, date, from, to, selectedSeats, totalFare, boarding, destination } = req.query;
+    console.log(trainName + " " + className + " " + routeName + " " + date + " " + from + " " + to + " " + selectedSeats + " " + totalFare + ' '+ boarding+ ' '+ destination);
   } catch (error) {
     console.error(error.message);
   }
 });
+
 
 
 // book a seat
@@ -168,6 +169,22 @@ app.get('/booking/seat', async (req, res) => {
     const total_seat = result3.rows[0].seat_count;
     console.log("res3 : " + total_seat);
     // console.log("res3 : " + result3.rows.length);
+    
+    const b_station = await db.query('SELECT b_station_name FROM BOARDING_STATION WHERE STATION_ID = $1', [fromStationId]);
+    // const b_station = result8.reduce((map, row) => {
+    //     map[row.b_station_name] = true; // You can assign any value to the map if needed
+    //     return map;
+    // }, {});
+    
+    const d_station = await db.query('SELECT b_station_name FROM BOARDING_STATION WHERE STATION_ID = $1', [toStationId]);
+    // const d_station = result9.reduce((map, row) => {
+    //     map[row.b_station_name] = true; // You can assign any value to the map if needed
+    //     return map;
+    // }, {});
+    
+
+
+
     res.status(200).json({
       status: "success",
       data: {
@@ -177,7 +194,9 @@ app.get('/booking/seat', async (req, res) => {
         fare: sendFare,
         train_name: trainName,
         class_name: className,
-        route_name: routeName
+        route_name: routeName,
+        b_station: b_station.rows,
+        d_station: d_station.rows
       }
     });
   }
@@ -346,7 +365,7 @@ app.get("/book/search", async (req, res) => {
       const result = await db.query(query3, [routeID]);
       routeStations.push({ routeID: routeID, results: result.rows });
     }
-    console.log("m1");
+    //console.log("m1");
 
     const queryForAvailableSeats = `
     SELECT CAST(seat_number AS INTEGER) AS seat_number
@@ -365,7 +384,7 @@ app.get("/book/search", async (req, res) => {
     ) AS seats
     ORDER BY CAST(seat_number AS INTEGER);
      `;
-    console.log("m2");
+   // console.log("m2");
 
     const queryForTotalSeats = `
       SELECT seat_count FROM train_class WHERE train_id = $1 AND class_id = $2;
@@ -403,8 +422,6 @@ app.get("/book/search", async (req, res) => {
     }
 
     console.log(result4);
-
-
     res.status(200).json({
       status: "success",
       data: {
@@ -651,7 +668,8 @@ app.post("/users", async (req, res) => {
       status: "success",
       data: {
         status: "Account created successfully",
-        userID: results.rows[0].user_id
+        userID: results.rows[0].user_id,
+        jwtToken: jwtToken
       }
     });
 

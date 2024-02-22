@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import './bookSeat.css';
 import { useData } from './AppContext';
+import './comp.css'
 
 const BookAvailableSeat = () => {
     const navigate = useNavigate();
@@ -21,6 +22,12 @@ const BookAvailableSeat = () => {
     const [date, setDate] = useState('');
     const [from, setFrom] = useState('');
     const [to, setTo] = useState('');
+    const [selectedStation, setSelectedStation] = useState('');
+    const [selectedStation_d, setSelectedStation_d] = useState('');
+
+
+    const [b_station, setB_station] = useState([]);
+    const [d_station, setD_station] = useState([]);
 
 
 
@@ -36,7 +43,7 @@ const BookAvailableSeat = () => {
         const routeIdParam = searchParams.get('routeId');
         const dateParam = searchParams.get('date');
         const fromParam = searchParams.get('from');
-        const toParam = searchParams.get('to');
+        const toParam = searchParams.get('to'); //gets data from url
 
         // setClassId(classIdParam);
         // setTrainId(trainIdParam);
@@ -81,6 +88,20 @@ const BookAvailableSeat = () => {
                 setTrainName(rec.data.train_name);
                 setClassName(rec.data.class_name);
                 setRouteName(rec.data.route_name);
+                console.log("mew---------------------");
+                console.log(rec.data.b_station[0]);
+
+                const bStationArray = rec.data.b_station.map(row => row.b_station_name);
+                setB_station(bStationArray);
+                console.log(bStationArray);
+                const dStationArray = rec.data.d_station.map(row => row.b_station_name);
+                setD_station(dStationArray);
+                console.log(dStationArray);
+                setSelectedStation( bStationArray[0]);
+                setSelectedStation_d( dStationArray[0]);
+
+                
+                console.log(selectedStation_d+'is the dis');
 
                 // console.log("Available Seat Count: " + availableSeatCount);
                 // console.log("Available Seat Arr: " + availableSeatArr);
@@ -116,8 +137,23 @@ const BookAvailableSeat = () => {
 
     const handleBookClick = async () => {
         // ticket booking
-        navigate('/booking/ticket', { state: { selectedSeats, totalFare, trainName, className, routeName, date, from, to } })
+        navigate('/booking/ticket', { state: { selectedSeats, totalFare, trainName, className, routeName, date, from, to, selectedStation, selectedStation_d} })
     }
+
+    const handleDropdownChange = (event) => {
+        setSelectedStation(event.target.value);
+        console.log(event.target.value+'vvvvvvvvvvvvvvvvvvvvvvvvv')
+        console.log(selectedStation+'------------------------------------');
+        console.log("hehehheheeeeeeeehehehehehheheheh");
+    };
+
+    const handleDropdownChange2 = (event) => {
+        setSelectedStation_d(event.target.value);
+        console.log(selectedStation_d+'------------------------------------++++++');
+        console.log(event.target.value+'ttttttttttttttttttttttt')
+        
+    };
+
 
     const renderSeats = () => {
         if (!totalSeat || totalSeat <= 0) {
@@ -167,17 +203,44 @@ const BookAvailableSeat = () => {
                 </div>
 
                 <div className="selected-seat" style={{ width: '500px', height: 'auto', border: '1px solid black', display: 'flex', flexDirection: 'column', margin: '40px', padding: '10px' }}>
-                    <div><p><h3 style={{ fontSize: '45px' }}>Tickets</h3></p>
+                    <div><p><h3 style={{ fontSize: '45px' }}>Seat Details</h3></p>
                         <p style={{ fontSize: '20px' }}> <strong>Name:</strong> <span style={{ padding: '10px' }}></span> {name}</p>
                         <p style={{ fontSize: '20px' }}><strong>Train Name:</strong> <span style={{ padding: '10px' }}></span>{trainName}</p>
                         <p style={{ fontSize: '20px' }}> <strong>Class Name:</strong> <span style={{ padding: '10px' }}></span>{className}</p>
-                        <p style={{ fontSize: '20px' }}><strong>Route ID:</strong> <span style={{ padding: '10px' }}></span>{routeName}</p></div>
+                        {/* <p style={{ fontSize: '20px' }}><strong>Route ID:</strong> <span style={{ padding: '10px' }}></span>{routeName}</p> */}
+                        <p style={{ fontSize: '20px' }}><strong>From:</strong> <span style={{ padding: '10px' }}></span>{from}</p>
+                        <p style={{ fontSize: '20px' }}><strong>To:</strong> <span style={{ padding: '10px' }}></span>{to}</p>
+
+
+
+
+                    </div>
                     <p style={{ fontSize: '20px' }}> <strong>Date of journey:</strong> <span style={{ padding: '10px' }}></span> {date}</p>
                     <p style={{ fontSize: '20px' }}><strong>Selected Seats: </strong></p>
                     <p style={{ fontSize: '20px' }}>
                         {selectedSeats.length > 0 ? ` ${selectedSeats.join(', ')}` : 'No seats selected'}</p>
-                    <p style={{ fontSize: '20px' }}><strong>Fare: </strong> {totalFare}</p>
-                    <button style={{ width: '200px', height: '50px', backgroundColor: 'green', color: 'white', fontSize: '20px', marginTop: '20px' }} onClick={handleBookClick}>Book</button>
+                    <p style={{ fontSize: '20px' }}><strong>Price per seat: </strong><span style={{ padding: '10px' }}></span> {fare} tk.</p>
+                    <p style={{ fontSize: '20px' }}><strong>Total Fare: <span style={{ padding: '10px' }}></span></strong> {totalFare} tk.</p>
+                    {/*dropdown*/}
+                    <div style={{ marginTop: '20px' }}>
+                        <label htmlFor="stationDropdown"><p style={{ fontSize: '20px' }}><strong>Boarding Station:</strong></p></label>
+                        <select id="stationDropdown" onChange={handleDropdownChange} style={{ marginLeft: '10px', fontSize: '16px' }}>
+                            {b_station.map((station, index) => (
+                                <option key={index} value={station}>{station}</option>
+                            ))}
+                        </select>
+
+                        <label htmlFor="stationDropdown"><p style={{ fontSize: '20px' }}><strong>Disembarking Station:</strong></p></label>
+                        <select id="stationDropdown" onChange={handleDropdownChange2} style={{ marginLeft: '10px', fontSize: '16px' }}>
+                            {d_station.map((station, index) => (
+                                <option key={index} value={station}>{station}</option>
+                            ))}
+                        </select>
+                    </div>
+
+
+                            <div><span style={{ padding: '180px' }}></span>
+                     <button className='button' style={{width:'100px'}}onClick={handleBookClick}>Confirm</button></div>
                 </div>
             </div>
         </Fragment>
