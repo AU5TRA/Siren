@@ -128,6 +128,12 @@ CREATE TABLE transaction (
 );
 
 
+-- seat id add korte hobe
+-- serial primary key
+-- procedure
+-- price per ticket
+
+
 CREATE TABLE ticket (
     ticket_id VARCHAR(15) PRIMARY KEY,
     user_id INTEGER REFERENCES passenger(user_id),
