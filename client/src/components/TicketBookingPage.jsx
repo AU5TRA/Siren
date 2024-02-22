@@ -1,7 +1,24 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import Modal from 'react-modal';
+
+
 import './ticketBook.css';
+
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+  },
+};
+
+
+
 const TicketBookingPage = () => {
   const location = useLocation();
   const { selectedSeats, totalFare, trainName, className, routeName, date, from, to, selectedStation, selectedStation_d } = location.state;
@@ -10,6 +27,8 @@ const TicketBookingPage = () => {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [discountedFare, setDiscountedFare] = useState(totalFare);
 
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const [transactionId, setTransactionId] = useState('');
 
   useEffect(() => {
     // const fetchData = ()
@@ -65,10 +84,31 @@ const TicketBookingPage = () => {
       } else {
         alert('Booking failed');
       }
+
+      openModal();
     } catch (error) {
       console.error(error.message);
     }
   }
+
+  const handleConfirm1 = async () => {
+    try {
+      openModal();
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+
+
+
 
   return (
     <>
@@ -104,8 +144,45 @@ const TicketBookingPage = () => {
         <p><strong>Discounted Fare: </strong>{discountedFare} tk.</p>
       </div>
       <div>
-        <button className='confirmButton' style={{ width: '200px' }} onClick={handleConfirm}>Confirm Booking</button>
+        <button className='confirmButton' style={{ width: '200px' }} onClick={handleConfirm1}>Confirm Booking</button>
       </div>
+
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Add Transaction ID modal"
+      >
+
+
+
+        <div className="modal-header">
+          <h4>Add Transaction Id</h4>
+          <button onClick={closeModal} className="close">
+            &times;
+          </button>
+        </div>
+        <form>
+          <div className="modal-body">
+            <input
+              type="text"
+              className="form-control mb-2"
+              placeholder='Transaction ID'
+              value={transactionId || ''}
+              onChange={e => setTransactionId(e.target.value)}
+            />
+            {transactionId ? (
+              <button type="button" onClick={handleConfirm} className="btn btn-success">
+                Confirm
+              </button>
+            ) : (
+              <button type="button" onClick={handleConfirm} className="btn btn-danger">
+                Add Later
+              </button>
+            )}
+          </div>
+        </form>
+      </Modal>
     </>
   );
 };
