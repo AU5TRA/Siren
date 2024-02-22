@@ -63,3 +63,24 @@ EXECUTE FUNCTION log_in();
 
 
 
+-- check for password match , phone number check , postcode check before updating passenger information
+CREATE OR REPLACE FUNCTION check_password()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.password <> OLD.password THEN
+        RAISE EXCEPTION 'Password does not match' USING ERRCODE = 'XX009';
+    END IF;
+    IF NEW.phone_number IS NULL OR LENGTH(NEW.phone_number) < 11 THEN
+        RAISE EXCEPTION 'Invalid phone Number' USING ERRCODE = 'XX004';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+CREATE TRIGGER check_password_trigger
+BEFORE UPDATE
+ON passenger
+FOR EACH ROW
+EXECUTE FUNCTION check_password();

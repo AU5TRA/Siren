@@ -136,7 +136,6 @@ CREATE TABLE ticket (
     total_fare DECIMAL(10, 2) NOT NULL,
     travel_status VARCHAR(20),
     transaction_id INTEGER REFERENCES transaction(transaction_id)
-    
 );
 
 

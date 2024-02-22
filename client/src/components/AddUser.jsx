@@ -9,7 +9,7 @@ function AddUser() {
   const [last_name, setLastName] = useState('');
   const [nid_number, setNid] = useState(null);
   const [birth_registration_number, setBirthReg] = useState(null);
-  const [phone_number, setPhone] = useState(null);
+  const [phone_number, setPhone] = useState('');
   const [email, setEmail] = useState(null);
   const [date_of_birth, setDob] = useState(null);
   const [password, setPassword] = useState('');
@@ -30,8 +30,9 @@ function AddUser() {
       //window.location = "/";
       const data = await response.json();
       const userIDfromRes = data.userID;
-      console.log(data);
       setUserID(userIDfromRes);
+      console.log(data);
+
 
       // if (response.status === 400) {
       //   setMessage(`User with this contact information already exists! User ID ${userIDfromRes}`);
@@ -43,7 +44,8 @@ function AddUser() {
       //   setMessage(`Account is created successfully! Your user ID id ${userIDfromRes}`)
       // }
       if (response.status === 201) {
-        setMessage(`Account is created successfully! Your user ID id ${data.userID}`);
+
+        setMessage(`Account is created successfully!`);
       } else if(response.status === 400) {
         console.log(data.error);
         setMessage(data.error);
@@ -66,7 +68,7 @@ function AddUser() {
   }
   const closeMessage = () => {
     setShowMessage(false);
-    if (message === `Account is created successfully! Your user ID id ${userID}`) {
+    if (message === `Account is created successfully!`) {
       window.location = "/";
     }
   };

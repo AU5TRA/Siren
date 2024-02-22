@@ -5,10 +5,18 @@ const cors = require("cors");
 const db = require("./db");
 const jwtGenerator = require("./utils/jwtGenerator");
 const bcrypt = require('bcryptjs');
+// const { v4: uuidv4 } = require('uuid');
 const app = express();
 app.use(express.json());
 app.use(cors());
 
+function generateTicketId(trainName, className, date) {
+  const timestamp = Date.now();
+  const uniqueString = trainName.slice(0, 3) + className.slice(0, 3) + date.replaceAll('-', '');
+  const randomString = Math.random().toString(36).substring(2, 7);
+
+  return uniqueString + '_' + timestamp + '_' + randomString;
+}
 
 
 app.get("/is-verify", authorization, async (req, res) => {
@@ -28,6 +36,9 @@ app.get("/booking/ticket", async (req, res) => {
   try {
     const { trainName, className, routeName, date, from, to, selectedSeats, totalFare } = req.query;
     console.log(trainName + " " + className + " " + routeName + " " + date + " " + from + " " + to + " " + selectedSeats + " " + totalFare);
+
+    // const ticketID = uuidv4();
+    // const results = await db.query('SELECT * FROM passenger WHERE user_id = $1', [req.body.user_id]);
   } catch (error) {
     console.error(error.message);
   }
@@ -39,7 +50,6 @@ app.get('/booking/seat', async (req, res) => {
   try {
     const { trainId, classId, routeId, date, from, to } = req.query;
     console.log(trainId + " " + classId + " " + routeId + " " + date + " " + from + " " + to);
-
 
     const dateReceived = new Date(date);
     const year = dateReceived.getFullYear();
@@ -551,8 +561,7 @@ app.post("/users", async (req, res) => {
     // const email = req.body.email;
     const { first_name, last_name, nid_number, birth_registration_number, phone_number, email, date_of_birth, password, gender } = req.body;
     console.log(first_name + " " + last_name + " " + nid_number + " " + birth_registration_number + " " + phone_number + " " + email + " " + date_of_birth + " " + password + " " + gender);
-    if(password.length < 8)
-    {
+    if (password.length < 8) {
       return res.status(400).json({ error: "Password must be at least 8 characters" });
     }
     const results = await db.query(
@@ -657,24 +666,19 @@ app.post("/users", async (req, res) => {
 
   } catch (err) {
     console.log(err);
-    if(err.code === 'XX001')
-    {
+    if (err.code === 'XX001') {
       return res.status(400).json({ error: "NID already in use" });
     }
-    else if(err.code === 'XX002')
-    {
+    else if (err.code === 'XX002') {
       return res.status(400).json({ error: "Birth Registration Number already in use" });
     }
-    else if(err.code === 'XX003')
-    {
+    else if (err.code === 'XX003') {
       return res.status(400).json({ error: "NID or Birth Registration Number must be provided" });
     }
-    else if(err.code === 'XX004') 
-    {
+    else if (err.code === 'XX004') {
       return res.status(400).json({ error: "Invalid phone Number" });
     }
-    else if(err.code === 'XX005')
-    {
+    else if (err.code === 'XX005') {
       return res.status(400).json({ error: "First Name and Last Name are required fields" });
     }
     else if (err.code === 'XX006') {
@@ -686,7 +690,7 @@ app.post("/users", async (req, res) => {
     else if (err.code === 'XX008') {
       return res.status(400).json({ error: "Email is a required field" });
     }
-    else{
+    else {
       console.log("unknown error");
       return res.status(401).json({ error: err.message });
     }
@@ -702,26 +706,28 @@ app.put("/users/:id/update", async (req, res) => {
   try {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
-    console.log("here" + req.body.new_password + " here" + req.body.password);
+    // console.log("here" + req.body.new_password + " here" + req.body.password);
     var hashedPassword = await bcrypt.hash(req.body.new_password, salt);
 
     const user = await db.query("SELECT * FROM passenger WHERE user_id = $1", [req.params.id]);
 
-    if (!user.rows.length) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    // if (!user.rows.length) {
+    //   return res.status(404).json({ error: "User not found" });
+    // }
 
     const userData = user.rows[0];
-    const isOldPasswordValid = await bcrypt.compare(req.body.password, userData.password);
+    // const isOldPasswordValid = await bcrypt.compare(req.body.password, userData.password);
 
-    if (!isOldPasswordValid) {
-      console.log("Incorrect password");
-      return res.status(401).json({ error: "Invalid old password" });
-    }
+    // if (!isOldPasswordValid) {
+    //   console.log("Incorrect password");
+    //   return res.status(401).json({ error: "Invalid old password" });
+    // }
 
     if (req.body.new_password === '') {
       hashedPassword = userData.password;
     }
+
+    console.log(req.body.address + " ---" + req.body.post_code + "+++----- " + req.body.phone_number + " " + hashedPassword + " " + req.body.birth_registration_number + " " + req.params.id)
 
     const results = await db.query(
       'UPDATE passenger SET address = $1, post_code = $2, phone_number = $3, password = $4, birth_registration_number = $5 WHERE user_id = $6 returning *',
@@ -744,8 +750,17 @@ app.put("/users/:id/update", async (req, res) => {
       },
     });
   } catch (err) {
+    console.error(err.code);
+    console.error("-------------------")
     console.error(err);
-    res.status(500).json({ error: err.message });
+    // res.status(500).json({ error: err.message });
+    if (err.code === 'XX004') {
+      return res.status(400).json({ error: "Invalid phone Number" });
+    }
+    else if (err.code === 'XX009') {
+      // console.log("in Incorrect password");
+      return res.status(400).json({ error: "Incorrect Password" });
+    }
   }
 });
 
