@@ -129,9 +129,10 @@ CREATE TABLE transaction (
 
 
 -- seat id add korte hobe
--- serial primary key
+-- serial primary key ticket id
 -- procedure
 -- price per ticket
+-- fare hobe, total na
 
 
 CREATE TABLE ticket (

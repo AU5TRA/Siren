@@ -30,6 +30,9 @@ app.post("/booking/confirm", async (req, res) => {
       discountedFare} = req.body;
     // const ticketId = generateTicketId(selectedStation, selectedStation_d, date);
     console.log(date + " " + selectedSeats + " " + totalFare + " " + selectedStation + " " + selectedStation_d + " " + selectedOffer + " " + discountedFare);
+
+
+    
     res.status(200).json({
       status: "success",
       data: {
