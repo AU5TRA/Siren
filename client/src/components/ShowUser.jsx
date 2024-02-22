@@ -46,6 +46,8 @@ const ShowUser = () => {
   useEffect(() => {
     if (!loginState || userId === null || userId.toString() !== id) {
 
+    if (!loginState || userId === null || userId.toString() !== id) {
+
       // navigate(`/`);
       // // console.log(userId+"......"+id);
       // return
