@@ -50,7 +50,7 @@ button {
 .drop-down-from {
   position: absolute;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #d4bf79;
+  background-color: #aed1be;
   max-height: 150px;
   overflow-y: auto;
   width: 300px;
@@ -62,7 +62,7 @@ button {
 .drop-down-to {
   position: absolute;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #d4bf79;
+  background-color: #aed1be;
   max-height: 150px;
   overflow-y: auto;
   width: 300px;
@@ -80,7 +80,7 @@ button {
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #fff8e1;
+    background-color: #e2fcea;
   }
 }
 
