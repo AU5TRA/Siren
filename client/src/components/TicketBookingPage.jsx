@@ -62,7 +62,7 @@ const TicketBookingPage = () => {
         <div className="offer-cards">
           {offers.map((offer) => (
             <div key={offer.offer_id} className={`offer-card ${selectedOffer && selectedOffer.offer_id === offer.offer_id ? 'selected' : ''}`}>
-              <p>{offer.offer_description}</p>
+              <p>{offer.offer_description}!</p>
               <button onClick={() => handleOfferSelect(offer)}>
                 {selectedOffer && selectedOffer.offer_id === offer.offer_id ? 'Selected' : 'Select'}
               </button>
@@ -70,10 +70,9 @@ const TicketBookingPage = () => {
           ))}
         </div>
       </div>
-
+            <span style={{padding:'20px'}}></span>
       <div>
-        <h2>Discounted Fare</h2>
-        <p>{discountedFare}</p>
+        <p><strong>Discounted Fare: </strong>{discountedFare} tk.</p>
       </div>
     </>
   );
