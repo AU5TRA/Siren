@@ -135,12 +135,13 @@ CREATE TABLE transaction (
 
 
 CREATE TABLE ticket (
-    ticket_id VARCHAR(15) PRIMARY KEY,
+    ticket_id VARCHAR(15) SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES passenger(user_id),
+    seat_id INTEGER REFERENCES seat(seat_id),
     boarding_station_id INTEGER REFERENCES boarding_station(b_station_id),
     destination_station_id INTEGER REFERENCES boarding_station(b_station_id),
-    total_fare DECIMAL(10, 2) NOT NULL,
-    travel_status VARCHAR(20),
+    price DECIMAL(10, 2) NOT NULL,
+    ticket_status VARCHAR(20),
     transaction_id INTEGER REFERENCES transaction(transaction_id)
 );
 

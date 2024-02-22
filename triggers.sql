@@ -1,5 +1,5 @@
 -- register new user trigger
-CREATE OR REPLACE FUNCTION log_in()
+CREATE OR REPLACE FUNCTION sign_up()
 RETURNS TRIGGER AS $$
 DECLARE
     LNAME VARCHAR(50);
@@ -53,11 +53,11 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE TRIGGER log_in_trigger
+CREATE TRIGGER sign_up_trigger
 BEFORE INSERT 
 ON passenger
 FOR EACH ROW
-EXECUTE FUNCTION log_in();
+EXECUTE FUNCTION sign_up();
 
 
 
@@ -91,21 +91,30 @@ EXECUTE FUNCTION check_password();
 -- inserting into ticket and transaction table
 CREATE OR REPLACE FUNCTION insert_ticket_transaction()
 RETURNS TRIGGER AS $$
-DECLARE
-    
 BEGIN
     IF NEW.transaction_id IS NULL THEN
-        NEW.received := 'false';
-        INSERT INTO transaction(mode_of_transaction,offer_id, transaction_time, amount, received);
-    END IF;
-    ELSE IF NEW.transaction_id IS NOT NULL THEN
-        NEW.received := 'true';
-        INSERT INTO transaction(transaction_id, mode_of_transaction,offer_id, transaction_time, amount, received);
-        INSERT INTO ticket(ticket_id, user_id, boarding_station_id, destination_station_id, total_fare, travel_status, transaction_id);
+        NEW.received := FALSE;
+        NEW.ticket_status := 'pending';
+        INSERT INTO ticket(ticket_id, user_id, boarding_station_id, destination_station_id, total_fare, travel_status)
+        VALUES (NEW.ticket_id, NEW.user_id, NEW.boarding_station_id, NEW.destination_station_id, NEW.total_fare, NEW.travel_status);
+    ELSIF NEW.transaction_id IS NOT NULL THEN
+        NEW.received := TRUE;
+        NEW.ticket_status := 'confirmed';
+        INSERT INTO transaction(transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received)
+        VALUES (NEW.transaction_id, NEW.mode_of_transaction, NEW.offer_id, NEW.transaction_time, NEW.amount, NEW.received);
+        INSERT INTO ticket(ticket_id, user_id, boarding_station_id, destination_station_id, total_fare, travel_status, transaction_id)
+        VALUES (NEW.ticket_id, NEW.user_id, NEW.boarding_station_id, NEW.destination_station_id, NEW.total_fare, NEW.travel_status, NEW.transaction_id);
     END IF;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;    
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER insert_ticket_transaction_trigger
+BEFORE INSERT
+ON ticket
+FOR EACH ROW
+EXECUTE FUNCTION insert_ticket_transaction();
 
 
 

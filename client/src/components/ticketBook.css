@@ -1,46 +1,46 @@
 .offer-cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  
-  .offer-card {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    width: 200px;
-  }
-  
-  .offer-card p {
-    margin: 0;
-  }
-  
-  .offer-card button {
-    margin-top: 10px;
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .offer-card.selected {
-    background-color: #007bff;
-    color: #fff;
-  }
-  
-  .offer-card.selected button {
-    background-color: #fff;
-    color: #007bff;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 
-  .confirmButton {
-    background-color: rgb(83, 165, 83);
-  }
-  
+.offer-card {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  width: 200px;
+}
 
-  .confirmButton:hover {
-    background-color: rgb(101, 147, 101);
-    color: white;
+.offer-card p {
+  margin: 0;
+}
+
+.offer-card button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #206f49;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.offer-card.selected {
+  background-color: #206f49;
+  color: #fff;
+}
+
+.offer-card.selected button {
+  background-color: #fff;
+  color: #007bff;
+}
+
+.confirmButton {
+  background-color: rgb(83, 165, 83);
+}
+
+
+.confirmButton:hover {
+  background-color: rgb(101, 147, 101);
+  color: white;
 }
