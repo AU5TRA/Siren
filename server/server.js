@@ -10,15 +10,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-function generateTicketId(trainName, className, date) {
-  const timestamp = Date.now();
-  const uniqueString = trainName.slice(0, 3) + className.slice(0, 3) + date.replaceAll('-', '');
-  const randomString = Math.random().toString(36).substring(2, 7);
-
-  return uniqueString + '_' + timestamp + '_' + randomString;
-}
-
-
 app.post("/booking/confirm", async (req, res) => {
   try {
     const { date,
