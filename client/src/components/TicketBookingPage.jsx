@@ -41,6 +41,35 @@ const TicketBookingPage = () => {
     }
   };
 
+
+  const handleConfirm = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/booking/confirm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          date,
+          selectedSeats,
+          totalFare,
+          selectedStation,
+          selectedStation_d,
+          selectedOffer,
+          discountedFare,
+        }),
+      });
+      const result = await response.json();
+      if (result.status === 'success') {
+        alert('Booking confirmed successfully');
+      } else {
+        alert('Booking failed');
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+
   return (
     <>
       <div>
@@ -70,9 +99,12 @@ const TicketBookingPage = () => {
           ))}
         </div>
       </div>
-            <span style={{padding:'20px'}}></span>
+      <span style={{ padding: '20px' }}></span>
       <div>
         <p><strong>Discounted Fare: </strong>{discountedFare} tk.</p>
+      </div>
+      <div>
+        <button className='confirmButton' style={{ width: '200px' }} onClick={handleConfirm}>Confirm Booking</button>
       </div>
     </>
   );

@@ -43,7 +43,7 @@ BEGIN
         RAISE EXCEPTION 'Insert a valid date of Birth' USING ERRCODE = 'XX006';
     END IF;
 
-    IF NEW.phone_number IS NULL OR LENGTH(NEW.phone_number) < 11 THEN
+    IF NEW.phone_number IS NULL OR LENGTH(NEW.phone_number) <> 11 THEN
         RAISE EXCEPTION 'Invalid phone Number' USING ERRCODE = 'XX004';
     END IF;
 
@@ -84,3 +84,45 @@ BEFORE UPDATE
 ON passenger
 FOR EACH ROW
 EXECUTE FUNCTION check_password();
+
+
+
+
+-- inserting into ticket and transaction table
+CREATE OR REPLACE FUNCTION insert_ticket_transaction()
+RETURNS TRIGGER AS $$
+DECLARE
+    
+BEGIN
+    IF NEW.transaction_id IS NULL THEN
+        NEW.received := 'false';
+        INSERT INTO transaction(mode_of_transaction,offer_id, transaction_time, amount, received);
+    END IF;
+    ELSE IF NEW.transaction_id IS NOT NULL THEN
+        NEW.received := 'true';
+        INSERT INTO transaction(transaction_id, mode_of_transaction,offer_id, transaction_time, amount, received);
+        INSERT INTO ticket(ticket_id, user_id, boarding_station_id, destination_station_id, total_fare, travel_status, transaction_id);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;    
+
+
+
+
+    -- transaction_id INTEGER PRIMARY KEY,
+    -- mode_of_transaction VARCHAR(50) NOT NULL,
+    -- offer_id INTEGER REFERENCES offer(offer_id),
+    -- transaction_time TIMESTAMP,
+    -- amount DECIMAL(10, 2) NOT NULL
+    -- received BOOLEAN 
+
+
+
+    -- ticket_id VARCHAR(15) PRIMARY KEY,
+    -- user_id INTEGER REFERENCES passenger(user_id),
+    -- boarding_station_id INTEGER REFERENCES boarding_station(b_station_id),
+    -- destination_station_id INTEGER REFERENCES boarding_station(b_station_id),
+    -- total_fare DECIMAL(10, 2) NOT NULL,
+    -- travel_status VARCHAR(20),
+    -- transaction_id INTEGER REFERENCES transaction(transaction_id)
