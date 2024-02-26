@@ -10,6 +10,33 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+
+app.get("/users/:id/tickets", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const seats_map = {};
+    const results = await db.query('SELECT * FROM ticket WHERE user_id = $1', [userId]);
+    console.log(userId);
+    for(const ticket of results.rows){
+      const seat = await db.query('SELECT seat_number FROM seat WHERE seat_id = $1', [ticket.seat_id]);
+      seats_map[ticket.ticket_id] = seat.rows[0].seat_number;
+    }
+    // console.log(results.rows);  
+    console.log(seats_map);
+    console.log(results.rows);
+    
+    res.status(200).json({
+      status: "success",
+      data: {
+        tickets: results.rows,
+        map : seats_map
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 app.post("/booking/confirm", async (req, res) => {
   try {
     const { date,
@@ -70,7 +97,7 @@ app.post("/booking/confirm", async (req, res) => {
 
 
 
-
+      // const tickets = [];
 
     for (const seat of selectedSeatsArray) {
       console.log(seat);
@@ -86,12 +113,17 @@ app.post("/booking/confirm", async (req, res) => {
       console.log(typeof seat_id_n+'++');
       // const result = await db.query(insertQuery, [userId, b_station_id, d_station_id, price, transactionId, seat_id]);
       const result = await db.query('SELECT * from insert_ticket_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9)', [userId, b_station_id, d_station_id, price, transactionId, seat_id_n, route, date, stations]);
+      // const ticketRes = await db.query('SELECT * FROM ticket WHERE user_id = $1 AND seat_id = $2', [userId, seat_id_n]);
+      // console.log(ticketRes.rows[0]);
+      // tickets.push(ticketRes.rows[0].ticket_id);
     }
+
+    // console.log("-------" + tickets + "-------");
 
     res.status(200).json({
       status: "success",
       data: {
-
+        // ticket: tickets,
       }
     });
   } catch (error) {

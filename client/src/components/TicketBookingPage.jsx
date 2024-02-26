@@ -1,5 +1,6 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import {useData} from './AppContext'
@@ -22,6 +23,7 @@ const customStyles = {
 const TicketBookingPage = () => {
   const {userId, route}= useData();
   const location = useLocation();
+  // const navigate = useNavigate();
   const { selectedSeats, totalFare, trainName, className, routeName, date, from, to, selectedStation, selectedStation_d } = location.state;
 
   const [offers, setOffers] = useState([]);
@@ -30,6 +32,8 @@ const TicketBookingPage = () => {
 
   const [modalIsOpen, setIsOpen] = useState(false);
   const [transactionId, setTransactionId] = useState(null);
+
+  // const [tickets, setTickets] = useState([]);
 
   useEffect(() => {
     // const fetchData = ()
@@ -87,6 +91,17 @@ const TicketBookingPage = () => {
       const result = await response.json();
       if (result.status === 'success') {
         alert('Booking confirmed successfully');
+        // console.log(result.data.ticket);
+        // setTickets(result.data.ticket);
+        // console.log(tickets);
+        if(transactionId == null) 
+        {
+          // window.location.href = `/users/${userId}`;
+          // location
+          window.location.href = `/users/${userId}`;
+          // navigate(`/users/${userId}`, {state : {seat_numbers : selectedSeats, ticket_ids : tickets}});
+        }
+        else window.location.href = `/`;
       } else {
         alert('Booking failed');
       }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useData } from './AppContext';
 import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
@@ -21,6 +21,7 @@ const customStyles = {
 const ShowUser = () => {
   const modalRef = React.createRef();
   const navigate = useNavigate();
+  const location = useLocation();
   const { loginState, userId } = useData();
   const { id } = useParams();
   const [userData, setUserData] = useState([]);
@@ -37,6 +38,7 @@ const ShowUser = () => {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [errMessage, setErrMessage] = useState('');
   const [errorModalIsOpen, setErrorModalIsOpen] = useState(false);
+  const [seatmap, setMap] = useState({});
 
 
   // const [passGiven, setPassGiven] = useState(false);
@@ -60,6 +62,10 @@ const ShowUser = () => {
         if (id == "") {
           return;
         }
+        const { seat_numbers, ticket_ids } = location.state;
+        console.log("seat_numbers: " + seat_numbers);
+        console.log("ticket_ids: " + ticket_ids);
+
         const response = await fetch(`http://localhost:3001/users/${id}`);
         const rec = await response.json();
         // console.log(rec.data.result);
@@ -74,13 +80,31 @@ const ShowUser = () => {
         setDOB(rec.data.result.date_of_birth || '');
         setBirthReg(rec.data.result.birth_registration_number || '');
 
+
         // console.log(userData);
       } catch (error) {
         console.error(error.message);
       }
     };
 
+    const fetchTicketHistory = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/users/${id}/tickets`);
+        const rec = await response.json();
+        // console.log(rec.data);
+        setTicketHistory(rec.data.tickets);
+        console.log(ticketHistory);
+        setMap(rec.data.map);
+        console.log(seatmap);
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
+
     fetchUserData();
+    fetchTicketHistory();
+
+
   }, [id]);
 
   function openModal() {
@@ -191,17 +215,53 @@ const ShowUser = () => {
                 <div className={cardClicked ? "col-md-6 clicked" : "col-md-6"} onClick={() => setCardClicked(!cardClicked)}>
                   <div className={cardClicked ? "ticket-history clicked" : "ticket-history"}>
 
+                    {/* {ticketHistory && ticketHistory.length > 0 ? (
+                      ticketHistory.map(ticket => (
+                        <div key={ticket.ticket_id} className="ticket-history-entry">
+                          <p><strong>Ticket ID:</strong> {ticket.ticket_id}</p>
+                          <p><strong>Status:</strong> {ticket.ticket_status}</p>
+                          <p><strong>Seat Number</strong></p>
+                          <ul>
+                            {seatmap && seatmap[ticket.seat_id].map(seat => (
+                              <li key={seat.seat_number}>{seat.seat_number}</li>
+                            ))}
+                          </ul>
+                          <span style={{ padding: '25px' }}></span>
+                        </div>
+
+                      ))
+                    ) : (
+                      <p>No ticket history available.</p>
+                    )} */}
                     {ticketHistory && ticketHistory.length > 0 ? (
                       ticketHistory.map(ticket => (
-                        <div key={ticket.id} className="ticket-history-entry">
-                          <p><strong>Ticket ID:</strong> {ticket.id}</p>
-                          <p><strong>Status:</strong> {ticket.status}</p>
-                          {/* ticket details here */}
+                        <div key={ticket.ticket_id} className="ticket-history-entry">
+                          <p><strong>Ticket ID:</strong> {ticket.ticket_id}</p>
+                          <p><strong>Status:</strong> {ticket.ticket_status}</p>
+                          <p><strong>Seat Number:</strong> {seatmap[ticket.seat_id]}</p>
+                          <p><strong>Price:</strong>{ticket.price}</p>
+                          {/* <p><strong>Date of journey:</strong> {ticket.travel_date}</p> */}
+                          {
+                            ticket.ticket_status === 'pending' ? (
+                              // <Link to={`/users/${userData.user_id}/tickets/${ticket.ticket_id}`} className="btn btn-warning">Pay</Link>
+                              // <button className="btn btn-warning" onClick={() => navigate(`/users/${userData.user_id}/tickets/${ticket.ticket_id}`, { state: { ticket_id: ticket.ticket_id, seat_id: ticket.seat_id, price: ticket.price } })}>Pay</button>
+                              <button style={{
+                                width: '150px', height: '30px', backgroundColor: 'green', color: 'white', fontSize: '15px', display: 'flex', justifyContent: 'center',
+                                alignItems: 'center'
+                              }} >proceed to pay</button>
+                            ) : (
+                              <p><strong>Transaction ID:</strong> {ticket.transaction_id}</p>
+                            )
+
+                          }
+                          <span style={{ padding: '25px' }}></span>
                         </div>
                       ))
                     ) : (
                       <p>No ticket history available.</p>
                     )}
+
+
                   </div>
                 </div>
               </div>
@@ -289,14 +349,14 @@ const ShowUser = () => {
 
             {/*<input type="text" className='form-control' placeholder='First name' value={first_name} onChange={e => setFirstName(e.target.value)} /> */}
           </div>
-    
+
           <div className="modal-footer">
-          <button type="submit" className="btn btn-warning">
-            Confirm
-          </button>
-          <button type="button" onClick={resetInfo} className="btn btn-danger">
-            Reset
-          </button>
+            <button type="submit" className="btn btn-warning">
+              Confirm
+            </button>
+            <button type="button" onClick={resetInfo} className="btn btn-danger">
+              Reset
+            </button>
           </div>
         </form>
         <ErrorModal

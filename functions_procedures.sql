@@ -60,7 +60,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-drop function insert_ticket_transaction;
+-- drop function insert_ticket_transaction;
 
 
 -----------------------------------------------station sequence finding function
