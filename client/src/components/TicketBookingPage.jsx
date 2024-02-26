@@ -32,6 +32,7 @@ const TicketBookingPage = () => {
 
   const [modalIsOpen, setIsOpen] = useState(false);
   const [transactionId, setTransactionId] = useState(null);
+  
 
   // const [tickets, setTickets] = useState([]);
 

@@ -43,6 +43,7 @@ const ShowUser = () => {
 
   // const [passGiven, setPassGiven] = useState(false);
   const [cardClicked, setCardClicked] = useState(false);
+  const [ticketTransactionMap, setTicketTransactionMap] = useState([]);
 
 
   useEffect(() => {
@@ -62,15 +63,12 @@ const ShowUser = () => {
         if (id == "") {
           return;
         }
-        const { seat_numbers, ticket_ids } = location.state;
-        console.log("seat_numbers: " + seat_numbers);
-        console.log("ticket_ids: " + ticket_ids);
 
         const response = await fetch(`http://localhost:3001/users/${id}`);
         const rec = await response.json();
-        // console.log(rec.data.result);
+        console.log(rec.data.result);
         setUserData(rec.data.result);
-        //setUser(rec.data.result);
+        // setUser(rec.data.result);
         // console.log("hello");
 
         setAddress(rec.data.result.address || '');
@@ -93,9 +91,21 @@ const ShowUser = () => {
         const rec = await response.json();
         // console.log(rec.data);
         setTicketHistory(rec.data.tickets);
-        console.log(ticketHistory);
         setMap(rec.data.map);
-        console.log(seatmap);
+        // console.log(ticketHistory);
+        // console.log(seatmap);
+        console.log('Updated ticket history:', rec.data.tickets);
+        console.log('Updated seatmap:', rec.data.map);
+        let ttMap = [];
+        ticketHistory.forEach(ticket => {
+          console.log(ticket.ticket_id + " " + ticket.transaction_id);
+          if (!ttMap[ticket.transaction_id]) {
+            ttMap[ticket.transaction_id] = []; 
+          }
+          ttMap[ticket.transaction_id].push(ticket.ticket_id);
+        });
+        setTicketTransactionMap(ttMap);
+        console.log(ticketTransactionMap);
       } catch (error) {
         console.error(error.message);
       }
@@ -242,6 +252,7 @@ const ShowUser = () => {
                     ) : (
                       <p>No ticket history available.</p>
                     )}
+                    
 
 
                   </div>
