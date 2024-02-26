@@ -10,15 +10,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-function generateTicketId(trainName, className, date) {
-  const timestamp = Date.now();
-  const uniqueString = trainName.slice(0, 3) + className.slice(0, 3) + date.replaceAll('-', '');
-  const randomString = Math.random().toString(36).substring(2, 7);
-
-  return uniqueString + '_' + timestamp + '_' + randomString;
-}
-
-
 app.post("/booking/confirm", async (req, res) => {
   try {
     const { date,
@@ -28,16 +19,63 @@ app.post("/booking/confirm", async (req, res) => {
       selectedStation_d,
       selectedOffer,
       discountedFare,
+<<<<<<< HEAD
     userId} = req.body;
     // const ticketId = generateTicketId(selectedStation, selectedStation_d, date);
     console.log(date + " " + selectedSeats + " " + totalFare + " " + selectedStation + " " + selectedStation_d + " " + selectedOffer + " " + discountedFare+" "+ userId);
+=======
+      transactionId,
+      userId,
+      route,
+      trainName,
+      className } = req.body;
+
+    console.log("******" + selectedSeats + "******" + typeof selectedSeats);
+    const selectedSeatsArray = [...selectedSeats];
+    // const ticketId = generateTicketId(selectedStation, selectedStation_d, date);
+    console.log(date + " " + selectedSeats + " " + totalFare + " " + selectedStation + " " + selectedStation_d + " " + selectedOffer + " " + discountedFare + " " + transactionId + " user: " + userId + " " + route);
+    const cnt = selectedSeatsArray.length;
+    console.log(cnt);
+
+    const price = totalFare / cnt;
+    console.log(price);
+
+    const insertQuery = `INSERT INTO ticket (user_id, boarding_station_id, destination_station_id , price, transaction_id, seat_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
+    const result1 = await db.query(`SELECT B_STATION_ID FROM BOARDING_STATION WHERE B_STATION_NAME = $1`, [selectedStation]);
+    const result2 = await db.query(`SELECT B_STATION_ID FROM BOARDING_STATION WHERE B_STATION_NAME = $1`, [selectedStation_d]);
+    const b_station_id = result1.rows[0].b_station_id;
+    const d_station_id = result2.rows[0].b_station_id;
+>>>>>>> ed0d469cac770b173304329826d6f46312d7089d
 
 
-    
+    // const result = await db.query(insertQuery, [1, selectedStation, selectedStation_d, price, ]);
+    const result4 = await db.query(`SELECT train_id FROM train WHERE train_name = $1 `, [trainName]);
+    const train_id = result4.rows[0].train_id;
+    const result5 = await db.query(`SELECT class_id FROM class WHERE class_name = $1 `, [className]);
+    const class_id = result5.rows[0].class_id;
+
+    console.log("----" + selectedSeatsArray.length + "----")
+
+    for (const seat of selectedSeatsArray) {
+      console.log(seat);
+      console.log(typeof seat);
+      // p_user_id INTEGER,
+      // p_boarding_station_id INTEGER,
+      // p_destination_station_id INTEGER,
+      // p_price DECIMAL(10, 2),
+      // p_transaction_id INTEGER
+
+      const result3 = await db.query(`SELECT SEAT_ID FROM SEAT WHERE SEAT_NUMBER = $1 AND route_id= $2 AND TRAIN_ID= $3 AND CLASS_ID=$4`, [seat.toString(), route, train_id, class_id]);
+      const seat_id = result3.rows[0].seat_id;
+      console.log(typeof seat_id);
+      // const result = await db.query(insertQuery, [userId, b_station_id, d_station_id, price, transactionId, seat_id]);
+      const result = await db.query('SELECT * from insert_ticket_transaction($1, $2, $3, $4, $5, $6)', [userId, b_station_id, d_station_id, price, transactionId, seat_id]);
+    }
+
     res.status(200).json({
       status: "success",
       data: {
-        
+
       }
     });
   } catch (error) {

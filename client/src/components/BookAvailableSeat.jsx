@@ -25,7 +25,7 @@ const BookAvailableSeat = () => {
     const [selectedStation, setSelectedStation] = useState('');
     const [selectedStation_d, setSelectedStation_d] = useState('');
 
-
+    const {setRoute} = useData();
     const [b_station, setB_station] = useState([]);
     const [d_station, setD_station] = useState([]);
 
@@ -44,7 +44,7 @@ const BookAvailableSeat = () => {
         const dateParam = searchParams.get('date');
         const fromParam = searchParams.get('from');
         const toParam = searchParams.get('to'); //gets data from url
-
+        setRoute(routeIdParam);
         // setClassId(classIdParam);
         // setTrainId(trainIdParam);
         setRouteId(routeIdParam);
