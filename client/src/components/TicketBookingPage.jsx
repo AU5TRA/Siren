@@ -2,14 +2,8 @@ import React from 'react'
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
-<<<<<<< HEAD
-
-import { useData } from './AppContext';
-import { useNavigate } from 'react-router-dom';
-=======
 import {useData} from './AppContext'
 
->>>>>>> ed0d469cac770b173304329826d6f46312d7089d
 import './ticketBook.css';
 
 const customStyles = {
@@ -35,12 +29,7 @@ const TicketBookingPage = () => {
   const [discountedFare, setDiscountedFare] = useState(totalFare);
 
   const [modalIsOpen, setIsOpen] = useState(false);
-<<<<<<< HEAD
-  const [transactionId, setTransactionId] = useState('');
-  const{userId}= useData();
-=======
   const [transactionId, setTransactionId] = useState(null);
->>>>>>> ed0d469cac770b173304329826d6f46312d7089d
 
   useEffect(() => {
     // const fetchData = ()
@@ -88,15 +77,11 @@ const TicketBookingPage = () => {
           selectedStation_d,
           selectedOffer,
           discountedFare,
-<<<<<<< HEAD
-          userId
-=======
           transactionId,
           userId,
           className,
           trainName,
           route
->>>>>>> ed0d469cac770b173304329826d6f46312d7089d
         }),
       });
       const result = await response.json();

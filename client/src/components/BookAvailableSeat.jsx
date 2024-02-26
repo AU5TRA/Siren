@@ -137,6 +137,10 @@ const BookAvailableSeat = () => {
 
     const handleBookClick = async () => {
         // ticket booking
+        if(totalFare === 0){
+            alert('Please select at least One Seat');
+        }
+        else
         navigate('/booking/ticket', { state: { selectedSeats, totalFare, trainName, className, routeName, date, from, to, selectedStation, selectedStation_d} })
     }
 

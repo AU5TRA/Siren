@@ -19,11 +19,6 @@ app.post("/booking/confirm", async (req, res) => {
       selectedStation_d,
       selectedOffer,
       discountedFare,
-<<<<<<< HEAD
-    userId} = req.body;
-    // const ticketId = generateTicketId(selectedStation, selectedStation_d, date);
-    console.log(date + " " + selectedSeats + " " + totalFare + " " + selectedStation + " " + selectedStation_d + " " + selectedOffer + " " + discountedFare+" "+ userId);
-=======
       transactionId,
       userId,
       route,
@@ -45,7 +40,6 @@ app.post("/booking/confirm", async (req, res) => {
     const result2 = await db.query(`SELECT B_STATION_ID FROM BOARDING_STATION WHERE B_STATION_NAME = $1`, [selectedStation_d]);
     const b_station_id = result1.rows[0].b_station_id;
     const d_station_id = result2.rows[0].b_station_id;
->>>>>>> ed0d469cac770b173304329826d6f46312d7089d
 
 
     // const result = await db.query(insertQuery, [1, selectedStation, selectedStation_d, price, ]);
@@ -55,6 +49,28 @@ app.post("/booking/confirm", async (req, res) => {
     const class_id = result5.rows[0].class_id;
 
     console.log("----" + selectedSeatsArray.length + "----")
+  
+
+    const result = await db.query('SELECT * FROM get_station_sequence($1)', [route]);
+
+    const stationIds = result.rows.map(row => row.station_id);
+    
+    const startStation= await db.query('SELECT station_id FROM boarding_station WHERE B_STATION_NAME = $1', [selectedStation]);
+    const endStation= await db.query('SELECT station_id FROM boarding_station WHERE B_STATION_NAME = $1', [selectedStation_d]);
+    
+    const startIndex = stationIds.indexOf(startStation.rows[0].station_id);
+    console.log(startIndex+'haha'+startStation.rows[0].station_id);
+    const endIndex = stationIds.indexOf(endStation.rows[0].station_id);
+    console.log(endIndex+'haehe'+ endStation.rows[0].station_id);
+
+    const stations = stationIds.slice(startIndex, endIndex + 1);
+
+
+      console.log(stations+"\\\\\\\\\\\\\\\\\\\\\\");
+
+
+
+
 
     for (const seat of selectedSeatsArray) {
       console.log(seat);
@@ -66,10 +82,10 @@ app.post("/booking/confirm", async (req, res) => {
       // p_transaction_id INTEGER
 
       const result3 = await db.query(`SELECT SEAT_ID FROM SEAT WHERE SEAT_NUMBER = $1 AND route_id= $2 AND TRAIN_ID= $3 AND CLASS_ID=$4`, [seat.toString(), route, train_id, class_id]);
-      const seat_id = result3.rows[0].seat_id;
-      console.log(typeof seat_id);
+      const seat_id_n = result3.rows[0].seat_id;
+      console.log(typeof seat_id_n+'++');
       // const result = await db.query(insertQuery, [userId, b_station_id, d_station_id, price, transactionId, seat_id]);
-      const result = await db.query('SELECT * from insert_ticket_transaction($1, $2, $3, $4, $5, $6)', [userId, b_station_id, d_station_id, price, transactionId, seat_id]);
+      const result = await db.query('SELECT * from insert_ticket_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9)', [userId, b_station_id, d_station_id, price, transactionId, seat_id_n, route, date, stations]);
     }
 
     res.status(200).json({
@@ -166,36 +182,39 @@ app.get('/booking/seat', async (req, res) => {
     const routeName = resultRouteName.rows[0].route_name;
 
 
-    const query3 = `
-  WITH RECURSIVE StationSequence AS (
-    SELECT 
-        rs.route_id,
-        rs.station_id,
-        rs.sequence_number,
-        s.station_name
-    FROM 
-        route_stations rs
-    JOIN 
-        station s ON rs.station_id = s.station_id
-    WHERE 
-        rs.route_id = $1
-    UNION ALL
-    SELECT 
-        rs.route_id,
-        rs.station_id,
-        rs.sequence_number,
-        s.station_name
-    FROM 
-        route_stations rs
-    JOIN 
-        StationSequence ss ON rs.route_id = ss.route_id AND rs.sequence_number = ss.sequence_number + 1
-    JOIN 
-        station s ON rs.station_id = s.station_id
+  //   const query3 = `
+  // WITH RECURSIVE StationSequence AS (
+  //   SELECT 
+  //       rs.route_id,
+  //       rs.station_id,
+  //       rs.sequence_number,
+  //       s.station_name
+  //   FROM 
+  //       route_stations rs
+  //   JOIN 
+  //       station s ON rs.station_id = s.station_id
+  //   WHERE 
+  //       rs.route_id = $1
+  //   UNION ALL
+  //   SELECT 
+  //       rs.route_id,
+  //       rs.station_id,
+  //       rs.sequence_number,
+  //       s.station_name
+  //   FROM 
+  //       route_stations rs
+  //   JOIN 
+  //       StationSequence ss ON rs.route_id = ss.route_id AND rs.sequence_number = ss.sequence_number + 1
+  //   JOIN 
+  //       station s ON rs.station_id = s.station_id
 
-  )
+  // )
 
-  SELECT DISTINCT * FROM StationSequence
-  ORDER BY sequence_number;`;
+  // SELECT DISTINCT * FROM StationSequence
+  // ORDER BY sequence_number;`;
+
+    const query3 = `SELECT * FROM get_station_sequence($1);`
+
 
     const resultForStations = await db.query(query3, [routeId]);
     console.log("resultForStations : " + resultForStations.rows.length);
@@ -424,36 +443,38 @@ app.get("/book/search", async (req, res) => {
      `;// returns the fares of those trains to go from FROM to TO for each of their classes
 
     const trainFares = await db.query(query2, [fromStationId, toStationId]);
-    const query3 = `
-        WITH RECURSIVE StationSequence AS (
-          SELECT 
-              rs.route_id,
-              rs.station_id,
-              rs.sequence_number,
-              s.station_name
-          FROM 
-              route_stations rs
-          JOIN 
-              station s ON rs.station_id = s.station_id
-          WHERE 
-              rs.route_id = $1
-          UNION ALL
-          SELECT 
-              rs.route_id,
-              rs.station_id,
-              rs.sequence_number,
-              s.station_name
-          FROM 
-              route_stations rs
-          JOIN 
-              StationSequence ss ON rs.route_id = ss.route_id AND rs.sequence_number = ss.sequence_number + 1
-          JOIN 
-              station s ON rs.station_id = s.station_id
+    // const query3 = `
+    //     WITH RECURSIVE StationSequence AS (
+    //       SELECT 
+    //           rs.route_id,
+    //           rs.station_id,
+    //           rs.sequence_number,
+    //           s.station_name
+    //       FROM 
+    //           route_stations rs
+    //       JOIN 
+    //           station s ON rs.station_id = s.station_id
+    //       WHERE 
+    //           rs.route_id = $1
+    //       UNION ALL
+    //       SELECT 
+    //           rs.route_id,
+    //           rs.station_id,
+    //           rs.sequence_number,
+    //           s.station_name
+    //       FROM 
+    //           route_stations rs
+    //       JOIN 
+    //           StationSequence ss ON rs.route_id = ss.route_id AND rs.sequence_number = ss.sequence_number + 1
+    //       JOIN 
+    //           station s ON rs.station_id = s.station_id
 
-        )
+    //     )
 
-        SELECT DISTINCT * FROM StationSequence
-        ORDER BY sequence_number;`;   // for a given route_id, extracts the stations and their sequence
+    //     SELECT DISTINCT * FROM StationSequence
+    //     ORDER BY sequence_number;`;   // for a given route_id, extracts the stations and their sequence
+
+    const query3 = `SELECT * FROM get_station_sequence($1);`
 
     let routeStations = []; // This will hold routeIDs and their stations
     for (const routeID of distinctRouteIDs) {

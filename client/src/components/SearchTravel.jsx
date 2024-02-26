@@ -35,6 +35,8 @@ const SearchTravel = () => {
   const [totalSeats, setTotalSeats] = useState({});
   const [countOut, setCountOut] = useState(0);
 
+  const{userId}= useData();
+
   useEffect(() => {
     if (inputValueFrom) {
       onSearchFunc();
@@ -287,10 +289,10 @@ const SearchTravel = () => {
                           <div><strong>Seat Count:</strong> {availableSeatsCount}</div>
                           <div>
                             <center>
-                              
+                              {userId && availableSeatsCount > 0 ? (
                               <Link to={`/bookseat?trainId=${train.train_id}&classId=${f.class_id}&routeId=${train.route_id}&date=${dateSearched}
-                              &from=${inputValueFrom}&to=${inputValueTo}&`} className='button'>book now</Link>
-
+                              &from=${inputValueFrom}&to=${inputValueTo}&`} className='button'>Book Now</Link>
+                              ): <Link to={`/users/login` } className='button'>Login to Book</Link>}
                             </center>
                           </div>
 
