@@ -103,9 +103,10 @@ app.post("/booking/confirm", async (req, res) => {
     // const tickets = [];
     const offerRes = await db.query('SELECT * FROM offer WHERE offer_id = $1', [selectedOffer]);
     const offer_id = offerRes.rows[0].offer_id;
+    console.log("transac : " + transactionId + "-----");
     // const result = await db.query(insertQuery, [userId, b_station_id, d_station_id, price, transactionId, seat_id]);
-    const res = await db.query('SELECT * FROM insert_transaction($1, $2, $3, $4, $5)', [transactionId, 'Bkash', offer_id, totalFare, userId]);
-    console.log(res.rows);
+    const resTransaction = await db.query('SELECT * FROM insert_transaction($1, $2, $3, $4, $5)', [transactionId, 'Bkash', offer_id, totalFare, userId]);
+    console.log(resTransaction.rows);
 
     for (const seat of selectedSeatsArray) {
       console.log(seat);

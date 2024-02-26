@@ -100,7 +100,7 @@ const ShowUser = () => {
         ticketHistory.forEach(ticket => {
           console.log(ticket.ticket_id + " " + ticket.transaction_id);
           if (!ttMap[ticket.transaction_id]) {
-            ttMap[ticket.transaction_id] = []; 
+            ttMap[ticket.transaction_id] = [];
           }
           ttMap[ticket.transaction_id].push(ticket.ticket_id);
         });
@@ -224,39 +224,46 @@ const ShowUser = () => {
 
                 <div className={cardClicked ? "col-md-6 clicked" : "col-md-6"} onClick={() => setCardClicked(!cardClicked)}>
                   <div className={cardClicked ? "ticket-history clicked" : "ticket-history"}>
-
-                    {ticketHistory && ticketHistory.length > 0 ? (
-                      ticketHistory.map(ticket => (
-                        <div key={ticket.ticket_id} className="ticket-history-entry">
-                          <p><strong>Ticket ID:</strong> {ticket.ticket_id}</p>
-                          <p><strong>Status:</strong> {ticket.ticket_status}</p>
-                          <p><strong>Seat Number:</strong> {seatmap[ticket.seat_id]}</p>
-                          <p><strong>Price:</strong>{ticket.price}</p>
-                          {/* <p><strong>Date of journey:</strong> {ticket.travel_date}</p> */}
-                          {
-                            ticket.ticket_status === 'pending' ? (
-                              // <Link to={`/users/${userData.user_id}/tickets/${ticket.ticket_id}`} className="btn btn-warning">Pay</Link>
-                              // <button className="btn btn-warning" onClick={() => navigate(`/users/${userData.user_id}/tickets/${ticket.ticket_id}`, { state: { ticket_id: ticket.ticket_id, seat_id: ticket.seat_id, price: ticket.price } })}>Pay</button>
-                              <button style={{
-                                width: '150px', height: '30px', backgroundColor: 'green', color: 'white', fontSize: '15px', display: 'flex', justifyContent: 'center',
-                                alignItems: 'center'
-                              }} >proceed to pay</button>
-                            ) : (
-                              <p><strong>Transaction ID:</strong> {ticket.transaction_id}</p>
-                            )
-
+                    {Object.keys(ticketTransactionMap).map(transactionId => (
+                      <div key={transactionId}>
+                        {
+                          transactionId !== 'undefined' ? ( 
+                            <h3>Transaction ID: {transactionId}</h3>
+                          ) : (
+                            <h3>unpaid</h3>
+                          )
+                        }
+                        {ticketTransactionMap[transactionId].map(ticketId => {
+                          const ticket = ticketHistory.find(ticket => ticket.ticket_id === ticketId);
+                          if (ticket) {
+                            return (
+                              <div key={ticketId} className="ticket-history-entry">
+                                <p><strong>Ticket ID:</strong> {ticket.ticket_id}</p>
+                                <p><strong>Status:</strong> {ticket.ticket_status}</p>
+                                <p><strong>Seat Number:</strong> {seatmap[ticket.seat_id]}</p>
+                                <p><strong>Price:</strong> {ticket.price}</p>
+                                {
+                                  ticket.ticket_status === 'pending' ? (
+                                    <button style={{
+                                      width: '150px', height: '30px', backgroundColor: 'green', color: 'white', fontSize: '15px', display: 'flex', justifyContent: 'center',
+                                      alignItems: 'center'
+                                    }} >proceed to pay</button>
+                                  ) : (
+                                    <p><strong>Transaction ID:</strong> {ticket.transaction_id}</p>
+                                  )
+                                }
+                                <span style={{ padding: '25px' }}></span>
+                              </div>
+                            );
+                          } else {
+                            return null;
                           }
-                          <span style={{ padding: '25px' }}></span>
-                        </div>
-                      ))
-                    ) : (
-                      <p>No ticket history available.</p>
-                    )}
-                    
-
-
+                        })}
+                      </div>
+                    ))}
                   </div>
                 </div>
+
               </div>
             </div>
             <div className="card-footer">

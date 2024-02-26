@@ -72,8 +72,8 @@ BEGIN
     if transaction_id IS NULL THEN
         received := 0;
         transaction_id := nextval('negative_transaction_id_seq');
-        INSERT INTO transaction(mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
-        VALUES (mode_of_transaction, offer_id, transaction_time, amount, received, user_id);
+        INSERT INTO transaction(transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
+        VALUES (transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id);
     ELSE
         received := 1;
         INSERT INTO transaction(transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
