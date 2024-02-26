@@ -215,24 +215,6 @@ const ShowUser = () => {
                 <div className={cardClicked ? "col-md-6 clicked" : "col-md-6"} onClick={() => setCardClicked(!cardClicked)}>
                   <div className={cardClicked ? "ticket-history clicked" : "ticket-history"}>
 
-                    {/* {ticketHistory && ticketHistory.length > 0 ? (
-                      ticketHistory.map(ticket => (
-                        <div key={ticket.ticket_id} className="ticket-history-entry">
-                          <p><strong>Ticket ID:</strong> {ticket.ticket_id}</p>
-                          <p><strong>Status:</strong> {ticket.ticket_status}</p>
-                          <p><strong>Seat Number</strong></p>
-                          <ul>
-                            {seatmap && seatmap[ticket.seat_id].map(seat => (
-                              <li key={seat.seat_number}>{seat.seat_number}</li>
-                            ))}
-                          </ul>
-                          <span style={{ padding: '25px' }}></span>
-                        </div>
-
-                      ))
-                    ) : (
-                      <p>No ticket history available.</p>
-                    )} */}
                     {ticketHistory && ticketHistory.length > 0 ? (
                       ticketHistory.map(ticket => (
                         <div key={ticket.ticket_id} className="ticket-history-entry">

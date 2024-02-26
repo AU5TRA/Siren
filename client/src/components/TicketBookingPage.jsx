@@ -1,9 +1,9 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
-import {useData} from './AppContext'
+import { useData } from './AppContext'
 
 import './ticketBook.css';
 
@@ -21,7 +21,7 @@ const customStyles = {
 
 
 const TicketBookingPage = () => {
-  const {userId, route}= useData();
+  const { userId, route } = useData();
   const location = useLocation();
   // const navigate = useNavigate();
   const { selectedSeats, totalFare, trainName, className, routeName, date, from, to, selectedStation, selectedStation_d } = location.state;
@@ -44,6 +44,8 @@ const TicketBookingPage = () => {
         console.log(JSON.stringify(result));
         if (result.status === 'success' && result.data && result.data.offers) {
           setOffers(result.data.offers);
+          console.log(result.data.offers);
+          setSelectedOffer(result.data.offers[0].offer_id);
         }
       } catch (error) {
         console.error(error.message);
@@ -56,7 +58,7 @@ const TicketBookingPage = () => {
   }, [location]);
 
   const handleOfferSelect = (offer) => {
-    setSelectedOffer(offer);
+    setSelectedOffer(offer.offer_id);
     if (offer) {
       const discount = (totalFare * offer.offer_pct) / 100;
       setDiscountedFare(totalFare - discount);
@@ -94,14 +96,13 @@ const TicketBookingPage = () => {
         // console.log(result.data.ticket);
         // setTickets(result.data.ticket);
         // console.log(tickets);
-        if(transactionId == null) 
-        {
+        if (transactionId == null) {
           // window.location.href = `/users/${userId}`;
           // location
           window.location.href = `/users/${userId}`;
           // navigate(`/users/${userId}`, {state : {seat_numbers : selectedSeats, ticket_ids : tickets}});
         }
-        else window.location.href = `/`;
+        else window.location.href = window.location.href = `/users/${userId}`;
       } else {
         alert('Booking failed');
       }
@@ -111,6 +112,7 @@ const TicketBookingPage = () => {
       console.error(error.message);
     }
   }
+
 
   const handleConfirm1 = async () => {
     try {
@@ -151,12 +153,14 @@ const TicketBookingPage = () => {
         <h2>Available Offers</h2>
         <div className="offer-cards">
           {offers.map((offer) => (
-            <div key={offer.offer_id} className={`offer-card ${selectedOffer && selectedOffer.offer_id === offer.offer_id ? 'selected' : ''}`}>
-              <p>{offer.offer_description}!</p>
-              <button onClick={() => handleOfferSelect(offer)}>
-                {selectedOffer && selectedOffer.offer_id === offer.offer_id ? 'Selected' : 'Select'}
-              </button>
-            </div>
+            offer.offer_id !== 0 && ( 
+              <div key={offer.offer_id} className={`offer-card ${selectedOffer && selectedOffer.offer_id === offer.offer_id ? 'selected' : ''}`}>
+                <p>{offer.offer_description}!</p>
+                <button onClick={() => handleOfferSelect(offer)}>
+                  {selectedOffer && selectedOffer.offer_id === offer.offer_id ? 'Selected' : 'Select'}
+                </button>
+              </div>
+            )
           ))}
         </div>
       </div>

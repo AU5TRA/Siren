@@ -18,7 +18,10 @@ $$ LANGUAGE plpgsql;
 
 
 -- ticket insert function
-CREATE OR REPLACE FUNCTION insert_ticket_transaction(
+
+
+-- drop function insert_ticket_transaction;
+CREATE OR REPLACE FUNCTION insert_ticket(
     user_id INTEGER,
     boarding_station_id INTEGER,
     destination_station_id INTEGER,
@@ -31,34 +34,60 @@ CREATE OR REPLACE FUNCTION insert_ticket_transaction(
 )
 RETURNS VOID AS $$
 BEGIN
-   
     
-FOR i IN 1 .. array_length(station_sequence, 1) 
-    LOOP
+    FOR i IN 1 .. array_length(station_sequence, 1) LOOP
         UPDATE seat_availability
         SET available = FALSE
-        WHERE seat_availability.seat_id = insert_ticket_transaction.seat_id
+        WHERE seat_availability.seat_id = insert_ticket.seat_id
         AND seat_availability.travel_date = journey_date
         AND seat_availability.station_id = station_sequence[i];
     END LOOP;
 
-
     IF transaction_id IS NULL THEN
-        INSERT INTO ticket(user_id, boarding_station_id, destination_station_id, price, ticket_status, seat_id) 
-        VALUES (user_id, boarding_station_id, destination_station_id, price, 'pending', seat_id);
+        INSERT INTO ticket(user_id, boarding_station_id, destination_station_id, price, ticket_status, seat_id, date_of_journey)
+        VALUES (user_id, boarding_station_id, destination_station_id, price, 'pending', seat_id, journey_date);
     ELSE
-        INSERT INTO transaction(transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received)
-        VALUES (transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received);
-        
-        INSERT INTO ticket(user_id, boarding_station_id, destination_station_id, price, ticket_status, transaction_id, seat_id) 
-        VALUES (user_id, boarding_station_id, destination_station_id, price, 'confirmed', transaction_id, seat_id);
+        INSERT INTO ticket(user_id, boarding_station_id, destination_station_id, price, ticket_status, transaction_id, seat_id, date_of_journey)
+        VALUES (user_id, boarding_station_id, destination_station_id, price, 'confirmed', transaction_id, seat_id, journey_date);
     END IF;
-
-    
-
+  
 END;
 $$ LANGUAGE plpgsql;
 
+
+
+-- transaction insert function
+CREATE OR REPLACE FUNCTION insert_transaction(
+    transaction_id INTEGER,
+    mode_of_transaction VARCHAR(50),
+    offer_id INTEGER,
+    amount DECIMAL(10, 2),
+    user_id INTEGER
+)
+RETURNS VOID AS $$
+DECLARE
+    transaction_time TIMESTAMP := now();
+    received INTEGER;
+BEGIN
+    if transaction_id IS NULL THEN
+        received := 0;
+        transaction_id := nextval('negative_transaction_id_seq');
+        INSERT INTO transaction(mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
+        VALUES (mode_of_transaction, offer_id, transaction_time, amount, received, user_id);
+    ELSE
+        received := 1;
+        INSERT INTO transaction(transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
+        VALUES (transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id);
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
+CREATE SEQUENCE negative_transaction_id_seq
+    START WITH -1  
+    INCREMENT BY -1; 
 
 -- drop function insert_ticket_transaction;
 

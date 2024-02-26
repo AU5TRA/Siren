@@ -124,7 +124,8 @@ CREATE TABLE transaction (
     offer_id INTEGER REFERENCES offer(offer_id),
     transaction_time TIMESTAMP,
     amount DECIMAL(10, 2) NOT NULL
-    received BOOLEAN 
+    received BOOLEAN,
+    user_id INTEGER REFERENCES passenger(user_id) 
 );
 
 
@@ -143,7 +144,8 @@ CREATE TABLE ticket (
     destination_station_id INTEGER REFERENCES boarding_station(b_station_id),
     price DECIMAL(10, 2) NOT NULL,
     ticket_status VARCHAR(20),
-    transaction_id INTEGER REFERENCES transaction(transaction_id)
+    transaction_id INTEGER REFERENCES transaction(transaction_id),
+    date_of_journey DATE
 );
 
 
