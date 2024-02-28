@@ -46,7 +46,7 @@ const TicketBookingPage = () => {
         if (result.status === 'success' && result.data && result.data.offers) {
           setOffers(result.data.offers);
           console.log(result.data.offers);
-          setSelectedOffer(result.data.offers[0].offer_id);
+         // setSelectedOffer(result.data.offers[0].offer_id);
         }
       } catch (error) {
         console.error(error.message);
@@ -155,10 +155,10 @@ const TicketBookingPage = () => {
         <div className="offer-cards">
           {offers.map((offer) => (
             offer.offer_id !== 0 && ( 
-              <div key={offer.offer_id} className={`offer-card ${selectedOffer && selectedOffer.offer_id === offer.offer_id ? 'selected' : ''}`}>
+              <div key={offer.offer_id} className={`offer-card ${selectedOffer && selectedOffer=== offer.offer_id ? 'selected' : ''}`}>
                 <p>{offer.offer_description}!</p>
                 <button onClick={() => handleOfferSelect(offer)}>
-                  {selectedOffer && selectedOffer.offer_id === offer.offer_id ? 'Selected' : 'Select'}
+                  {selectedOffer && selectedOffer === offer.offer_id ? 'Selected' : 'Select'}
                 </button>
               </div>
             )
