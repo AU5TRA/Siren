@@ -48,9 +48,9 @@ app.post("/booking/confirm", async (req, res) => {
       discountedFare,
       transactionId,
       userId,
-      route,
+      className,
       trainName,
-      className } = req.body;
+      route } = req.body;
 
     console.log(selectedOffer + "+++++++")
     console.log("******" + selectedSeats + "******" + typeof selectedSeats);

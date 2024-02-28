@@ -27,7 +27,7 @@ const TicketBookingPage = () => {
   const { selectedSeats, totalFare, trainName, className, routeName, date, from, to, selectedStation, selectedStation_d } = location.state;
 
   const [offers, setOffers] = useState([]);
-  const [selectedOffer, setSelectedOffer] = useState(null);
+  const [selectedOffer, setSelectedOffer] = useState(0);
   const [discountedFare, setDiscountedFare] = useState(totalFare);
 
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -59,7 +59,9 @@ const TicketBookingPage = () => {
   }, [location]);
 
   const handleOfferSelect = (offer) => {
+    console.log("***********"+offer.offer_id);
     setSelectedOffer(offer.offer_id);
+    console.log(+"-------------------"+selectedOffer+"-------------------");
     if (offer) {
       const discount = (totalFare * offer.offer_pct) / 100;
       setDiscountedFare(totalFare - discount);
@@ -71,6 +73,7 @@ const TicketBookingPage = () => {
 
   const handleConfirm = async () => {
     try {
+      console.log("***********-------******"+selectedOffer);
       const response = await fetch('http://localhost:3001/booking/confirm', {
         method: 'POST',
         headers: {
@@ -150,12 +153,13 @@ const TicketBookingPage = () => {
         <p>{selectedStation_d}</p>
       </div>
 
-      <div>
-        <h2>Available Offers</h2>
+      <div>  
         <div className="offer-cards">
+        
           {offers.map((offer) => (
             offer.offer_id !== 0 && ( 
               <div key={offer.offer_id} className={`offer-card ${selectedOffer && selectedOffer=== offer.offer_id ? 'selected' : ''}`}>
+                <h2>Available Offers</h2>
                 <p>{offer.offer_description}!</p>
                 <button onClick={() => handleOfferSelect(offer)}>
                   {selectedOffer && selectedOffer === offer.offer_id ? 'Selected' : 'Select'}
@@ -167,7 +171,7 @@ const TicketBookingPage = () => {
       </div>
       <span style={{ padding: '20px' }}></span>
       <div>
-        <p><strong>Discounted Fare: </strong>{discountedFare} tk.</p>
+        <p><strong>Total price: </strong>{discountedFare} tk.</p>
       </div>
       <div>
         <button className='confirmButton' style={{ width: '200px' }} onClick={handleConfirm1}>Confirm Booking</button>
