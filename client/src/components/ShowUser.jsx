@@ -19,9 +19,9 @@ const customStyles = {
 
 
 const ShowUser = () => {
-  const modalRef = React.createRef();
-  const navigate = useNavigate();
-  const location = useLocation();
+  // const modalRef = React.createRef();
+  // const navigate = useNavigate();
+  // const location = useLocation();
   const { loginState, userId } = useData();
   const { id } = useParams();
   const [userData, setUserData] = useState([]);
@@ -85,37 +85,48 @@ const ShowUser = () => {
       }
     };
 
-    const fetchTicketHistory = async () => {
-      try {
-        const response = await fetch(`http://localhost:3001/users/${id}/tickets`);
-        const rec = await response.json();
-        // console.log(rec.data);
-        setTicketHistory(rec.data.tickets);
-        setMap(rec.data.map);
-        // console.log(ticketHistory);
-        // console.log(seatmap);
-        console.log('Updated ticket history:', rec.data.tickets);
-        console.log('Updated seatmap:', rec.data.map);
-        let ttMap = [];
-        ticketHistory.forEach(ticket => {
-          console.log(ticket.ticket_id + " " + ticket.transaction_id);
-          if (!ttMap[ticket.transaction_id]) {
-            ttMap[ticket.transaction_id] = [];
-          }
-          ttMap[ticket.transaction_id].push(ticket.ticket_id);
-        });
-        setTicketTransactionMap(ttMap);
-        console.log(ticketTransactionMap);
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
+
 
     fetchUserData();
-    fetchTicketHistory();
+    // fetchTicketHistory();
 
 
   }, [id]);
+
+  useEffect(() => {
+    try {
+      if (userData.user_id) {
+        const fetchTicketHistory = async () => {
+          try {
+            const response = await fetch(`http://localhost:3001/users/${id}/tickets`);
+            const rec = await response.json();
+            // console.log(rec.data);
+            setTicketHistory(rec.data.tickets);
+            setMap(rec.data.map);
+            // console.log(ticketHistory);
+            // console.log(seatmap);
+            console.log('Updated ticket history:', rec.data.tickets);
+            console.log('Updated seatmap:', rec.data.map);
+            let ttMap = [];
+            ticketHistory.forEach(ticket => {
+              console.log(ticket.ticket_id + " " + ticket.transaction_id);
+              if (!ttMap[ticket.transaction_id]) {
+                ttMap[ticket.transaction_id] = [];
+              }
+              ttMap[ticket.transaction_id].push(ticket.ticket_id);
+            });
+            setTicketTransactionMap(ttMap);
+            console.log(ticketTransactionMap);
+          } catch (error) {
+            console.error(error.message);
+          }
+        };
+        fetchTicketHistory();
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+  }, [userData]);
 
   function openModal() {
     setIsOpen(true);
@@ -191,6 +202,7 @@ const ShowUser = () => {
     setBirthReg(userData.birth_registration_number);
   }
 
+  console.log("**************" , ticketHistory);
   return (
     <Fragment>
       <div className="container mt-5">
@@ -198,18 +210,18 @@ const ShowUser = () => {
           <div className={`card`}>
             <div className="card-header" >
               <div className="row">
-                <div className="col-md-6" onClick={() => setCardClicked(!cardClicked)}>
+                <div className="col-md-6" >
                   <h2>User Dashboard</h2>
                 </div>
-                <div className="col-md-6" onClick={() => setCardClicked(!cardClicked)}>
+                <div className="col-md-6">
                   <h2>Ticket History</h2>
                 </div>
               </div>
             </div>
             <div className="card-body" >
               <div className="row">
-                <div className={cardClicked ? "col-md-6 clicked" : "col-md-6"} onClick={() => setCardClicked(!cardClicked)}>
-                  <div className={cardClicked ? "user-information clicked" : "user-information"}>
+                <div className={"col-md-6"} >
+                  <div className={"user-information"}>
                     <p><strong>First Name:</strong> {userData.first_name}</p>
                     <p><strong>Last Name:</strong> {userData.last_name}</p>
                     <p><strong>Date of Birth:</strong> {formatDateOfBirth(userData.date_of_birth)}</p>
@@ -222,45 +234,19 @@ const ShowUser = () => {
                   </div>
                 </div>
 
-                <div className={cardClicked ? "col-md-6 clicked" : "col-md-6"} onClick={() => setCardClicked(!cardClicked)}>
-                  <div className={cardClicked ? "ticket-history clicked" : "ticket-history"}>
-                    {Object.keys(ticketTransactionMap).map(transactionId => (
-                      <div key={transactionId}>
-                        {
-                          transactionId !== 'undefined' ? ( 
-                            <h3>Transaction ID: {transactionId}</h3>
-                          ) : (
-                            <h3>unpaid</h3>
-                          )
-                        }
-                        {ticketTransactionMap[transactionId].map(ticketId => {
-                          const ticket = ticketHistory.find(ticket => ticket.ticket_id === ticketId);
-                          if (ticket) {
-                            return (
-                              <div key={ticketId} className="ticket-history-entry">
-                                <p><strong>Ticket ID:</strong> {ticket.ticket_id}</p>
-                                <p><strong>Status:</strong> {ticket.ticket_status}</p>
-                                <p><strong>Seat Number:</strong> {seatmap[ticket.seat_id]}</p>
-                                <p><strong>Price:</strong> {ticket.price}</p>
-                                {
-                                  ticket.ticket_status === 'pending' ? (
-                                    <button style={{
-                                      width: '150px', height: '30px', backgroundColor: 'green', color: 'white', fontSize: '15px', display: 'flex', justifyContent: 'center',
-                                      alignItems: 'center'
-                                    }} >proceed to pay</button>
-                                  ) : (
-                                    <p><strong>Transaction ID:</strong> {ticket.transaction_id}</p>
-                                  )
-                                }
-                                <span style={{ padding: '25px' }}></span>
-                              </div>
-                            );
-                          } else {
-                            return null;
-                          }
-                        })}
-                      </div>
-                    ))}
+                <div className={"col-md-6"}>
+                <div className="ticket-information">
+                    {ticketHistory.length > 0 ? (
+                      ticketHistory.map(ticket => (
+                        <div key={ticket.ticket_id} className="ticket-item">
+                          <p><strong>Transaction ID:</strong> {ticket.transaction_id}</p>
+                          <p><strong>Ticket ID:</strong>{ticket.ticket_id}</p>
+                          <p><strong>Fare:</strong>{ticket.price}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No tickets found.</p>
+                    )}
                   </div>
                 </div>
 
@@ -276,12 +262,6 @@ const ShowUser = () => {
           <p>Loading...</p>
         )}
       </div>
-
-      {/* <button type="button" className="btn btn-warning" onClick={() => modalRef.current.style.display = 'block'}>
-      Edit
-    </button> */}
-
-
 
       <Modal
         isOpen={modalIsOpen}
