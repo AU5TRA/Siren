@@ -13,6 +13,7 @@ app.use(cors());
 
 app.get("/users/:id/tickets", async (req, res) => {
   try {
+    console.log("in tickets?????????")
     const userId = req.params.id;
     const seats_map = {};
     const results = await db.query('SELECT * FROM ticket WHERE user_id = $1', [userId]);

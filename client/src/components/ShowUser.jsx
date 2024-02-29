@@ -104,6 +104,7 @@ const ShowUser = () => {
 
   useEffect(() => {
     try {
+      console.log("user id: ", userData.user_id);
       if (userData.user_id) {
         const fetchTicketHistory = async () => {
           try {
@@ -135,7 +136,7 @@ const ShowUser = () => {
     } catch (error) {
       console.error(error.message);
     }
-  }, [userData]);
+  }, [userId]);
 
   function openModal() {
     setIsOpen(true);
@@ -263,7 +264,7 @@ const ShowUser = () => {
                                   <p>Seat: {seatmap[ticketId]}</p>
                                   {ticket.ticket_status === 'pending' && (
                                     <button onClick={() => handleProceedToPay(transactionId)} className="payButton">
-                                      Proceed to Pay
+                                     Proceed to Pay
                                     </button>
                                   )}
                                   <span style={{ marginLeft: '150px' }}></span>
