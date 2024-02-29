@@ -29,7 +29,7 @@ function formatDate(time24) {
 
 const ShowUser = () => {
   // const modalRef = React.createRef();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   // const location = useLocation();
   const { loginState, userId } = useData();
   const { id } = useParams();
@@ -149,6 +149,9 @@ const ShowUser = () => {
     setErrorModalIsOpen(false);
   };
 
+  function showTicket() {
+    navigate(`/users/${id}/tickets`);
+  }
 
   const UpdateInformation = async (e) => {
     // console.log("here");
@@ -225,9 +228,9 @@ const ShowUser = () => {
                 <div className="col-md-6" >
                   <h2>User Dashboard</h2>
                 </div>
-                <div className="col-md-6">
+                {/* <div className="col-md-6">
                   <h2>Ticket History</h2>
-                </div>
+                </div> */}
               </div>
             </div>
             <div className="card-body" >
@@ -246,7 +249,7 @@ const ShowUser = () => {
                   </div>
                 </div>
 
-                <div className={"col-md-6"}>
+                {/* <div className={"col-md-6"}>
                   <div className="ticket-information">
                     <div className={"col-md-6"}>
                       {Object.entries(ticketTransactionMap).map(([transactionId, ticketIds]) => (
@@ -276,13 +279,17 @@ const ShowUser = () => {
                     </div>
 
                   </div>
-                </div>
+                </div> */}
 
               </div>
             </div>
             <div className="card-footer">
               <button onClick={openModal} className="btn btn-warning">
                 Edit
+              </button>
+              <span style={{ padding: '20px' }}></span>
+              <button onClick={showTicket} className="btn btn-warning">
+                Ticket History
               </button>
             </div>
           </div>
