@@ -14,9 +14,7 @@ import BookSeat from './routes/bookSeat';
 import TicketBooking from './routes/ticketBooking';
 import TicketHistory from './routes/ticketHistory';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import NavBar from './components/NavBar';
-import NavBar2 from './components/NavBar2';
 
 import './components/App.css';
 import { AppProvider } from './components/AppContext';

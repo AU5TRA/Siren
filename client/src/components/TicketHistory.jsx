@@ -55,8 +55,6 @@ const TicketHistory = () => {
         <Fragment>
             {Object.entries(ticketTransactionMap).map(([transactionId, ticketIds]) => (
                 <div key={transactionId}>
-                    {/* {console.log('Transaction ID:', transactionId)} */}
-                    {/* {console.log('Is transaction ID null?', transactionId === null || transactionId === 'null')} */}
                     {transactionId === 'null' && <h4>Pending Tickets</h4>}
                     {transactionId !== 'null' && <h4>Transaction ID: {transactionId}</h4>}
                     <ul className='ticket-details-list'>
