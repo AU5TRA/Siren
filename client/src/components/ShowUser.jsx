@@ -18,13 +18,7 @@ const customStyles = {
 };
 
 
-function formatDate(time24) {
-  const [hours, minutes] = time24.split(":");
-  const parsedHours = parseInt(hours, 10);
-  const period = parsedHours >= 12 ? "PM" : "AM";
-  const hours12 = parsedHours % 12 || 12;
-  return `${hours12}:${minutes} ${period}`;
-}
+
 
 
 const ShowUser = () => {
@@ -43,16 +37,12 @@ const ShowUser = () => {
   const [new_password, setNewPassword] = useState('');
   const [date_of_birth, setDOB] = useState('');
   const [birth_registration_number, setBirthReg] = useState('');
-  const [ticketHistory, setTicketHistory] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [errMessage, setErrMessage] = useState('');
   const [errorModalIsOpen, setErrorModalIsOpen] = useState(false);
-  const [seatmap, setMap] = useState({});
 
 
-  // const [passGiven, setPassGiven] = useState(false);
-  const [cardClicked, setCardClicked] = useState(false);
-  const [ticketTransactionMap, setTicketTransactionMap] = useState([]);
+
 
 
   useEffect(() => {
@@ -102,41 +92,7 @@ const ShowUser = () => {
 
   }, [id]);
 
-  useEffect(() => {
-    try {
-      console.log("user id: ", userData.user_id);
-      if (userData.user_id) {
-        const fetchTicketHistory = async () => {
-          try {
-            const response = await fetch(`http://localhost:3001/users/${id}/tickets`);
-            const rec = await response.json();
-            // console.log(rec.data);
-            setTicketHistory(rec.data.tickets);
-            setMap(rec.data.map);
-            // console.log(ticketHistory);
-            // console.log(seatmap);
-            console.log('Updated ticket history:', rec.data.tickets);
-            console.log('Updated seatmap:', rec.data.map);
-            let ttMap = [];
-            ticketHistory.forEach(ticket => {
-              console.log(ticket.ticket_id + " " + ticket.transaction_id);
-              if (!ttMap[ticket.transaction_id]) {
-                ttMap[ticket.transaction_id] = [];
-              }
-              ttMap[ticket.transaction_id].push(ticket.ticket_id);
-            });
-            setTicketTransactionMap(ttMap);
-            console.log(ticketTransactionMap);
-          } catch (error) {
-            console.error(error.message);
-          }
-        };
-        fetchTicketHistory();
-      }
-    } catch (error) {
-      console.error(error.message);
-    }
-  }, [userId]);
+ 
 
   function openModal() {
     setIsOpen(true);
@@ -215,10 +171,6 @@ const ShowUser = () => {
     setBirthReg(userData.birth_registration_number);
   }
 
-  const handleProceedToPay = async (transactionId) => {
-  };
-
-  console.log("**************", ticketHistory);
   return (
     <Fragment>
       <div className="container mt-5">

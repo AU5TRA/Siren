@@ -12,26 +12,31 @@ app.use(cors());
 
 
 /////////////////endpoint for ticket history
-app.get("/siren/users/:id/history", (req, res) => {
+app.get("/siren/users/:id/history", async (req, res) => {
 
-  try{
+  try {
     const userId = req.params.id;
     console.log(userId);
 
-
-
-
-
+    const seats_map = {};
+    const results = await db.query('SELECT * FROM ticket WHERE user_id = $1', [userId]);
+    console.log(userId);
+    for (const ticket of results.rows) {
+      const seat = await db.query('SELECT seat_number FROM seat WHERE seat_id = $1', [ticket.seat_id]);
+      seats_map[ticket.ticket_id] = seat.rows[0].seat_number;
+    }
+    // console.log(results.rows);  
+    console.log(seats_map);
+    console.log(results.rows);
 
     res.status(200).json({
       status: "success",
       data: {
-        
+        tickets: results.rows,
+        map: seats_map
       },
     });
-
-
-  }catch(err){
+  } catch (err) {
     console.log(err);
   }
 
