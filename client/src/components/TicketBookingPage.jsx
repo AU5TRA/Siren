@@ -46,7 +46,8 @@ const TicketBookingPage = () => {
         if (result.status === 'success' && result.data && result.data.offers) {
           setOffers(result.data.offers);
           console.log(result.data.offers);
-         // setSelectedOffer(result.data.offers[0].offer_id);
+          const size = result.data.offers.length; 
+          setSelectedOffer(result.data.offers[size-1].offer_id);
         }
       } catch (error) {
         console.error(error.message);
@@ -152,14 +153,14 @@ const TicketBookingPage = () => {
         <p>{selectedStation}</p>
         <p>{selectedStation_d}</p>
       </div>
-
+      <div><h2>Available Offers</h2></div>
       <div>  
         <div className="offer-cards">
         
           {offers.map((offer) => (
             offer.offer_id !== 0 && ( 
               <div key={offer.offer_id} className={`offer-card ${selectedOffer && selectedOffer=== offer.offer_id ? 'selected' : ''}`}>
-                <h2>Available Offers</h2>
+                
                 <p>{offer.offer_description}!</p>
                 <button onClick={() => handleOfferSelect(offer)}>
                   {selectedOffer && selectedOffer === offer.offer_id ? 'Selected' : 'Select'}
@@ -174,7 +175,7 @@ const TicketBookingPage = () => {
         <p><strong>Total price: </strong>{discountedFare} tk.</p>
       </div>
       <div>
-        <button className='confirmButton' style={{ width: '200px' }} onClick={handleConfirm1}>Confirm Booking</button>
+        <button className='secondary-button' style={{ width: '200px' }} onClick={handleConfirm1}>Confirm</button>
       </div>
 
       <Modal

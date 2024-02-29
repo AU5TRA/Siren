@@ -11,6 +11,32 @@ app.use(express.json());
 app.use(cors());
 
 
+/////////////////endpoint for ticket history
+app.get("/siren/users/:id/history", (req, res) => {
+
+  try{
+    const userId = req.params.id;
+    console.log(userId);
+
+
+
+
+
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        
+      },
+    });
+
+
+  }catch(err){
+    console.log(err);
+  }
+
+});
+
 app.get("/users/:id/tickets", async (req, res) => {
   try {
     console.log("in tickets?????????")
@@ -370,7 +396,7 @@ app.get("/review", async (req, res) => {
   try {
     const trainID = req.query.trainID;
     const classType = req.query.classType;
-    const results = await db.query('SELECT * FROM review WHERE train_id = $1 AND class_id = $2', [trainID, classType]);
+    const results = await db.query('SELECT p.user_id, p.first_name, p.last_name, r.review_content, r.rating FROM review r join passenger p on (r.user_id= p.user_id) WHERE r.train_id = $1 AND r.class_id = $2', [trainID, classType]);
     res.status(200).json({
       status: "success",
       result: results.rows,

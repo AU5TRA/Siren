@@ -12,6 +12,7 @@ import ReviewPage from './routes/reviewPage';
 import BookTrain from './routes/bookTrain';
 import BookSeat from './routes/bookSeat';
 import TicketBooking from './routes/ticketBooking';
+import TicketHistory from './routes/ticketHistory';
 import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import NavBar from './components/NavBar';
@@ -84,6 +85,7 @@ const App = () => {
                         <Route path="/users/login" element={<LoginPage setAuth={setAuth} />} />
                         <Route path="/users/:id/update" element={<UpdateUserInfo />} />
                         <Route path="/users/:id" element={<ShowUserInfo />} />
+                        <Route path="/users/:id/tickets" element={<TicketHistory />} />
                         <Route path="/users" element={<AddUserInfo />} />
                         <Route path="/search" element={<SearchUserInfo />} />
                         <Route path="/trains" element={<SearchTrainInfo />} />
@@ -92,6 +94,7 @@ const App = () => {
                         <Route path="/review" element={<ReviewPage />} />
                         <Route path="/bookseat" element={<BookSeat />} />
                         <Route path="/booking/ticket" element={<TicketBooking />} />
+                        
                     </Routes>
                 </Router>
             </AppProvider>
