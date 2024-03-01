@@ -16,7 +16,6 @@ app.post('/users/:id/transaction/:transactionId', async (req, res) => {
   console.log(req.params.transactionId);
   console.log("//////////////////////////////");
   const updateTransaction = await db.query(`UPDATE ticket SET transaction_id = $1, ticket_status = 'confirmed' WHERE user_id = $2`, [req.params.transactionId, req.params.id]);
-  const updateTransaction2 = await db.query(`UPDATE transaction SET transaction_status = 'confirmed' WHERE transaction_id = $1`, [req.params.transactionId]);
   console.log(updateTransaction);
   res.status(200).json({
     status: "success",
