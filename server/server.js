@@ -459,6 +459,7 @@ app.get("/book/search", async (req, res) => {
     const day = String(dateReceived.getDate()).padStart(2, '0');
 
     const formattedDate = `${year}-${month}-${day}`;
+   const populate= await db.query('Call populate_seat_availability()');
     const queryFrom = `SELECT station_name from station WHERE LOWER(station_name) LIKE LOWER($1);`
 
     const queryTo = `SELECT station_name from station WHERE LOWER(station_name) LIKE LOWER($1);`
