@@ -3,12 +3,27 @@ import { useData } from './AppContext';
 import './ticketBook.css';
 import Modal from 'react-modal';
 
+<<<<<<< HEAD
 function formattime(time24) {
     const [hours, minutes] = time24.split(":");
     const parsedHours = parseInt(hours, 10);
     const period = parsedHours >= 12 ? "PM" : "AM";
     const hours12 = parsedHours % 12 || 12;
     return `${hours12}:${minutes} ${period}`;
+=======
+function formatDate(time24) {
+
+    if (!time24) {
+        // Return a default value or keep as an empty string
+        return '';
+    }
+    // const [hours, minutes] = time24.split(":");
+    // const parsedHours = parseInt(hours, 10);
+    // const period = parsedHours >= 12 ? "PM" : "AM";
+    // const hours12 = parsedHours % 12 || 12;
+   // return `${hours12}:${minutes} ${period}`;
+   return time24;
+>>>>>>> 4b6685d82ccada22c1c4f76fc204921a2644400b
 }
 
 function formatDate(dateString) {
