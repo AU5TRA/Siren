@@ -5,18 +5,23 @@ const cors = require("cors");
 const db = require("./db");
 const jwtGenerator = require("./utils/jwtGenerator");
 const bcrypt = require('bcryptjs');
+const { requirePropFactory } = require("@mui/material");
 // const { v4: uuidv4 } = require('uuid');
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 
-app.post('/users/:id/transaction/:transactionId', async (req, res) => {
+app.post('/transaction/:id/transaction/:transactionId/:oldTransactionId', async (req, res) => {
   console.log(req.params.id);
   console.log(req.params.transactionId);
+  console.log(req.params.oldTransactionId);
   console.log("//////////////////////////////");
-  const updateTransaction = await db.query(`UPDATE ticket SET transaction_id = $1, ticket_status = 'confirmed' WHERE user_id = $2`, [req.params.transactionId, req.params.id]);
+
+  const updateTransaction = await db.query(`UPDATE transaction SET transaction_id = $1, received = 1 WHERE user_id = $2 AND transaction_id = $3 RETURNING *`, [req.params.transactionId, req.params.id, req.params.oldTransactionId]);
   console.log(updateTransaction);
+  const updateTicket = await db.query(`UPDATE ticket SET transaction_id = $1, ticket_status = 'confirmed' WHERE user_id = $2 AND transaction_id = $3`, [req.params.transactionId, req.params.id, req.params.oldTransactionId]);
+  console.log(updateTicket);
   res.status(200).json({
     status: "success",
     data: {
@@ -25,51 +30,6 @@ app.post('/users/:id/transaction/:transactionId', async (req, res) => {
   });
 });
 
-
-/////////////////endpoint for ticket history
-// app.get("/siren/users/:id/history", async (req, res) => {
-
-//   try {
-//     const userId = req.params.id;
-//     console.log(userId);
-
-//     const seats_map = {};
-//     const results = await db.query('SELECT * FROM ticket WHERE user_id = $1', [userId]);
-//     console.log(userId);
-//     for (const ticket of results.rows) {
-//       const seat = await db.query('SELECT seat_number FROM seat WHERE seat_id = $1', [ticket.seat_id]);
-//       seats_map[ticket.ticket_id] = seat.rows[0].seat_number;
-//     }
-
-//     // console.log(results.rows);  
-//     // console.log(seats_map);
-//     // console.log(results.rows);
-//     console.log("**********");
-
-
-
-//     const ticket_time_map = {};
-//     for (const ticket of results.rows) {
-//       const st_id = await db.query(`SELECT station_id from boarding_station where b_station_id = $1`, [ticket.boarding_station_id]);
-//       const time = await db.query(`SELECT * from schedule sc JOIN seat s ON sc.train_id = s.train_id AND sc.route_id = s.route_id
-//       WHERE s.seat_id = $1 and sc.station_id = 2;`, [ticket.seat_id, st_id.rows[0].station_id]);
-//       console.log(time.rows[0].departure_time);
-//       ticket_time_map[ticket.ticket_id] = time.rows[0].departure_time;
-//       console.log(ticket_time_map);
-//     }
-
-//     res.status(200).json({
-//       status: "success",
-//       data: {
-//         tickets: results.rows,
-//         map: seats_map
-//       },
-//     });
-//   } catch (err) {
-//     console.log(err);
-//   }
-
-// });
 
 app.get("/users/:id/tickets", async (req, res) => {
   try {
@@ -91,10 +51,10 @@ app.get("/users/:id/tickets", async (req, res) => {
       const st_id = await db.query(`SELECT station_id from boarding_station where b_station_id = $1`, [ticket.boarding_station_id]);
       const time = await db.query(`SELECT * from schedule sc JOIN seat s ON sc.train_id = s.train_id AND sc.route_id = s.route_id
       WHERE s.seat_id = $1 and sc.station_id = $2;`, [ticket.seat_id, st_id.rows[0].station_id]);
-      console.log(time.rows[0].departure);
+      // console.log(time.rows[0].departure);
       ticket_time_map[ticket.ticket_id] = time.rows[0].departure;
     }
-    console.log(ticket_time_map);
+    // console.log(ticket_time_map);
 
     res.status(200).json({
       status: "success",
@@ -178,11 +138,14 @@ app.post("/booking/confirm", async (req, res) => {
     console.log("transac : " + transactionId + "-----");
     // const result = await db.query(insertQuery, [userId, b_station_id, d_station_id, price, transactionId, seat_id]);
     const resTransaction = await db.query('SELECT * FROM insert_transaction($1, $2, $3, $4, $5)', [transactionId, 'Bkash', offer_id, totalFare, userId]);
-    console.log(resTransaction.rows);
+
+    // console.log(resTransaction.rows);
+    console.log("------//" + resTransaction.rows[0].transaction_id + "//------");
+    const transactionId2 = resTransaction.rows[0].transaction_id;
 
     for (const seat of selectedSeatsArray) {
-      console.log(seat);
-      console.log(typeof seat);
+      // console.log(seat);
+      // console.log(typeof seat);
       // p_user_id INTEGER,
       // p_boarding_station_id INTEGER,
       // p_destination_station_id INTEGER,
@@ -191,10 +154,10 @@ app.post("/booking/confirm", async (req, res) => {
 
       const result3 = await db.query(`SELECT SEAT_ID FROM SEAT WHERE SEAT_NUMBER = $1 AND route_id= $2 AND TRAIN_ID= $3 AND CLASS_ID=$4`, [seat.toString(), route, train_id, class_id]);
       const seat_id_n = result3.rows[0].seat_id;
-      console.log(typeof seat_id_n + '++');
+      // console.log(typeof seat_id_n + '++');
 
-      const result = await db.query('SELECT * from insert_ticket($1, $2, $3, $4, $5, $6, $7, $8, $9)', [userId, b_station_id, d_station_id, price, transactionId, seat_id_n, route, date, stations]);
-      console.log(result.rows);
+      const result = await db.query('SELECT * from insert_ticket($1, $2, $3, $4, $5, $6, $7, $8, $9)', [userId, b_station_id, d_station_id, price, transactionId2, seat_id_n, route, date, stations]);
+      // console.log(result.rows);
 
       // const ticketRes = await db.query('SELECT * FROM ticket WHERE user_id = $1 AND seat_id = $2', [userId, seat_id_n]);
       // console.log(ticketRes.rows[0]);
@@ -499,7 +462,7 @@ app.get("/book/search", async (req, res) => {
     const day = String(dateReceived.getDate()).padStart(2, '0');
 
     const formattedDate = `${year}-${month}-${day}`;
-   const populate= await db.query('Call populate_seat_availability()');
+    //  const populate= await db.query('Call populate_seat_availability()');
     const queryFrom = `SELECT station_name from station WHERE LOWER(station_name) LIKE LOWER($1);`
 
     const queryTo = `SELECT station_name from station WHERE LOWER(station_name) LIKE LOWER($1);`

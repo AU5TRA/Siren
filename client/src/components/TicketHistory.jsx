@@ -30,6 +30,8 @@ const TicketHistory = () => {
     const [timeMap, setTimeMap] = useState({});
     // const [showModal, setShowModal] = useState(false);
     const [modalIsOpen, setIsOpen] = useState(false);
+    const [oldTransactionId, setOldTransactionId] = useState(null);
+    const [selectedTicketId, setSelectedTicketId] = useState(null);
     const [selectedTransactionId, setSelectedTransactionId] = useState(null);
 
     useEffect(() => {
@@ -47,7 +49,7 @@ const TicketHistory = () => {
                 setSeatmap(data.data.map);
                 setTimeMap(data.data.time);
 
-                console.log("timeMap", timeMap);
+                // console.log("timeMap", timeMap);
                 const ttMap = {};
                 data.data.tickets.forEach(ticket => {
                     if (!ttMap[ticket.transaction_id]) {
@@ -56,6 +58,7 @@ const TicketHistory = () => {
                     ttMap[ticket.transaction_id].push(ticket.ticket_id);
                 });
                 setTicketTransactionMap(ttMap);
+                console.log("ttMap", ttMap);
             } catch (error) {
                 console.error(error.message);
             }
@@ -67,19 +70,38 @@ const TicketHistory = () => {
 
 
 
-    function openModal() {
+    function openModal(ticketId) {
+        console.log("ticketId", ticketId);
+        setIsOpen(true);
+        const transactionId = Object.keys(ticketTransactionMap).find(key => {
+            const ticketIds = ticketTransactionMap[key];
+            return ticketIds.includes(ticketId);
+        });
+
+        // if (transactionId !== undefined) {
+        //     setOldTransactionId(transactionId);
+        //     console.log("oldTransactionId : ", transactionId);
+        //     setSelectedTicketId(ticketId);
+            
+        // } else {
+        //     console.log("Transaction ID not found for ticket ID:", ticketId);
+        // }
+        setSelectedTicketId(ticketId);
+        setOldTransactionId(transactionId);
         setIsOpen(true);
     }
+
 
     function closeModal() {
         setIsOpen(false);
         console.log("//// selectedTransactionId : ", selectedTransactionId);
-        // sendTransactionId(selectedTransactionId);
+        console.log("//// oldTransactionId : ", oldTransactionId);
+        sendTransactionId(selectedTransactionId, oldTransactionId);
     }
 
-    const sendTransactionId = async (transactionId) => {
+    const sendTransactionId = async (transactionId, oldTransactionId) => {
         try {
-            const response = await fetch(`http://localhost:3001/users/${userId}/transaction/${transactionId}`, {
+            const response = await fetch(`http://localhost:3001/transaction/${userId}/transaction/${transactionId}/${oldTransactionId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,15 +114,15 @@ const TicketHistory = () => {
             console.error(error.message);
         }
     }
-    
+
 
 
     return (
         <Fragment>
             {Object.entries(ticketTransactionMap).map(([transactionId, ticketIds]) => (
                 <div key={transactionId}>
-                    {transactionId === 'null' && <h4>Pending Tickets</h4>}
-                    {transactionId !== 'null' && <h4>Transaction ID: {transactionId}</h4>}
+                    {transactionId < 0 || transactionId === 'null' && <h4>Pending Tickets</h4>}
+                    {transactionId > 0 && <h4>Transaction ID: {transactionId}</h4>}
                     <ul className='ticket-details-list'>
                         {ticketIds.map(ticketId => {
                             const ticket = ticketHistory.find(ticket => ticket.ticket_id === ticketId);
@@ -110,11 +132,13 @@ const TicketHistory = () => {
                                     <p><strong>Ticket status:</strong> {ticket ? ticket.ticket_status : ''}</p>
                                     <p><strong>Date:</strong> {ticket ? formatDate(ticket.date_of_journey) : ''}</p>
                                     <p><strong>Time:</strong> {ticket ? formattime(timeMap[ticket.ticket_id]) : ''}</p>
-                                    <p><strong>Seat:</strong> {seatmap[ticketId]}</p>
+                                    <p><strong>Seat number:</strong> {seatmap[ticketId]}</p>
+
                                     {ticket && ticket.ticket_status === 'pending' && (
-                                        <button onClick={openModal} className="btn btn-warning">
+                                        <button onClick={() => openModal(ticket.ticket_id)} className="btn btn-warning">
                                             Proceed to pay
                                         </button>
+
                                     )}
                                     <span style={{ marginLeft: '150px' }}></span>
                                 </li>

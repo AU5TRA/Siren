@@ -43,9 +43,9 @@ BEGIN
         AND seat_availability.station_id = station_sequence[i];
     END LOOP;
 
-    IF transaction_id IS NULL THEN
-        INSERT INTO ticket(user_id, boarding_station_id, destination_station_id, price, ticket_status, seat_id, date_of_journey)
-        VALUES (user_id, boarding_station_id, destination_station_id, price, 'pending', seat_id, journey_date);
+    IF transaction_id < 0 THEN
+        INSERT INTO ticket(user_id, boarding_station_id, destination_station_id, price, ticket_status, transaction_id, seat_id, date_of_journey)
+        VALUES (user_id, boarding_station_id, destination_station_id, price, 'pending', transaction_id, seat_id, journey_date);
     ELSE
         INSERT INTO ticket(user_id, boarding_station_id, destination_station_id, price, ticket_status, transaction_id, seat_id, date_of_journey)
         VALUES (user_id, boarding_station_id, destination_station_id, price, 'confirmed', transaction_id, seat_id, journey_date);
@@ -57,6 +57,32 @@ $$ LANGUAGE plpgsql;
 
 
 -- transaction insert function
+-- CREATE OR REPLACE FUNCTION insert_transaction(
+--     transaction_id INTEGER,
+--     mode_of_transaction VARCHAR(50),
+--     offer_id INTEGER,
+--     amount DECIMAL(10, 2),
+--     user_id INTEGER
+-- )
+-- RETURNS VOID AS $$
+-- DECLARE
+--     transaction_time TIMESTAMP := now();
+--     received INTEGER;
+-- BEGIN
+--     if transaction_id IS NULL THEN
+--         received := 0;
+--         transaction_id := nextval('negative_transaction_id_seq');
+--         INSERT INTO transaction(transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
+--         VALUES (transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id);
+--     ELSE
+--         received := 1;
+--         INSERT INTO transaction(transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
+--         VALUES (transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id);
+--     END IF;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION insert_transaction(
     transaction_id INTEGER,
     mode_of_transaction VARCHAR(50),
@@ -64,25 +90,28 @@ CREATE OR REPLACE FUNCTION insert_transaction(
     amount DECIMAL(10, 2),
     user_id INTEGER
 )
-RETURNS VOID AS $$
+RETURNS transaction AS $$
 DECLARE
     transaction_time TIMESTAMP := now();
     received INTEGER;
+    new_transaction transaction; 
 BEGIN
     if transaction_id IS NULL THEN
         received := 0;
         transaction_id := nextval('negative_transaction_id_seq');
         INSERT INTO transaction(transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
-        VALUES (transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id);
+        VALUES (transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
+        RETURNING * INTO new_transaction; 
     ELSE
         received := 1;
         INSERT INTO transaction(transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
-        VALUES (transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id);
+        VALUES (transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
+        RETURNING * INTO new_transaction; 
     END IF;
+    
+    RETURN new_transaction; 
 END;
 $$ LANGUAGE plpgsql;
-
-
 
 
 CREATE SEQUENCE negative_transaction_id_seq
