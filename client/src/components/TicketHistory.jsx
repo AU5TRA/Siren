@@ -4,11 +4,17 @@ import { useData } from './AppContext';
 import './ticketBook.css';
 
 function formatDate(time24) {
-    const [hours, minutes] = time24.split(":");
-    const parsedHours = parseInt(hours, 10);
-    const period = parsedHours >= 12 ? "PM" : "AM";
-    const hours12 = parsedHours % 12 || 12;
-    return `${hours12}:${minutes} ${period}`;
+
+    if (!time24) {
+        // Return a default value or keep as an empty string
+        return '';
+    }
+    // const [hours, minutes] = time24.split(":");
+    // const parsedHours = parseInt(hours, 10);
+    // const period = parsedHours >= 12 ? "PM" : "AM";
+    // const hours12 = parsedHours % 12 || 12;
+   // return `${hours12}:${minutes} ${period}`;
+   return time24;
 }
 
 const TicketHistory = () => {
