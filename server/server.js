@@ -11,36 +11,66 @@ app.use(express.json());
 app.use(cors());
 
 
-/////////////////endpoint for ticket history
-app.get("/siren/users/:id/history", async (req, res) => {
-
-  try {
-    const userId = req.params.id;
-    console.log(userId);
-
-    const seats_map = {};
-    const results = await db.query('SELECT * FROM ticket WHERE user_id = $1', [userId]);
-    console.log(userId);
-    for (const ticket of results.rows) {
-      const seat = await db.query('SELECT seat_number FROM seat WHERE seat_id = $1', [ticket.seat_id]);
-      seats_map[ticket.ticket_id] = seat.rows[0].seat_number;
-    }
-    // console.log(results.rows);  
-    console.log(seats_map);
-    console.log(results.rows);
-
-    res.status(200).json({
-      status: "success",
-      data: {
-        tickets: results.rows,
-        map: seats_map
-      },
-    });
-  } catch (err) {
-    console.log(err);
-  }
-
+app.post('/users/:id/transaction/:transactionId', async (req, res) => {
+  console.log(req.params.id);
+  console.log(req.params.transactionId);
+  console.log("//////////////////////////////");
+  const updateTransaction = await db.query(`UPDATE ticket SET transaction_id = $1, ticket_status = 'confirmed' WHERE user_id = $2`, [req.params.transactionId, req.params.id]);
+  const updateTransaction2 = await db.query(`UPDATE transaction SET transaction_status = 'confirmed' WHERE transaction_id = $1`, [req.params.transactionId]);
+  console.log(updateTransaction);
+  res.status(200).json({
+    status: "success",
+    data: {
+      transaction: updateTransaction.rows,
+    },
+  });
 });
+
+
+/////////////////endpoint for ticket history
+// app.get("/siren/users/:id/history", async (req, res) => {
+
+//   try {
+//     const userId = req.params.id;
+//     console.log(userId);
+
+//     const seats_map = {};
+//     const results = await db.query('SELECT * FROM ticket WHERE user_id = $1', [userId]);
+//     console.log(userId);
+//     for (const ticket of results.rows) {
+//       const seat = await db.query('SELECT seat_number FROM seat WHERE seat_id = $1', [ticket.seat_id]);
+//       seats_map[ticket.ticket_id] = seat.rows[0].seat_number;
+//     }
+
+//     // console.log(results.rows);  
+//     // console.log(seats_map);
+//     // console.log(results.rows);
+//     console.log("**********");
+
+
+
+//     const ticket_time_map = {};
+//     for (const ticket of results.rows) {
+//       const st_id = await db.query(`SELECT station_id from boarding_station where b_station_id = $1`, [ticket.boarding_station_id]);
+//       const time = await db.query(`SELECT * from schedule sc JOIN seat s ON sc.train_id = s.train_id AND sc.route_id = s.route_id
+//       WHERE s.seat_id = $1 and sc.station_id = 2;`, [ticket.seat_id, st_id.rows[0].station_id]);
+//       console.log(time.rows[0].departure_time);
+//       ticket_time_map[ticket.ticket_id] = time.rows[0].departure_time;
+//       console.log(ticket_time_map);
+//     }
+
+//     res.status(200).json({
+//       status: "success",
+//       data: {
+//         tickets: results.rows,
+//         map: seats_map
+//       },
+//     });
+//   } catch (err) {
+//     console.log(err);
+//   }
+
+// });
 
 app.get("/users/:id/tickets", async (req, res) => {
   try {
@@ -54,14 +84,25 @@ app.get("/users/:id/tickets", async (req, res) => {
       seats_map[ticket.ticket_id] = seat.rows[0].seat_number;
     }
     // console.log(results.rows);  
-    console.log(seats_map);
-    console.log(results.rows);
+    // console.log(seats_map);
+    // console.log(results.rows);
+
+    const ticket_time_map = {};
+    for (const ticket of results.rows) {
+      const st_id = await db.query(`SELECT station_id from boarding_station where b_station_id = $1`, [ticket.boarding_station_id]);
+      const time = await db.query(`SELECT * from schedule sc JOIN seat s ON sc.train_id = s.train_id AND sc.route_id = s.route_id
+      WHERE s.seat_id = $1 and sc.station_id = $2;`, [ticket.seat_id, st_id.rows[0].station_id]);
+      console.log(time.rows[0].departure);
+      ticket_time_map[ticket.ticket_id] = time.rows[0].departure;
+    }
+    console.log(ticket_time_map);
 
     res.status(200).json({
       status: "success",
       data: {
         tickets: results.rows,
-        map: seats_map
+        map: seats_map,
+        time: ticket_time_map
       },
     });
   } catch (err) {
