@@ -97,11 +97,12 @@ const TicketHistory = () => {
         console.log("//// selectedTransactionId : ", selectedTransactionId);
         console.log("//// oldTransactionId : ", oldTransactionId);
         sendTransactionId(selectedTransactionId, oldTransactionId);
+        window.location.reload();
     }
 
     const sendTransactionId = async (transactionId, oldTransactionId) => {
         try {
-            const response = await fetch(`http://localhost:3001/transaction/${userId}/transaction/${transactionId}/${oldTransactionId}`, {
+            const response = await fetch(`http://localhost:3001/transaction/${userId}/${transactionId}/${oldTransactionId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

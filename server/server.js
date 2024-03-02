@@ -12,20 +12,35 @@ app.use(express.json());
 app.use(cors());
 
 
-app.post('/transaction/:id/transaction/:transactionId/:oldTransactionId', async (req, res) => {
+app.post('/transaction/:id/:transactionId/:oldTransactionId', async (req, res) => {
   console.log(req.params.id);
   console.log(req.params.transactionId);
   console.log(req.params.oldTransactionId);
+  const oldTransactionId = req.params.oldTransactionId;
   console.log("//////////////////////////////");
 
-  const updateTransaction = await db.query(`UPDATE transaction SET transaction_id = $1, received = 1 WHERE user_id = $2 AND transaction_id = $3 RETURNING *`, [req.params.transactionId, req.params.id, req.params.oldTransactionId]);
-  console.log(updateTransaction);
+  const result = await db.query(`SELECT * FROM transaction where transaction_id = $1`, [oldTransactionId]);
+  console.log(result.rows[0]);
+  const offerId = result.rows[0].offer_id;
+  const totalFare = result.rows[0].amount;
+  console.log(offerId);
+  console.log(totalFare);
+
+  const res2 = await db.query(`SELECT * FROM insert_transaction($1, $2, $3, $4, $5)`, [req.params.transactionId, 'Bkash', offerId, totalFare, req.params.id]);
+  console.log(res2.rows);
+  
+  // const  
+
+  // const updateTransaction = await db.query(`UPDATE transaction SET transaction_id = $1, received = 1 WHERE user_id = $2 AND transaction_id = $3 RETURNING *`, [req.params.transactionId, req.params.id, req.params.oldTransactionId]);
+  // console.log(updateTransaction);
   const updateTicket = await db.query(`UPDATE ticket SET transaction_id = $1, ticket_status = 'confirmed' WHERE user_id = $2 AND transaction_id = $3`, [req.params.transactionId, req.params.id, req.params.oldTransactionId]);
   console.log(updateTicket);
+  const del = await db.query(`DELETE FROM transaction where transaction_id = $1`, [req.params.oldTransactionId]);
+  console.log(del);
   res.status(200).json({
     status: "success",
     data: {
-      transaction: updateTransaction.rows,
+      ticket : updateTicket.rows,
     },
   });
 });
