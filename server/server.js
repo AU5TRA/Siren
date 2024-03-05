@@ -80,7 +80,7 @@ app.get("/users/:id/tickets", async (req, res) => {
       WHERE s.seat_id = $1 and sc.station_id = $2;`, [ticket.seat_id, st_id.rows[0].station_id]);
       // console.log(time.rows[0].departure);
       const transactionRes = await db.query('SELECT * FROM transaction JOIN ticket ON transaction.transaction_id = ticket.transaction_id WHERE ticket.ticket_id = $1', [ticket.ticket_id]);
-      console.log(transactionRes.rows[0].mode_of_transaction);
+      // console.log(transactionRes.rows[0].mode_of_transaction);
       ticket_time_map[ticket.ticket_id] = time.rows[0].departure;
       ticket_trans_map[ticket.ticket_id] = transactionRes.rows[0].mode_of_transaction;
     }
@@ -89,7 +89,7 @@ app.get("/users/:id/tickets", async (req, res) => {
     // console.log(tr.rows);
     const transactionJourneyMap = {};
     const arr = tr.rows.map(row => row.transaction_id);
-    console.log(arr);
+    // console.log(arr);
     for (const t of arr) {
       const seatIDs = await db.query('SELECT seat_id, boarding_station_id, destination_station_id FROM ticket where transaction_id = $1', [t]);
       const seat_id_temp = seatIDs.rows[0].seat_id;
@@ -111,7 +111,7 @@ app.get("/users/:id/tickets", async (req, res) => {
       transactionJourneyMap[t] = { trainName: trainName.rows[0].train_name, className: className.rows[0].class_name, from: from, to: to };
     }
     // console.log(ticket_time_map);
-    console.log(transactionJourneyMap);
+    // console.log(transactionJourneyMap);
 
     res.status(200).json({
       status: "success",
