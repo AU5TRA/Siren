@@ -12,6 +12,18 @@ app.use(express.json());
 app.use(cors());
 
 
+app.post('/transaction/refund/:userId/:transactionId', async (req, res) => {
+  
+  const { userId, transactionId } = req.params;
+  
+
+  const result = await db.query(`SELECT * FROM transaction WHERE user_id = $1 AND transaction_id = $2`, [userId, transactionId])
+
+
+  const refund = await db.query(`CALL refund_tickets($1, $2)`, [userId, transactionId]);
+
+});
+
 app.post('/transaction/:id/:transactionId/:oldTransactionId', async (req, res) => {
   console.log(req.params.id);
   console.log(req.params.transactionId);

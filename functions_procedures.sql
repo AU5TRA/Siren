@@ -186,3 +186,57 @@ BEGIN
 END;
 $$;
 
+----- refunding
+-- CREATE OR REPLACE PROCEDURE refund_tickets(user_id INTEGER, transaction_id1 INTEGER) AS $$
+-- DECLARE
+--     refund_amt DECIMAL(10, 2);
+-- BEGIN
+--     SELECT amount * 0.8 INTO refund_amt
+--     FROM transaction
+--     WHERE transaction_id = transaction_id1;
+    
+--     INSERT INTO refund (transaction_id, refund_time, refund_amount)
+--     VALUES (transaction_id1, NOW(), refund_amt);
+
+    
+--     UPDATE seat_availability sa
+--     SET available = TRUE
+    
+--     FROM ticket t 
+--     WHERE sa.seat_id = t.seat_id 
+--     AND t.transaction_id = transaction_id1
+--     AND t.user_id = user_id;
+    
+--     DELETE FROM ticket
+--     WHERE user_id = user_id
+--     AND transaction_id = transaction_id1;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE PROCEDURE refund_tickets(user_id1 INTEGER, transaction_id1 INTEGER) 
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    refund_amt DECIMAL(10, 2);
+BEGIN
+    SELECT amount * 0.8 INTO refund_amt
+    FROM "transaction"
+    WHERE transaction_id = transaction_id1;
+    
+    INSERT INTO refund (transaction_id, refund_time, refund_amount)
+    VALUES (transaction_id1, NOW(), refund_amt);
+
+    
+    UPDATE seat_availability sa
+    SET available = TRUE
+    FROM ticket t 
+    WHERE sa.seat_id = t.seat_id 
+    AND t.transaction_id = transaction_id1
+    AND t.user_id = user_id1;
+    
+    DELETE FROM ticket
+    WHERE user_id = user_id1
+    AND transaction_id = transaction_id1;
+END;
+$$;

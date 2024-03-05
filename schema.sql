@@ -161,13 +161,6 @@ CREATE TABLE review (
 );
 
 
-CREATE TABLE refund (
-    refund_id SERIAL PRIMARY KEY,
-    transaction_id INTEGER REFERENCES transaction(transaction_id),
-    refund_time TIMESTAMP,
-    refund_amount DECIMAL(10, 2) NOT NULL
-);
-
 CREATE TABLE train_class(
     train_id INTEGER REFERENCES train(train_id),
     class_id INTEGER REFERENCES class(class_id),
