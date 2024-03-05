@@ -5,7 +5,7 @@ const cors = require("cors");
 const db = require("./db");
 const jwtGenerator = require("./utils/jwtGenerator");
 const bcrypt = require('bcryptjs');
-const { requirePropFactory } = require("@mui/material");
+// const { requirePropFactory } = require("@mui/material");
 // const { v4: uuidv4 } = require('uuid');
 const app = express();
 app.use(express.json());
@@ -18,7 +18,13 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId', async (req, res) =
   console.log(req.params.oldTransactionId);
   const oldTransactionId = req.params.oldTransactionId;
   console.log("//////////////////////////////");
-  
+  let t_id = req.params.transactionId;
+  if (t_id === '') {
+    return res.status(400).json({
+      status: "error",
+      message: "Transaction ID cannot be empty",
+    });
+  }
 
   const result = await db.query(`SELECT * FROM transaction where transaction_id = $1`, [oldTransactionId]);
   console.log(result.rows[0]);
@@ -205,24 +211,14 @@ app.post("/booking/confirm", async (req, res) => {
     const transactionId2 = resTransaction.rows[0].transaction_id;
 
     for (const seat of selectedSeatsArray) {
-      // console.log(seat);
-      // console.log(typeof seat);
-      // p_user_id INTEGER,
-      // p_boarding_station_id INTEGER,
-      // p_destination_station_id INTEGER,
-      // p_price DECIMAL(10, 2),
-      // p_transaction_id INTEGER
+
 
       const result3 = await db.query(`SELECT SEAT_ID FROM SEAT WHERE SEAT_NUMBER = $1 AND route_id= $2 AND TRAIN_ID= $3 AND CLASS_ID=$4`, [seat.toString(), route, train_id, class_id]);
       const seat_id_n = result3.rows[0].seat_id;
       // console.log(typeof seat_id_n + '++');
 
       const result = await db.query('SELECT * from insert_ticket($1, $2, $3, $4, $5, $6, $7, $8, $9)', [userId, b_station_id, d_station_id, price, transactionId2, seat_id_n, route, date, stations]);
-      // console.log(result.rows);
-
-      // const ticketRes = await db.query('SELECT * FROM ticket WHERE user_id = $1 AND seat_id = $2', [userId, seat_id_n]);
-      // console.log(ticketRes.rows[0]);
-      // tickets.push(ticketRes.rows[0].ticket_id);
+      
     }
 
     // console.log("-------" + tickets + "-------");
@@ -321,36 +317,7 @@ app.get('/booking/seat', async (req, res) => {
     const routeName = resultRouteName.rows[0].route_name;
 
 
-    //   const query3 = `
-    // WITH RECURSIVE StationSequence AS (
-    //   SELECT 
-    //       rs.route_id,
-    //       rs.station_id,
-    //       rs.sequence_number,
-    //       s.station_name
-    //   FROM 
-    //       route_stations rs
-    //   JOIN 
-    //       station s ON rs.station_id = s.station_id
-    //   WHERE 
-    //       rs.route_id = $1
-    //   UNION ALL
-    //   SELECT 
-    //       rs.route_id,
-    //       rs.station_id,
-    //       rs.sequence_number,
-    //       s.station_name
-    //   FROM 
-    //       route_stations rs
-    //   JOIN 
-    //       StationSequence ss ON rs.route_id = ss.route_id AND rs.sequence_number = ss.sequence_number + 1
-    //   JOIN 
-    //       station s ON rs.station_id = s.station_id
-
-    // )
-
-    // SELECT DISTINCT * FROM StationSequence
-    // ORDER BY sequence_number;`;
+    
 
     const query3 = `SELECT * FROM get_station_sequence($1);`
 
@@ -424,16 +391,9 @@ app.get('/booking/seat', async (req, res) => {
     // console.log("res3 : " + result3.rows.length);
 
     const b_station = await db.query('SELECT b_station_name FROM BOARDING_STATION WHERE STATION_ID = $1', [fromStationId]);
-    // const b_station = result8.reduce((map, row) => {
-    //     map[row.b_station_name] = true; // You can assign any value to the map if needed
-    //     return map;
-    // }, {});
+
 
     const d_station = await db.query('SELECT b_station_name FROM BOARDING_STATION WHERE STATION_ID = $1', [toStationId]);
-    // const d_station = result9.reduce((map, row) => {
-    //     map[row.b_station_name] = true; // You can assign any value to the map if needed
-    //     return map;
-    // }, {});
 
 
 
@@ -583,37 +543,7 @@ app.get("/book/search", async (req, res) => {
      `;// returns the fares of those trains to go from FROM to TO for each of their classes
 
     const trainFares = await db.query(query2, [fromStationId, toStationId]);
-    // const query3 = `
-    //     WITH RECURSIVE StationSequence AS (
-    //       SELECT 
-    //           rs.route_id,
-    //           rs.station_id,
-    //           rs.sequence_number,
-    //           s.station_name
-    //       FROM 
-    //           route_stations rs
-    //       JOIN 
-    //           station s ON rs.station_id = s.station_id
-    //       WHERE 
-    //           rs.route_id = $1
-    //       UNION ALL
-    //       SELECT 
-    //           rs.route_id,
-    //           rs.station_id,
-    //           rs.sequence_number,
-    //           s.station_name
-    //       FROM 
-    //           route_stations rs
-    //       JOIN 
-    //           StationSequence ss ON rs.route_id = ss.route_id AND rs.sequence_number = ss.sequence_number + 1
-    //       JOIN 
-    //           station s ON rs.station_id = s.station_id
-
-    //     )
-
-    //     SELECT DISTINCT * FROM StationSequence
-    //     ORDER BY sequence_number;`;   // for a given route_id, extracts the stations and their sequence
-
+    
     const query3 = `SELECT * FROM get_station_sequence($1);`
 
     let routeStations = []; // This will hold routeIDs and their stations
@@ -829,93 +759,7 @@ app.post("/users", async (req, res) => {
     }
     const results = await db.query(
       'INSERT INTO passenger (first_name,last_name,nid_number,birth_registration_number,phone_number,email,date_of_birth,password,gender) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [first_name, last_name, nid_number, birth_registration_number, phone_number, email, date_of_birth, hashedPassword, gender]);
-    // console.log(phone_number + " " + email);
-    // //
-    // if (!email && !phone_number) {
-    //   return res.status(300).json({ status: "email and phone_number cannot both be empty" });
-    // }
-    // else if (!email && phone_number) {
-    //   const result1 = await db.query('SELECT * FROM passenger WHERE phone_number = $1', [req.body.phone_number]);
-
-    //   if (result1.rows.length !== 0) {
-    //     // res.send("user already exists")
-    //     res.status(400).json(
-    //       {
-    //         status: "user already exists",
-    //         "userID": result1.rows[0].user_id
-    //       }
-    //     )
-    //   }
-    //   else {
-    //     const results = await db.query(
-    //       'INSERT INTO passenger (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
-    //       [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, req.body.password]
-    //     );
-    //     //console.log("row start");
-    //     const jwtToken = jwtGenerator(results.rows[0].user_id);
-    //     console.log(results.rows[0].user_id);
-    //     return res.json({ jwtToken });
-
-    //     /*res.status(201).json({
-    //       status: "succes",
-    //       "userID": results.rows[0].user_id,
-
-    //     });*/
-    //   }
-    // }
-
-    // else if (!phone_number && email) {
-    //   const result2 = await db.query('SELECT * FROM passenger WHERE email = $1', [req.body.email]);
-
-    //   if (result2.rows.length !== 0) {
-    //     res.status(400).json(
-    //       {
-    //         status: "user already exists",
-    //         "userID": result2.rows[0].user_id
-    //       }
-    //     )
-    //   }
-
-    //   else {
-    // const results = await db.query(
-    //   'INSERT INTO "user" (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
-    //   [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, hashedPassword]
-    // );
-    // const jwtToken = jwtGenerator(results.rows[0].user_id);
-    // console.log(results.rows[0].user_id);
-    // return res.json({ jwtToken });
-    /*res.status(201).json({
-      status: "succes",
-      "userID": results.rows[0].user_id
-    });*/
-    // }
-    // }
-    // else {
-    //   const check = await db.query('SELECT * FROM passenger WHERE email = $1 OR phone_number = $2', [req.body.email, req.body.phone_number]);
-    //   console.log(check);
-    //   if (check.rows.length !== 0) {
-    //     res.status(400).json(
-    //       {
-    //         status: "user already exists",
-    //         "userID": check.rows[0].user_id
-    //       }
-    //     )
-    //   }
-    //
-    // else {
-    //   const results = await db.query(
-    //     'INSERT INTO passenger (first_name,last_name,email,gender,phone_number,nid_number,date_of_birth,address,birth_registration_number,post_code,password) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
-    //     [req.body.first_name, req.body.last_name, req.body.email, req.body.gender, req.body.phone_number, req.body.nid_number, req.body.date_of_birth, req.body.address, req.body.birth_registration_number, req.body.post_code, hashedPassword]
-    //   );
-    //   //console.log("row start");
-    //   console.log(results.rows[0].user_id);
-    //   //console.log("row end");
-    //   res.status(201).json({
-    //     status: "succes",
-    //     "userID": results.rows[0].user_id
-    //   });
-    // }
-    // }
+   
 
     const jwtToken = jwtGenerator(results.rows[0].user_id);
     console.log(results.rows[0].user_id);
@@ -975,17 +819,10 @@ app.put("/users/:id/update", async (req, res) => {
 
     const user = await db.query("SELECT * FROM passenger WHERE user_id = $1", [req.params.id]);
 
-    // if (!user.rows.length) {
-    //   return res.status(404).json({ error: "User not found" });
-    // }
 
     const userData = user.rows[0];
     // const isOldPasswordValid = await bcrypt.compare(req.body.password, userData.password);
 
-    // if (!isOldPasswordValid) {
-    //   console.log("Incorrect password");
-    //   return res.status(401).json({ error: "Invalid old password" });
-    // }
 
     if (req.body.new_password === '') {
       hashedPassword = userData.password;
