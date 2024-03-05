@@ -6,9 +6,15 @@ import About from '../components/About'
 import '../components/App.css'
 import { FiArrowRight } from "react-icons/fi";
 import { Link, Navigate } from 'react-router-dom';
+
+
+
+
+
 const homepage = () => {
 
-
+  // reloadPage();
+ 
   return (
     <div>
 
@@ -32,7 +38,7 @@ const homepage = () => {
             </Link>
           </button>
         </div>
-        <div className="home-image-section"><span style={{ marginLeft: '50px' }}></span>
+        <div className="home-image-section"><span style={{ marginLeft: '50px', padding: '5px' }}></span>
           <img src={'train2.png'} alt="" />
         </div>
         

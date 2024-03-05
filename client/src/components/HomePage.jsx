@@ -10,7 +10,12 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 // import './home.css';
 
 const HomePage = () => {
-    
+   
+    const reloadPage = () =>{
+        window.location.reload();
+    }
+
+
     // return (
     //     <div>
     //         <header className="header">
@@ -50,12 +55,15 @@ const HomePage = () => {
     //     isAuth();
     // }, []); 
 
+    
+      
     return <Fragment>
+       
          {/*isAuthenticated ? <NavBar2 /> : <NavBar />}
        {/* <div className="sidebar">
             <header className="header">
                 <div className="logo">
-                    <img src="../../siren_home.png" style={{ width: '150px', height: '50px', marginLeft: '10px' }} />
+                    < src="../../siren_home.png" style={{ width: '150px', height: '50px', marginLeft: '10px' }} />
                 </div>
             </header>
             <nav className="nav">

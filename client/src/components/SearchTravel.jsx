@@ -289,10 +289,10 @@ const SearchTravel = () => {
                           <div><strong>Seat Count:</strong> {availableSeatsCount}</div>
                           <div>
                             <center>
-                              {userId && availableSeatsCount > 0 ? (
+                              {userId?  ( availableSeatsCount > 0 ? (
                               <Link to={`/bookseat?trainId=${train.train_id}&classId=${f.class_id}&routeId=${train.route_id}&date=${dateSearched}
-                              &from=${inputValueFrom}&to=${inputValueTo}&`} className='button'>Book Now</Link>
-                              ): <Link to={`/users/login` } className='button'>Login to Book</Link>}
+                              &from=${inputValueFrom}&to=${inputValueTo}&`} className='button'>Book Now</Link>): <div className='button' style={{backgroundColor:'red', width:'140px'}}>Unavailable!</div>)
+                              : <Link to={`/users/login` } className='button'>Login to Book</Link>}
                             </center>
                           </div>
 

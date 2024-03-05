@@ -200,6 +200,13 @@ button {
   transition: transform 0.3s ease-in-out;
 }
 
+.selected::after {
+  content: "✔"; /* Unicode character for tick sign */
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: green; /* Color of the tick sign */
+}
 .class-card:hover {
   transform: scale(1.05);
 }
@@ -222,6 +229,11 @@ button {
 
 .class-card div:not(:first-child) {
   font-size: 14px;
+}
+
+.class-card img {
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .datePicker2 {

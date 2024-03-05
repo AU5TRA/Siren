@@ -32,7 +32,9 @@ const TicketBookingPage = () => {
 
   const [modalIsOpen, setIsOpen] = useState(false);
   const [transactionId, setTransactionId] = useState(null);
-  
+
+  const [transMode, setTransMode] = useState('');
+  const isSelected = true;
 
   // const [tickets, setTickets] = useState([]);
 
@@ -46,8 +48,8 @@ const TicketBookingPage = () => {
         if (result.status === 'success' && result.data && result.data.offers) {
           setOffers(result.data.offers);
           console.log(result.data.offers);
-          const size = result.data.offers.length; 
-          setSelectedOffer(result.data.offers[size-1].offer_id);
+          const size = result.data.offers.length;
+          setSelectedOffer(result.data.offers[size - 1].offer_id);
         }
       } catch (error) {
         console.error(error.message);
@@ -60,9 +62,9 @@ const TicketBookingPage = () => {
   }, [location]);
 
   const handleOfferSelect = (offer) => {
-    console.log("***********"+offer.offer_id);
+    console.log("***********" + offer.offer_id);
     setSelectedOffer(offer.offer_id);
-    console.log(+"-------------------"+selectedOffer+"-------------------");
+    console.log(+"-------------------" + selectedOffer + "-------------------");
     if (offer) {
       const discount = (totalFare * offer.offer_pct) / 100;
       setDiscountedFare(totalFare - discount);
@@ -74,7 +76,7 @@ const TicketBookingPage = () => {
 
   const handleConfirm = async () => {
     try {
-      console.log("***********-------******"+selectedOffer);
+      console.log("***********-------******" + selectedOffer);
       const response = await fetch('http://localhost:3001/booking/confirm', {
         method: 'POST',
         headers: {
@@ -119,6 +121,11 @@ const TicketBookingPage = () => {
   }
 
 
+  function handlePaymentMethodSelect(method) {
+    setTransMode(method);
+  }
+
+
   const handleConfirm1 = async () => {
     try {
       openModal();
@@ -154,13 +161,13 @@ const TicketBookingPage = () => {
         <p>{selectedStation_d}</p>
       </div>
       <div><h2>Available Offers</h2></div>
-      <div>  
+      <div>
         <div className="offer-cards">
-        
+
           {offers.map((offer) => (
-            offer.offer_id !== 0 && ( 
-              <div key={offer.offer_id} className={`offer-card ${selectedOffer && selectedOffer=== offer.offer_id ? 'selected' : ''}`}>
-                
+            offer.offer_id !== 0 && (
+              <div key={offer.offer_id} className={`offer-card ${selectedOffer && selectedOffer === offer.offer_id ? 'selected' : ''}`}>
+
                 <p>{offer.offer_description}!</p>
                 <button onClick={() => handleOfferSelect(offer)}>
                   {selectedOffer && selectedOffer === offer.offer_id ? 'Selected' : 'Select'}
@@ -195,6 +202,19 @@ const TicketBookingPage = () => {
         </div>
         <form>
           <div className="modal-body">
+
+            <div
+              className={`class-card ${transMode === 'bkash' ? 'selected' : ''}`}
+              onClick={() => handlePaymentMethodSelect('bkash')}
+            >
+              <img src={'../bkash4.png'} alt="Bkash" />
+            </div>
+            <div
+              className={`class-card ${transMode === 'nagad' ? 'selected' : ''}`}
+              onClick={() => handlePaymentMethodSelect('nagad')}
+            >
+              <img src={'../nagad.png'} alt="Nagad" />
+            </div>
             <input
               type="text"
               className="form-control mb-2"
