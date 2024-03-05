@@ -25,10 +25,12 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId', async (req, res) =
   const totalFare = result.rows[0].amount;
   console.log(offerId);
   console.log(totalFare);
+  const mode = result.rows[0].mode_of_transaction;
+  console.log("////////////" + mode + "//////////////////");
 
-  const res2 = await db.query(`SELECT * FROM insert_transaction($1, $2, $3, $4, $5)`, [req.params.transactionId, 'Bkash', offerId, totalFare, req.params.id]);
+  const res2 = await db.query(`SELECT * FROM insert_transaction($1, $2, $3, $4, $5)`, [req.params.transactionId, mode, offerId, totalFare, req.params.id]);
   console.log(res2.rows);
-  
+
   // const  
 
   // const updateTransaction = await db.query(`UPDATE transaction SET transaction_id = $1, received = 1 WHERE user_id = $2 AND transaction_id = $3 RETURNING *`, [req.params.transactionId, req.params.id, req.params.oldTransactionId]);
@@ -37,10 +39,11 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId', async (req, res) =
   console.log(updateTicket);
   const del = await db.query(`DELETE FROM transaction where transaction_id = $1`, [req.params.oldTransactionId]);
   console.log(del);
+  console.log("///////////DONEEEEE????????????");
   res.status(200).json({
     status: "success",
     data: {
-      ticket : updateTicket.rows,
+      ticket: updateTicket.rows,
     },
   });
 });
@@ -62,12 +65,16 @@ app.get("/users/:id/tickets", async (req, res) => {
     // console.log(results.rows);
 
     const ticket_time_map = {};
+    const ticket_trans_map = {};
     for (const ticket of results.rows) {
       const st_id = await db.query(`SELECT station_id from boarding_station where b_station_id = $1`, [ticket.boarding_station_id]);
       const time = await db.query(`SELECT * from schedule sc JOIN seat s ON sc.train_id = s.train_id AND sc.route_id = s.route_id
       WHERE s.seat_id = $1 and sc.station_id = $2;`, [ticket.seat_id, st_id.rows[0].station_id]);
       // console.log(time.rows[0].departure);
+      const transactionRes = await db.query('SELECT * FROM transaction JOIN ticket ON transaction.transaction_id = ticket.transaction_id WHERE ticket.ticket_id = $1', [ticket.ticket_id]);
+      console.log(transactionRes.rows[0].mode_of_transaction);
       ticket_time_map[ticket.ticket_id] = time.rows[0].departure;
+      ticket_trans_map[ticket.ticket_id] = transactionRes.rows[0].mode_of_transaction;
     }
     // console.log(ticket_time_map);
 
@@ -76,7 +83,8 @@ app.get("/users/:id/tickets", async (req, res) => {
       data: {
         tickets: results.rows,
         map: seats_map,
-        time: ticket_time_map
+        time: ticket_time_map,
+        transMode: ticket_trans_map
       },
     });
   } catch (err) {
@@ -97,9 +105,11 @@ app.post("/booking/confirm", async (req, res) => {
       userId,
       className,
       trainName,
-      route } = req.body;
+      route,
+      transMode } = req.body;
 
     console.log(selectedOffer + "+++++++")
+    console.log("////" + transMode + "////");
     console.log("******" + selectedSeats + "******" + typeof selectedSeats);
     const selectedSeatsArray = [...selectedSeats];
     // const ticketId = generateTicketId(selectedStation, selectedStation_d, date);
@@ -152,7 +162,7 @@ app.post("/booking/confirm", async (req, res) => {
     const offer_id = offerRes.rows[0].offer_id;
     console.log("transac : " + transactionId + "-----");
     // const result = await db.query(insertQuery, [userId, b_station_id, d_station_id, price, transactionId, seat_id]);
-    const resTransaction = await db.query('SELECT * FROM insert_transaction($1, $2, $3, $4, $5)', [transactionId, 'Bkash', offer_id, totalFare, userId]);
+    const resTransaction = await db.query('SELECT * FROM insert_transaction($1, $2, $3, $4, $5)', [transactionId, transMode, offer_id, totalFare, userId]);
 
     // console.log(resTransaction.rows);
     console.log("------//" + resTransaction.rows[0].transaction_id + "//------");
@@ -477,7 +487,7 @@ app.get("/book/search", async (req, res) => {
     const day = String(dateReceived.getDate()).padStart(2, '0');
 
     const formattedDate = `${year}-${month}-${day}`;
-    const populate= await db.query('Call populate_seat_availability()');
+    const populate = await db.query('Call populate_seat_availability()');
     const queryFrom = `SELECT station_name from station WHERE LOWER(station_name) LIKE LOWER($1);`
 
     const queryTo = `SELECT station_name from station WHERE LOWER(station_name) LIKE LOWER($1);`

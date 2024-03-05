@@ -33,6 +33,8 @@ const TicketHistory = () => {
     const [oldTransactionId, setOldTransactionId] = useState(null);
     const [selectedTicketId, setSelectedTicketId] = useState(null);
     const [selectedTransactionId, setSelectedTransactionId] = useState(null);
+    const [transModeMap, setTransModeMap] = useState({});
+
 
     useEffect(() => {
         const fetchTicketHistory = async () => {
@@ -44,10 +46,11 @@ const TicketHistory = () => {
                     throw new Error('Failed to fetch ticket history');
                 }
                 const data = await response.json();
-                // console.log("data:///", data);
+                console.log("data:///", data);
                 setTicketHistory(data.data.tickets);
                 setSeatmap(data.data.map);
                 setTimeMap(data.data.time);
+                
 
                 // console.log("timeMap", timeMap);
                 const ttMap = {};
@@ -59,6 +62,8 @@ const TicketHistory = () => {
                 });
                 setTicketTransactionMap(ttMap);
                 console.log("ttMap", ttMap);
+                setTransModeMap(data.data.transMode);
+                console.log("///", transModeMap);
             } catch (error) {
                 console.error(error.message);
             }
@@ -82,7 +87,7 @@ const TicketHistory = () => {
         //     setOldTransactionId(transactionId);
         //     console.log("oldTransactionId : ", transactionId);
         //     setSelectedTicketId(ticketId);
-            
+
         // } else {
         //     console.log("Transaction ID not found for ticket ID:", ticketId);
         // }
@@ -134,6 +139,7 @@ const TicketHistory = () => {
                                     <p><strong>Date:</strong> {ticket ? formatDate(ticket.date_of_journey) : ''}</p>
                                     <p><strong>Time:</strong> {ticket ? formattime(timeMap[ticket.ticket_id]) : ''}</p>
                                     <p><strong>Seat number:</strong> {seatmap[ticketId]}</p>
+                                    <p><strong>Transaction Mode:</strong> {transModeMap[ticket.ticket_id]}</p>
 
                                     {ticket && ticket.ticket_status === 'pending' && (
                                         <button onClick={() => openModal(ticket.ticket_id)} className="btn btn-warning">
