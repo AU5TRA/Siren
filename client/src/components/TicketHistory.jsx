@@ -138,6 +138,21 @@ const TicketHistory = () => {
         }
     }
 
+    const groupByDate = () => {
+        const groupedTickets = {};
+
+        ticketHistory.forEach(ticket => {
+            const date = formatDate(ticket.date_of_journey);
+            if (!groupedTickets[date]) {
+                groupedTickets[date] = [];
+            }
+            groupedTickets[date].push(ticket);
+        });
+
+        return groupedTickets;
+    };
+
+    const groupedTickets = groupByDate();
 
 
     return (
@@ -146,10 +161,10 @@ const TicketHistory = () => {
                 <div key={transactionId}>
                     {console.log("transactionId", transactionId)}
                     {/* {journey_map[transactionId].trainName} */}
-                    
+
                     <div onClick={() => toggleDropdown(transactionId)}>
-                    <h6>{journey_map[transactionId].trainName}, { journey_map[transactionId].className }, { journey_map[transactionId].from }, { journey_map[transactionId].to }</h6>
-                    
+                        <h6>{journey_map[transactionId].trainName}, {journey_map[transactionId].className}, {journey_map[transactionId].from}, {journey_map[transactionId].to}</h6>
+
                         {/* {transactionId < 0 || transactionId === 'null' ? (
                             <h4>Pending Tickets
                             </h4>
