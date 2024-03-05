@@ -35,6 +35,7 @@ const TicketHistory = () => {
     const [selectedTicketId, setSelectedTicketId] = useState(null);
     const [selectedTransactionId, setSelectedTransactionId] = useState(null);
     const [transModeMap, setTransModeMap] = useState({});
+    const [journey_map, setJourney_map] = useState({});
 
 
 
@@ -63,7 +64,7 @@ const TicketHistory = () => {
                 setTicketHistory(data.data.tickets);
                 setSeatmap(data.data.map);
                 setTimeMap(data.data.time);
-                
+
 
                 // console.log("timeMap", timeMap);
                 const ttMap = {};
@@ -74,9 +75,11 @@ const TicketHistory = () => {
                     ttMap[ticket.transaction_id].push(ticket.ticket_id);
                 });
                 setTicketTransactionMap(ttMap);
-                console.log("ttMap", ttMap);
+                // console.log("ttMap", ttMap);
                 setTransModeMap(data.data.transMode);
-                console.log("///", transModeMap);
+                // console.log("///", transModeMap);
+                setJourney_map(data.data.journeyMap);
+                // console.log("journey_map", journey_map[-20].trainName);
             } catch (error) {
                 console.error(error.message);
             }
@@ -141,13 +144,24 @@ const TicketHistory = () => {
         <Fragment>
             {Object.entries(ticketTransactionMap).map(([transactionId, ticketIds]) => (
                 <div key={transactionId}>
+                    {console.log("transactionId", transactionId)}
+                    {/* {journey_map[transactionId].trainName} */}
+                    
                     <div onClick={() => toggleDropdown(transactionId)}>
-                        {transactionId < 0 || transactionId === 'null' ? (
-                            <h4>Pending Tickets</h4>
+                    <h6>{journey_map[transactionId].trainName}, { journey_map[transactionId].className }, { journey_map[transactionId].from }, { journey_map[transactionId].to }</h6>
+                    
+                        {/* {transactionId < 0 || transactionId === 'null' ? (
+                            <h4>Pending Tickets
+                            </h4>
+
                         ) : (
-                            <h4>Transaction ID: {transactionId}</h4>
-                        )}
+                            <></>
+                            // <h4>{journey_map[transactionId].trainName}</h4>
+                            // { { journey_map[transactionId].className }, { journey_map[transactionId].from }, { journey_map[transactionId].to }}
+                        )} */}
                     </div>
+
+
                     {expandedTransactions[transactionId] && (
                         <ul className='ticket-details-list'>
                             {ticketIds.map(ticketId => {
@@ -159,7 +173,7 @@ const TicketHistory = () => {
                                         <p><strong>Date:</strong> {ticket ? formatDate(ticket.date_of_journey) : ''}</p>
                                         <p><strong>Time:</strong> {ticket ? formattime(timeMap[ticket.ticket_id]) : ''}</p>
                                         <p><strong>Seat number:</strong> {seatmap[ticketId]}</p>
-                                    <p><strong>Transaction Mode:</strong> {transModeMap[ticket.ticket_id]}</p>
+                                        <p><strong>Transaction Mode:</strong> {transModeMap[ticket.ticket_id]}</p>
                                         {ticket && ticket.ticket_status === 'pending' && (
                                             <button onClick={() => openModal(ticket.ticket_id)} className="btn btn-warning">
                                                 Proceed to pay
