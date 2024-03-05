@@ -18,6 +18,7 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId', async (req, res) =
   console.log(req.params.oldTransactionId);
   const oldTransactionId = req.params.oldTransactionId;
   console.log("//////////////////////////////");
+  
 
   const result = await db.query(`SELECT * FROM transaction where transaction_id = $1`, [oldTransactionId]);
   console.log(result.rows[0]);
@@ -189,8 +190,15 @@ app.post("/booking/confirm", async (req, res) => {
     const offerRes = await db.query('SELECT * FROM offer WHERE offer_id = $1', [selectedOffer]);
     const offer_id = offerRes.rows[0].offer_id;
     console.log("transac : " + transactionId + "-----");
+    let t_m = transMode;
+    let t_id = transactionId;
+    if(transactionId === '')
+    {
+      t_id = null;
+      t_m = 'not paid';
+    }
     // const result = await db.query(insertQuery, [userId, b_station_id, d_station_id, price, transactionId, seat_id]);
-    const resTransaction = await db.query('SELECT * FROM insert_transaction($1, $2, $3, $4, $5)', [transactionId, transMode, offer_id, totalFare, userId]);
+    const resTransaction = await db.query('SELECT * FROM insert_transaction($1, $2, $3, $4, $5)', [t_id, t_m, offer_id, totalFare, userId]);
 
     // console.log(resTransaction.rows);
     console.log("------//" + resTransaction.rows[0].transaction_id + "//------");
