@@ -92,13 +92,13 @@ const TicketHistory = () => {
 
 
 
-    function openModal(ticketId) {
-        console.log("ticketId", ticketId);
+    function openModal(transactionId) {
+        // console.log("ticketId", ticketId);
         setIsOpen(true);
-        const transactionId = Object.keys(ticketTransactionMap).find(key => {
-            const ticketIds = ticketTransactionMap[key];
-            return ticketIds.includes(ticketId);
-        });
+        // const transactionId = Object.keys(ticketTransactionMap).find(key => {
+        //     const ticketIds = ticketTransactionMap[key];
+        //     return ticketIds.includes(ticketId);
+        // });
 
         // if (transactionId !== undefined) {
         //     setOldTransactionId(transactionId);
@@ -108,7 +108,7 @@ const TicketHistory = () => {
         // } else {
         //     console.log("Transaction ID not found for ticket ID:", ticketId);
         // }
-        setSelectedTicketId(ticketId);
+        // setSelectedTicketId(ticketId);
         setOldTransactionId(transactionId);
         setIsOpen(true);
     }
@@ -163,8 +163,10 @@ const TicketHistory = () => {
                     {/* {journey_map[transactionId].trainName} */}
 
                     <div onClick={() => toggleDropdown(transactionId)}>
-                        <h6>{journey_map[transactionId].trainName}, {journey_map[transactionId].className}, {journey_map[transactionId].from}, {journey_map[transactionId].to}</h6>
-
+                        {console.log(JSON.stringify(journey_map))}
+                        {/* {transactionId !== 'null' ? (
+                            <h6>{journey_map[transactionId].trainName}, {journey_map[transactionId].className}, {journey_map[transactionId].from}, {journey_map[transactionId].to}</h6>)
+                            : (<h6>Pending Tickets</h6>)} */}
                         {/* {transactionId < 0 || transactionId === 'null' ? (
                             <h4>Pending Tickets
                             </h4>
@@ -174,6 +176,15 @@ const TicketHistory = () => {
                             // <h4>{journey_map[transactionId].trainName}</h4>
                             // { { journey_map[transactionId].className }, { journey_map[transactionId].from }, { journey_map[transactionId].to }}
                         )} */}
+                        <h5>
+                            {journey_map[transactionId] ? (<h6>{journey_map[transactionId].trainName}, {journey_map[transactionId].className}, {journey_map[transactionId].from}, {journey_map[transactionId].to}</h6>) : (<h6></h6>)}
+                        </h5>
+                        {transactionId < 0 ? (<h4>
+                            <button onClick={() => openModal(transactionId)} className="btn btn-warning">
+                                Proceed to pay
+                            </button></h4>
+                        ) : <></>}
+
                     </div>
 
 
@@ -189,11 +200,11 @@ const TicketHistory = () => {
                                         <p><strong>Time:</strong> {ticket ? formattime(timeMap[ticket.ticket_id]) : ''}</p>
                                         <p><strong>Seat number:</strong> {seatmap[ticketId]}</p>
                                         <p><strong>Transaction Mode:</strong> {transModeMap[ticket.ticket_id]}</p>
-                                        {ticket && ticket.ticket_status === 'pending' && (
+                                        {/* {ticket && ticket.ticket_status === 'pending' && (
                                             <button onClick={() => openModal(ticket.ticket_id)} className="btn btn-warning">
                                                 Proceed to pay
                                             </button>
-                                        )}
+                                        )} */}
                                         <span style={{ marginLeft: '150px' }}></span>
                                     </li>
                                 );
