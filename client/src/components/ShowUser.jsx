@@ -50,7 +50,6 @@ const ShowUser = () => {
 
 
 
-
   useEffect(() => {
 
     if (!loginState || userId === null || userId.toString() !== id) {

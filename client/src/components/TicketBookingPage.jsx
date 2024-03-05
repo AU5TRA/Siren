@@ -77,6 +77,7 @@ const TicketBookingPage = () => {
   const handleConfirm = async () => {
     try {
       console.log("***********-------******" + selectedOffer);
+      console.log("***********-------******" + transMode); 
       const response = await fetch('http://localhost:3001/booking/confirm', {
         method: 'POST',
         headers: {
@@ -94,7 +95,8 @@ const TicketBookingPage = () => {
           userId,
           className,
           trainName,
-          route
+          route,
+          transMode
         }),
       });
       const result = await response.json();
@@ -123,6 +125,7 @@ const TicketBookingPage = () => {
 
   function handlePaymentMethodSelect(method) {
     setTransMode(method);
+    console.log("********, ", method);
   }
 
 
@@ -181,9 +184,26 @@ const TicketBookingPage = () => {
       <div>
         <p><strong>Total price: </strong>{discountedFare} tk.</p>
       </div>
+      <div
+        className={`class-card ${transMode === 'bkash' ? 'selected' : ''}`}
+        onClick={() => handlePaymentMethodSelect('bkash')} style={{ width: '50px', height: '100px' }}
+      >
+        <img src={'../bkash4.png'} alt="Bkash" style={{ width: '80%', height: '100%' }} />
+      </div>
+      <div
+        className={`class-card ${transMode === 'nagad' ? 'selected' : ''}`}
+        onClick={() => handlePaymentMethodSelect('nagad')} style={{ width: '50px', height: '100px' }}
+      >
+        <img src={'../nagad.png'} alt="Nagad" style={{ width: '80%', height: '100%' }} />
+      </div>
+      <span style={{ padding: '20px' }}></span>
+
       <div>
         <button className='secondary-button' style={{ width: '200px' }} onClick={handleConfirm1}>Confirm</button>
       </div>
+      <span style={{ padding: '20px' }}></span>
+
+
 
       <Modal
         isOpen={modalIsOpen}
@@ -202,19 +222,6 @@ const TicketBookingPage = () => {
         </div>
         <form>
           <div className="modal-body">
-
-            <div
-              className={`class-card ${transMode === 'bkash' ? 'selected' : ''}`}
-              onClick={() => handlePaymentMethodSelect('bkash')}
-            >
-              <img src={'../bkash4.png'} alt="Bkash" />
-            </div>
-            <div
-              className={`class-card ${transMode === 'nagad' ? 'selected' : ''}`}
-              onClick={() => handlePaymentMethodSelect('nagad')}
-            >
-              <img src={'../nagad.png'} alt="Nagad" />
-            </div>
             <input
               type="text"
               className="form-control mb-2"
