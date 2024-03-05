@@ -19,7 +19,8 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId', async (req, res) =
   const oldTransactionId = req.params.oldTransactionId;
   console.log("//////////////////////////////");
   let t_id = req.params.transactionId;
-  if (t_id === '') {
+  if (t_id === '' || 'null') {
+    console.log("returning");
     return res.status(400).json({
       status: "error",
       message: "Transaction ID cannot be empty",
