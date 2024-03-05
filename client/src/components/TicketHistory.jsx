@@ -22,6 +22,7 @@ function formatDate(dateString) {
     return `${day}-${month}-${year}`;
 }
 
+
 const TicketHistory = () => {
     const { userId } = useData();
     const [ticketHistory, setTicketHistory] = useState([]);
@@ -33,6 +34,18 @@ const TicketHistory = () => {
     const [oldTransactionId, setOldTransactionId] = useState(null);
     const [selectedTicketId, setSelectedTicketId] = useState(null);
     const [selectedTransactionId, setSelectedTransactionId] = useState(null);
+
+
+    const [expandedTransactions, setExpandedTransactions] = useState({});
+
+    const toggleDropdown = (transactionId) => {
+        setExpandedTransactions(prev => ({
+            ...prev,
+            [transactionId]: !prev[transactionId],
+        }));
+    };
+
+
 
     useEffect(() => {
         const fetchTicketHistory = async () => {
@@ -70,6 +83,7 @@ const TicketHistory = () => {
 
 
 
+
     function openModal(ticketId) {
         console.log("ticketId", ticketId);
         setIsOpen(true);
@@ -82,7 +96,7 @@ const TicketHistory = () => {
         //     setOldTransactionId(transactionId);
         //     console.log("oldTransactionId : ", transactionId);
         //     setSelectedTicketId(ticketId);
-            
+
         // } else {
         //     console.log("Transaction ID not found for ticket ID:", ticketId);
         // }
@@ -122,32 +136,36 @@ const TicketHistory = () => {
         <Fragment>
             {Object.entries(ticketTransactionMap).map(([transactionId, ticketIds]) => (
                 <div key={transactionId}>
-                    {transactionId < 0 || transactionId === 'null' && <h4>Pending Tickets</h4>}
-                    {transactionId > 0 && <h4>Transaction ID: {transactionId}</h4>}
-                    <ul className='ticket-details-list'>
-                        {ticketIds.map(ticketId => {
-                            const ticket = ticketHistory.find(ticket => ticket.ticket_id === ticketId);
-                            return (
-                                <li key={ticketId}>
-                                    <p><strong>Ticket ID:</strong> {ticketId}</p>
-                                    <p><strong>Ticket status:</strong> {ticket ? ticket.ticket_status : ''}</p>
-                                    <p><strong>Date:</strong> {ticket ? formatDate(ticket.date_of_journey) : ''}</p>
-                                    <p><strong>Time:</strong> {ticket ? formattime(timeMap[ticket.ticket_id]) : ''}</p>
-                                    <p><strong>Seat number:</strong> {seatmap[ticketId]}</p>
-
-                                    {ticket && ticket.ticket_status === 'pending' && (
-                                        <button onClick={() => openModal(ticket.ticket_id)} className="btn btn-warning">
-                                            Proceed to pay
-                                        </button>
-
-                                    )}
-                                    <span style={{ marginLeft: '150px' }}></span>
-                                </li>
-                            );
-                        })}
-                    </ul>
+                    <div onClick={() => toggleDropdown(transactionId)}>
+                        {transactionId < 0 || transactionId === 'null' ? (
+                            <h4>Pending Tickets</h4>
+                        ) : (
+                            <h4>Transaction ID: {transactionId}</h4>
+                        )}
+                    </div>
+                    {expandedTransactions[transactionId] && (
+                        <ul className='ticket-details-list'>
+                            {ticketIds.map(ticketId => {
+                                const ticket = ticketHistory.find(ticket => ticket.ticket_id === ticketId);
+                                return (
+                                    <li key={ticketId}>
+                                        <p><strong>Ticket ID:</strong> {ticketId}</p>
+                                        {/* <p><strong>Ticket status:</strong> {ticket ? ticket.ticket_status : ''}</p> */}
+                                        <p><strong>Date:</strong> {ticket ? formatDate(ticket.date_of_journey) : ''}</p>
+                                        <p><strong>Time:</strong> {ticket ? formattime(timeMap[ticket.ticket_id]) : ''}</p>
+                                        <p><strong>Seat number:</strong> {seatmap[ticketId]}</p>
+                                        {ticket && ticket.ticket_status === 'pending' && (
+                                            <button onClick={() => openModal(ticket.ticket_id)} className="btn btn-warning">
+                                                Proceed to pay
+                                            </button>
+                                        )}
+                                        <span style={{ marginLeft: '150px' }}></span>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
                 </div>
-
             ))}
             <Modal isOpen={modalIsOpen} onRequestClose={closeModal} contentLabel="Example Modal">
                 {/* <input type="text" placeholder="Enter transactionID " /> */}

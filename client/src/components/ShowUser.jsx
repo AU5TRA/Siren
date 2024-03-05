@@ -6,6 +6,7 @@ import Modal from 'react-modal';
 import ErrorModal from './ErrorModal';
 import './showuserpg.css';
 
+
 const customStyles = {
   content: {
     top: '50%',
@@ -39,6 +40,13 @@ const ShowUser = () => {
   const [errMessage, setErrMessage] = useState('');
   const [errorModalIsOpen, setErrorModalIsOpen] = useState(false);
 
+  const {
+    setUserId,
+    token,
+    setToken,
+    name,
+    setName,
+    setLoginState} = useData();
 
 
 
@@ -168,6 +176,18 @@ const ShowUser = () => {
     setDOB(userData.date_of_birth);
     setBirthReg(userData.birth_registration_number);
   }
+  const logOut = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('name');
+      setName('');
+      setUserId('');
+      setLoginState(false);
+      window.location = '/';
+
+  }
+
+
 
   return (
     <Fragment>
@@ -242,6 +262,7 @@ const ShowUser = () => {
               <button onClick={showTicket} className="btn btn-warning">
                 Ticket History
               </button>
+              <button onClick={logOut} className='btn btn-danger' style={{ float: 'right' }}>Log Out</button>
             </div>
           </div>
         ) : (
