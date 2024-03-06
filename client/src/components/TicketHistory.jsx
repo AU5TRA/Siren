@@ -244,6 +244,7 @@ const TicketHistory = () => {
                                         <p><strong>Seat number:</strong> {seatmap[ticketId]}</p>
                                         <p><strong>Transaction Mode:</strong> {transModeMap[ticket.ticket_id]}</p>
                                         <p><strong>Route : </strong> {journey_map[transactionId].from}-{journey_map[transactionId].to}</p>
+                                        <p><strong>Price:</strong> {ticket ? ticket.price : ''}</p>
                                         <span style={{ marginLeft: '150px' }}></span>
                                     </li>
                                 );
