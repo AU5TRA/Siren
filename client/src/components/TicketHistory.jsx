@@ -2,6 +2,22 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { useData } from './AppContext';
 import './ticketBook.css';
 import Modal from 'react-modal';
+import './comp.css'
+
+const customStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)',
+      border: '2px solid #0e360e'
+      
+    },
+  };
+
+  
 
 function formattime(time24) {
     const [hours, minutes] = time24.split(":");
@@ -36,7 +52,7 @@ const TicketHistory = () => {
     const [selectedTransactionId, setSelectedTransactionId] = useState(null);
     const [transModeMap, setTransModeMap] = useState({});
     const [journey_map, setJourney_map] = useState({});
-
+    const [transMode, setTransMode] = useState('');
 
 
     const [expandedTransactions, setExpandedTransactions] = useState({});
@@ -134,20 +150,20 @@ const TicketHistory = () => {
         }
 
         refund(transactionId);
-        window.location.reload();
+         window.location.reload();
     }
 
     function closeModal() {
         setIsOpen(false);
         console.log("//// selectedTransactionId : ", selectedTransactionId);
         console.log("//// oldTransactionId : ", oldTransactionId);
-        sendTransactionId(selectedTransactionId, oldTransactionId);
-        window.location.reload();
+        sendTransactionId(selectedTransactionId, oldTransactionId, transMode);
+         window.location.reload();
     }
 
-    const sendTransactionId = async (transactionId, oldTransactionId) => {
+    const sendTransactionId = async (transactionId, oldTransactionId, transMode) => {
         try {
-            const response = await fetch(`http://localhost:3001/transaction/${userId}/${transactionId}/${oldTransactionId}`, {
+            const response = await fetch(`http://localhost:3001/transaction/${userId}/${transactionId}/${oldTransactionId}/${transMode}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -162,29 +178,30 @@ const TicketHistory = () => {
     }
 
 
-    const groupByDate = () => {
-        const groupedTickets = {};
 
-        ticketHistory.forEach(ticket => {
-            const date = formatDate(ticket.date_of_journey);
-            if (!groupedTickets[date]) {
-                groupedTickets[date] = [];
-            }
-            groupedTickets[date].push(ticket);
-        });
+    function handlePaymentMethodSelect(method) {
+        setTransMode(method);
+        console.log("********, ", method);
+    }
 
-        return groupedTickets;
-    };
 
-    const groupedTickets = groupByDate();
-
+    const transactionsByDOJ = {};
+    Object.entries(journey_map).forEach(([transactionId, { doj }]) => {
+        const formattedDate = formatDate(doj);
+        if (!transactionsByDOJ[formattedDate]) {
+            transactionsByDOJ[formattedDate] = [];
+        }
+        transactionsByDOJ[formattedDate].push(transactionId);
+    });
 
     return (
         <Fragment>
+
+
+
             {Object.entries(ticketTransactionMap).map(([transactionId, ticketIds]) => (
                 <div key={transactionId}>
                     {console.log("transactionId", transactionId)}
-                    {/* {journey_map[transactionId].trainName} */}
 
                     <div onClick={() => toggleDropdown(transactionId)}>
 
@@ -192,9 +209,11 @@ const TicketHistory = () => {
                             {journey_map[transactionId] ? (
                                 journey_map[transactionId].status === 'pending' ? (
                                     <>
+                                        {formatDate(journey_map[transactionId].doj)}, {' '}
+
                                         {journey_map[transactionId].trainName}, {' '}
-                                        {journey_map[transactionId].className}, {' '}
-                                        
+                                        {journey_map[transactionId].className}
+
                                         <span style={{ padding: '0 120px' }} className="spacer"></span>
                                         <button onClick={() => openModal(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
                                             Proceed to pay
@@ -203,20 +222,24 @@ const TicketHistory = () => {
                                 ) : (
                                     journey_map[transactionId].status === 'confirmed' ? (
                                         <>
+                                            {formatDate(journey_map[transactionId].doj)}, {' '}
+
                                             {journey_map[transactionId].trainName}, {' '}
-                                            {journey_map[transactionId].className}, {' '}
-                                        <span style={{ padding: '0 120px' }} className="spacer"></span>
-                                            
+                                            {journey_map[transactionId].className}
+                                            <span style={{ padding: '0 120px' }} className="spacer"></span>
+
                                             <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
                                                 Refund
                                             </button>
                                         </>
                                     ) : (<>
+                                        {formatDate(journey_map[transactionId].doj)}, {' '}
+
                                         {journey_map[transactionId].trainName}, {' '}
-                                        {journey_map[transactionId].className}, {' '}
-                                       
+                                        {journey_map[transactionId].className}
+
                                         <span style={{ padding: '0 120px' }} className="spacer"></span>
-                                        
+
                                         <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#cc0000', color: 'white', border: 'none', padding: '8px 20px', cursor: 'not-allowed', borderRadius: '20px' }} className="btn btn-warning">
                                             Cancelled
                                         </button> </>
@@ -231,6 +254,7 @@ const TicketHistory = () => {
 
 
                     </div>
+
                     <span style={{ marginTop: '20px' }}></span>
 
                     {expandedTransactions[transactionId] && (
@@ -253,12 +277,45 @@ const TicketHistory = () => {
                     )}
                 </div>
             ))}
-            <Modal isOpen={modalIsOpen} onRequestClose={closeModal} contentLabel="Example Modal">
-                {/* <input type="text" placeholder="Enter transactionID " /> */}
-                <input type="text" placeholder="Enter transactionID " value={selectedTransactionId} onChange={(e) => setSelectedTransactionId(e.target.value)} />
-                {console.log("selectedTransactionId", selectedTransactionId)}
-                <button onClick={closeModal}>close</button>
+            <Modal isOpen={modalIsOpen} onRequestClose={closeModal}  style={customStyles}>
+                <div>
+                    <input
+                        type="checkbox"
+                        id="bkashCheckbox"
+                        checked={transMode === 'bkash'}
+                        onChange={() => handlePaymentMethodSelect('bkash')}
+                    />
+                    <label htmlFor="bkashCheckbox">Bkash</label>
+                </div>
+                <div>
+                    <input
+                        type="checkbox"
+                        id="nagadCheckbox"
+                        checked={transMode === 'nagad'}
+                        onChange={() => handlePaymentMethodSelect('nagad')}
+                    />
+                    <label htmlFor="nagadCheckbox">Nagad</label>
+                </div>
+                <div>
+                    <input
+                        type="text"
+                        placeholder="Enter transaction ID"
+                        value={selectedTransactionId}
+                        onChange={(e) => setSelectedTransactionId(e.target.value)}
+                        style={{display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: '5px',
+                            border: '2px solid #0e360e',
+                            borderColor: '#0e360e'}}
+
+                    />
+                </div>
+                
+                <button className='button' onClick={closeModal} style={{ marginTop:'5px'}}>Confirm</button>
             </Modal>
+
+
         </Fragment>
     );
 

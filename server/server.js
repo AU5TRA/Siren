@@ -24,10 +24,11 @@ app.post('/transaction/refund/:userId/:transactionId', async (req, res) => {
 
 });
 
-app.post('/transaction/:id/:transactionId/:oldTransactionId', async (req, res) => {
+app.post('/transaction/:id/:transactionId/:oldTransactionId/:transMode', async (req, res) => {
   console.log(req.params.id);
   console.log(req.params.transactionId);
   console.log(req.params.oldTransactionId);
+  console.log(req.params.transMode);
   const oldTransactionId = req.params.oldTransactionId;
   console.log("//////////////////////////////");
   let t_id = req.params.transactionId;
@@ -38,6 +39,9 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId', async (req, res) =
       message: "Transaction ID cannot be empty",
     });
   }
+  const transMode = req.params.transMode;
+  console.log('transMode  ' + transMode);
+
 
   const result = await db.query(`SELECT * FROM transaction where transaction_id = $1`, [oldTransactionId]);
   console.log(result.rows[0]);
@@ -45,7 +49,11 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId', async (req, res) =
   const totalFare = result.rows[0].amount;
   console.log(offerId);
   console.log(totalFare);
-  const mode = result.rows[0].mode_of_transaction;
+  let mode = result.rows[0].mode_of_transaction;
+  console.log("type : " + typeof mode);
+  if (mode === '' || mode === 'not paid' || mode === 'null') {
+    mode = transMode;
+  }
   console.log("////////////" + mode + "//////////////////");
 
   const res2 = await db.query(`SELECT * FROM insert_transaction($1, $2, $3, $4, $5)`, [req.params.transactionId, mode, offerId, totalFare, req.params.id]);
@@ -109,7 +117,7 @@ app.get("/users/:id/tickets", async (req, res) => {
       const boardSt = seatIDs.rows[0].boarding_station_id;
       const tstatus = seatIDs.rows[0].ticket_status;
       const d_o_j = seatIDs.rows[0].date_of_journey;
-      
+
       const seat = await db.query('SELECT train_id, class_id FROM seat WHERE seat_id = $1', [seat_id_temp]);
       // console.log(seat.rows[0].train_id);
       // console.log(seat.rows[0].class_id);
@@ -123,7 +131,7 @@ app.get("/users/:id/tickets", async (req, res) => {
       const to = toRes.rows[0].station_name;
       // console.log(from);
       // console.log(to);
-      transactionJourneyMap[t] = { trainName: trainName.rows[0].train_name, className: className.rows[0].class_name, from: from, to: to , doj : d_o_j, status: tstatus};
+      transactionJourneyMap[t] = { trainName: trainName.rows[0].train_name, className: className.rows[0].class_name, from: from, to: to, doj: d_o_j, status: tstatus };
     }
     // console.log(ticket_time_map);
     // console.log(transactionJourneyMap);
