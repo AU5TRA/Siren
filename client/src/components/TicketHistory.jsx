@@ -130,9 +130,11 @@ const TicketHistory = () => {
             } catch (error) {
                 console.error(error.message);
             }
+
         }
 
         refund(transactionId);
+        window.location.reload();
     }
 
     function closeModal() {
@@ -188,27 +190,41 @@ const TicketHistory = () => {
 
                         <div className="journey-info" >
                             {journey_map[transactionId] ? (
-                                <>
-                                    {journey_map[transactionId].trainName},
-                                    {journey_map[transactionId].className},
-                                    {journey_map[transactionId].status}
-                                    <span style={{ padding: '0 20px' }} className="spacer"></span>
-                                </>
-                            ) : (
-                                <></>
-                            )}
-                            <span style={{ padding: '0 20px' }} className="spacer"></span>
-                            {transactionId < 0 ? (
-                                <>
-                                    <button onClick={() => openModal(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
-                                        Proceed to pay
-                                    </button>
-                                </>
-                            ) : (
-                                <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
-                                    Refund
-                                </button>
-                            )}
+                                journey_map[transactionId].status === 'pending' ? (
+                                    <>
+                                        {journey_map[transactionId].trainName}, {' '}
+                                        {journey_map[transactionId].className}, {' '}
+                                        
+                                        <span style={{ padding: '0 120px' }} className="spacer"></span>
+                                        <button onClick={() => openModal(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
+                                            Proceed to pay
+                                        </button>
+                                    </>
+                                ) : (
+                                    journey_map[transactionId].status === 'confirmed' ? (
+                                        <>
+                                            {journey_map[transactionId].trainName}, {' '}
+                                            {journey_map[transactionId].className}, {' '}
+                                        <span style={{ padding: '0 120px' }} className="spacer"></span>
+                                            
+                                            <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
+                                                Refund
+                                            </button>
+                                        </>
+                                    ) : (<>
+                                        {journey_map[transactionId].trainName}, {' '}
+                                        {journey_map[transactionId].className}, {' '}
+                                       
+                                        <span style={{ padding: '0 120px' }} className="spacer"></span>
+                                        
+                                        <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#cc0000', color: 'white', border: 'none', padding: '8px 20px', cursor: 'not-allowed', borderRadius: '20px' }} className="btn btn-warning">
+                                            Cancelled
+                                        </button> </>
+                                    )
+                                )
+                            ) : <></>}
+
+
                         </div>
 
 
