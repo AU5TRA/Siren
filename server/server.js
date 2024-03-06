@@ -13,9 +13,9 @@ app.use(cors());
 
 
 app.post('/transaction/refund/:userId/:transactionId', async (req, res) => {
-  
+
   const { userId, transactionId } = req.params;
-  
+
 
   const result = await db.query(`SELECT * FROM transaction WHERE user_id = $1 AND transaction_id = $2`, [userId, transactionId])
 
@@ -31,7 +31,7 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId', async (req, res) =
   const oldTransactionId = req.params.oldTransactionId;
   console.log("//////////////////////////////");
   let t_id = req.params.transactionId;
-  if (t_id === '' || 'null') {
+  if (t_id === '' || t_id === 'null') {
     console.log("returning");
     return res.status(400).json({
       status: "error",
@@ -103,10 +103,13 @@ app.get("/users/:id/tickets", async (req, res) => {
     const arr = tr.rows.map(row => row.transaction_id);
     // console.log(arr);
     for (const t of arr) {
-      const seatIDs = await db.query('SELECT seat_id, boarding_station_id, destination_station_id FROM ticket where transaction_id = $1', [t]);
+      const seatIDs = await db.query('SELECT seat_id, boarding_station_id, destination_station_id, ticket_status, date_of_journey FROM ticket where transaction_id = $1', [t]);
       const seat_id_temp = seatIDs.rows[0].seat_id;
       const desSt = seatIDs.rows[0].destination_station_id;
       const boardSt = seatIDs.rows[0].boarding_station_id;
+      const tstatus = seatIDs.rows[0].ticket_status;
+      const d_o_j = seatIDs.rows[0].date_of_journey;
+      
       const seat = await db.query('SELECT train_id, class_id FROM seat WHERE seat_id = $1', [seat_id_temp]);
       // console.log(seat.rows[0].train_id);
       // console.log(seat.rows[0].class_id);
@@ -120,7 +123,7 @@ app.get("/users/:id/tickets", async (req, res) => {
       const to = toRes.rows[0].station_name;
       // console.log(from);
       // console.log(to);
-      transactionJourneyMap[t] = { trainName: trainName.rows[0].train_name, className: className.rows[0].class_name, from: from, to: to };
+      transactionJourneyMap[t] = { trainName: trainName.rows[0].train_name, className: className.rows[0].class_name, from: from, to: to , doj : d_o_j, status: tstatus};
     }
     // console.log(ticket_time_map);
     // console.log(transactionJourneyMap);
@@ -132,7 +135,7 @@ app.get("/users/:id/tickets", async (req, res) => {
         map: seats_map,
         time: ticket_time_map,
         transMode: ticket_trans_map,
-        journeyMap : transactionJourneyMap
+        journeyMap: transactionJourneyMap
       },
     });
   } catch (err) {
@@ -211,8 +214,7 @@ app.post("/booking/confirm", async (req, res) => {
     console.log("transac : " + transactionId + "-----");
     let t_m = transMode;
     let t_id = transactionId;
-    if(transactionId === '')
-    {
+    if (transactionId === '') {
       t_id = null;
       t_m = 'not paid';
     }
@@ -231,7 +233,7 @@ app.post("/booking/confirm", async (req, res) => {
       // console.log(typeof seat_id_n + '++');
 
       const result = await db.query('SELECT * from insert_ticket($1, $2, $3, $4, $5, $6, $7, $8, $9)', [userId, b_station_id, d_station_id, price, transactionId2, seat_id_n, route, date, stations]);
-      
+
     }
 
     // console.log("-------" + tickets + "-------");
@@ -330,7 +332,7 @@ app.get('/booking/seat', async (req, res) => {
     const routeName = resultRouteName.rows[0].route_name;
 
 
-    
+
 
     const query3 = `SELECT * FROM get_station_sequence($1);`
 
@@ -556,7 +558,7 @@ app.get("/book/search", async (req, res) => {
      `;// returns the fares of those trains to go from FROM to TO for each of their classes
 
     const trainFares = await db.query(query2, [fromStationId, toStationId]);
-    
+
     const query3 = `SELECT * FROM get_station_sequence($1);`
 
     let routeStations = []; // This will hold routeIDs and their stations
@@ -772,7 +774,7 @@ app.post("/users", async (req, res) => {
     }
     const results = await db.query(
       'INSERT INTO passenger (first_name,last_name,nid_number,birth_registration_number,phone_number,email,date_of_birth,password,gender) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [first_name, last_name, nid_number, birth_registration_number, phone_number, email, date_of_birth, hashedPassword, gender]);
-   
+
 
     const jwtToken = jwtGenerator(results.rows[0].user_id);
     console.log(results.rows[0].user_id);

@@ -113,10 +113,10 @@ const TicketHistory = () => {
         setIsOpen(true);
     }
 
-    function openModal1(transactionId) {    
+    function openModal1(transactionId) {
         const refund = async (transactionId) => {
 
-            try {   
+            try {
                 console.log('///////////////////////////////////////refund clickec')
                 const response = await fetch(`http://localhost:3001/transaction/refund/${userId}/${transactionId}`, {
                     method: 'POST',
@@ -131,8 +131,8 @@ const TicketHistory = () => {
                 console.error(error.message);
             }
         }
-        
-        refund(transactionId); 
+
+        refund(transactionId);
     }
 
     function closeModal() {
@@ -159,7 +159,7 @@ const TicketHistory = () => {
         }
     }
 
-    
+
     const groupByDate = () => {
         const groupedTickets = {};
 
@@ -185,14 +185,14 @@ const TicketHistory = () => {
                     {/* {journey_map[transactionId].trainName} */}
 
                     <div onClick={() => toggleDropdown(transactionId)}>
-                        
-                        <div style={{ marginTop: '20px', fontSize: '20px' }} >
+
+                        <div className="journey-info" >
                             {journey_map[transactionId] ? (
                                 <>
                                     {journey_map[transactionId].trainName},
                                     {journey_map[transactionId].className},
-                                    {journey_map[transactionId].from},
-                                    {journey_map[transactionId].to}
+                                    {journey_map[transactionId].status}
+                                    <span style={{ padding: '0 20px' }} className="spacer"></span>
                                 </>
                             ) : (
                                 <></>
@@ -200,14 +200,14 @@ const TicketHistory = () => {
                             <span style={{ padding: '0 20px' }} className="spacer"></span>
                             {transactionId < 0 ? (
                                 <>
-                                    <button onClick={() => openModal(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '10px 20px', cursor: 'pointer', borderRadius: '5px' }} className="btn btn-warning">
+                                    <button onClick={() => openModal(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
                                         Proceed to pay
                                     </button>
                                 </>
                             ) : (
-                                <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '10px 20px', cursor: 'pointer', borderRadius: '5px' }} className="btn btn-warning">
-                                        Refund
-                                    </button>
+                                <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
+                                    Refund
+                                </button>
                             )}
                         </div>
 
@@ -215,7 +215,7 @@ const TicketHistory = () => {
 
 
                     </div>
-
+                    <span style={{ marginTop: '20px' }}></span>
 
                     {expandedTransactions[transactionId] && (
                         <ul className='ticket-details-list'>
@@ -224,11 +224,10 @@ const TicketHistory = () => {
                                 return (
                                     <li key={ticketId}>
                                         <p><strong>Ticket ID:</strong> {ticketId}</p>
-                                        <p><strong>Date:</strong> {ticket ? formatDate(ticket.date_of_journey) : ''}</p>
                                         <p><strong>Time:</strong> {ticket ? formattime(timeMap[ticket.ticket_id]) : ''}</p>
                                         <p><strong>Seat number:</strong> {seatmap[ticketId]}</p>
                                         <p><strong>Transaction Mode:</strong> {transModeMap[ticket.ticket_id]}</p>
-                                       
+                                        <p><strong>Route : </strong> {journey_map[transactionId].from}-{journey_map[transactionId].to}</p>
                                         <span style={{ marginLeft: '150px' }}></span>
                                     </li>
                                 );

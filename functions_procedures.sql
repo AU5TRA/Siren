@@ -234,6 +234,12 @@ BEGIN
     WHERE sa.seat_id = t.seat_id 
     AND t.transaction_id = transaction_id1
     AND t.user_id = user_id1;
+
+    UPDATE ticket SET ticket_status = 'cancelled'
+    WHERE user_id = user_id1 AND transaction_id = transaction_id1;
+
+    UPDATE "transaction" SET received = 0
+    WHERE transaction_id = transaction_id1;
     
     DELETE FROM ticket
     WHERE user_id = user_id1
