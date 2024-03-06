@@ -240,9 +240,6 @@ BEGIN
 
     UPDATE "transaction" SET received = 0
     WHERE transaction_id = transaction_id1;
-    
-    DELETE FROM ticket
-    WHERE user_id = user_id1
-    AND transaction_id = transaction_id1;
+   
 END;
 $$;

@@ -192,6 +192,7 @@ const TicketHistory = () => {
                                     {journey_map[transactionId].trainName},
                                     {journey_map[transactionId].className},
                                     {formatDate(journey_map[transactionId].doj)}
+                                    {/* {journey_map[transactionId].status} */}
                                     <span style={{ padding: '0 20px' }} className="spacer"></span>
                                 </>
                             ) : (
