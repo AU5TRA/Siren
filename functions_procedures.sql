@@ -18,9 +18,6 @@ $$ LANGUAGE plpgsql;
 
 
 -- ticket insert function
-
-
--- drop function insert_ticket_transaction;
 CREATE OR REPLACE FUNCTION insert_ticket(
     user_id INTEGER,
     boarding_station_id INTEGER,
@@ -57,32 +54,6 @@ $$ LANGUAGE plpgsql;
 
 
 -- transaction insert function
--- CREATE OR REPLACE FUNCTION insert_transaction(
---     transaction_id INTEGER,
---     mode_of_transaction VARCHAR(50),
---     offer_id INTEGER,
---     amount DECIMAL(10, 2),
---     user_id INTEGER
--- )
--- RETURNS VOID AS $$
--- DECLARE
---     transaction_time TIMESTAMP := now();
---     received INTEGER;
--- BEGIN
---     if transaction_id IS NULL THEN
---         received := 0;
---         transaction_id := nextval('negative_transaction_id_seq');
---         INSERT INTO transaction(transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
---         VALUES (transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id);
---     ELSE
---         received := 1;
---         INSERT INTO transaction(transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id)
---         VALUES (transaction_id, mode_of_transaction, offer_id, transaction_time, amount, received, user_id);
---     END IF;
--- END;
--- $$ LANGUAGE plpgsql;
-
-
 CREATE OR REPLACE FUNCTION insert_transaction(
     transaction_id INTEGER,
     mode_of_transaction VARCHAR(50),
@@ -121,7 +92,7 @@ CREATE SEQUENCE negative_transaction_id_seq
 -- drop function insert_ticket_transaction;
 
 
------------------------------------------------station sequence finding function
+--station sequence finding function
 CREATE OR REPLACE FUNCTION get_station_sequence(route_id_input INT)
 RETURNS TABLE(
     route_id INT,
@@ -186,33 +157,7 @@ BEGIN
 END;
 $$;
 
------ refunding
--- CREATE OR REPLACE PROCEDURE refund_tickets(user_id INTEGER, transaction_id1 INTEGER) AS $$
--- DECLARE
---     refund_amt DECIMAL(10, 2);
--- BEGIN
---     SELECT amount * 0.8 INTO refund_amt
---     FROM transaction
---     WHERE transaction_id = transaction_id1;
-    
---     INSERT INTO refund (transaction_id, refund_time, refund_amount)
---     VALUES (transaction_id1, NOW(), refund_amt);
-
-    
---     UPDATE seat_availability sa
---     SET available = TRUE
-    
---     FROM ticket t 
---     WHERE sa.seat_id = t.seat_id 
---     AND t.transaction_id = transaction_id1
---     AND t.user_id = user_id;
-    
---     DELETE FROM ticket
---     WHERE user_id = user_id
---     AND transaction_id = transaction_id1;
--- END;
--- $$ LANGUAGE plpgsql;
-
+-- refunding
 
 CREATE OR REPLACE PROCEDURE refund_tickets(user_id1 INTEGER, transaction_id1 INTEGER) 
 LANGUAGE plpgsql
