@@ -5,8 +5,6 @@ const cors = require("cors");
 const db = require("./db");
 const jwtGenerator = require("./utils/jwtGenerator");
 const bcrypt = require('bcryptjs');
-// const { requirePropFactory } = require("@mui/material");
-// const { v4: uuidv4 } = require('uuid');
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -24,23 +22,23 @@ app.post('/transaction/refund/:userId/:transactionId', async (req, res) => {
 
 });
 
+
 app.post('/transaction/:id/:transactionId/:oldTransactionId/:transMode', async (req, res) => {
   console.log(req.params.id);
   console.log(req.params.transactionId);
   console.log(req.params.oldTransactionId);
   console.log(req.params.transMode);
   const oldTransactionId = req.params.oldTransactionId;
-  console.log("//////////////////////////////");
+  
   let t_id = req.params.transactionId;
   if (t_id === '' || t_id === 'null') {
-    console.log("returning");
+
     return res.status(400).json({
       status: "error",
       message: "Transaction ID cannot be empty",
     });
   }
   const transMode = req.params.transMode;
-  console.log('transMode  ' + transMode);
 
 
   const result = await db.query(`SELECT * FROM transaction where transaction_id = $1`, [oldTransactionId]);
@@ -54,20 +52,14 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId/:transMode', async (
   if (mode === '' || mode === 'not paid' || mode === 'null') {
     mode = transMode;
   }
-  console.log("////////////" + mode + "//////////////////");
+  
 
   const res2 = await db.query(`SELECT * FROM insert_transaction($1, $2, $3, $4, $5)`, [req.params.transactionId, mode, offerId, totalFare, req.params.id]);
-  console.log(res2.rows);
 
-  // const  
-
-  // const updateTransaction = await db.query(`UPDATE transaction SET transaction_id = $1, received = 1 WHERE user_id = $2 AND transaction_id = $3 RETURNING *`, [req.params.transactionId, req.params.id, req.params.oldTransactionId]);
-  // console.log(updateTransaction);
   const updateTicket = await db.query(`UPDATE ticket SET transaction_id = $1, ticket_status = 'confirmed' WHERE user_id = $2 AND transaction_id = $3`, [req.params.transactionId, req.params.id, req.params.oldTransactionId]);
-  console.log(updateTicket);
+ 
   const del = await db.query(`DELETE FROM transaction where transaction_id = $1`, [req.params.oldTransactionId]);
-  console.log(del);
-  console.log("///////////DONEEEEE????????????");
+  ;
   res.status(200).json({
     status: "success",
     data: {
@@ -79,7 +71,7 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId/:transMode', async (
 
 app.get("/users/:id/tickets", async (req, res) => {
   try {
-    console.log("in tickets?????????")
+   
     const userId = req.params.id;
     const seats_map = {};
     const results = await db.query('SELECT * FROM ticket WHERE user_id = $1', [userId]);
@@ -88,9 +80,7 @@ app.get("/users/:id/tickets", async (req, res) => {
       const seat = await db.query('SELECT seat_number FROM seat WHERE seat_id = $1', [ticket.seat_id]);
       seats_map[ticket.ticket_id] = seat.rows[0].seat_number;
     }
-    // console.log(results.rows);  
-    // console.log(seats_map);
-    // console.log(results.rows);
+   
 
     const ticket_time_map = {};
     const ticket_trans_map = {};
@@ -98,18 +88,18 @@ app.get("/users/:id/tickets", async (req, res) => {
       const st_id = await db.query(`SELECT station_id from boarding_station where b_station_id = $1`, [ticket.boarding_station_id]);
       const time = await db.query(`SELECT * from schedule sc JOIN seat s ON sc.train_id = s.train_id AND sc.route_id = s.route_id
       WHERE s.seat_id = $1 and sc.station_id = $2;`, [ticket.seat_id, st_id.rows[0].station_id]);
-      // console.log(time.rows[0].departure);
+      
       const transactionRes = await db.query('SELECT * FROM transaction JOIN ticket ON transaction.transaction_id = ticket.transaction_id WHERE ticket.ticket_id = $1', [ticket.ticket_id]);
-      // console.log(transactionRes.rows[0].mode_of_transaction);
+    
       ticket_time_map[ticket.ticket_id] = time.rows[0].departure;
       ticket_trans_map[ticket.ticket_id] = transactionRes.rows[0].mode_of_transaction;
     }
 
     const tr = await db.query('SELECT distinct(transaction_id) FROM ticket WHERE user_id = $1', [userId]);
-    // console.log(tr.rows);
+   
     const transactionJourneyMap = {};
     const arr = tr.rows.map(row => row.transaction_id);
-    // console.log(arr);
+  
     for (const t of arr) {
       const seatIDs = await db.query('SELECT seat_id, boarding_station_id, destination_station_id, ticket_status, date_of_journey FROM ticket where transaction_id = $1', [t]);
       const seat_id_temp = seatIDs.rows[0].seat_id;
@@ -119,22 +109,18 @@ app.get("/users/:id/tickets", async (req, res) => {
       const d_o_j = seatIDs.rows[0].date_of_journey;
 
       const seat = await db.query('SELECT train_id, class_id FROM seat WHERE seat_id = $1', [seat_id_temp]);
-      // console.log(seat.rows[0].train_id);
-      // console.log(seat.rows[0].class_id);
+     
       const trainName = await db.query('SELECT train_name from train WHERE train_id = $1', [seat.rows[0].train_id]);
       const className = await db.query('SELECT class_name from class WHERE class_id = $1', [seat.rows[0].class_id]);
-      // console.log(trainName.rows[0].train_name);
-      // console.log(className.rows[0].class_name);
+     
+     
       const fromRes = await db.query('SELECT station_name from station JOIN boarding_station ON station.station_id = boarding_station.station_id WHERE boarding_station.b_station_id = $1', [boardSt]);
       const toRes = await db.query('SELECT station_name from station JOIN boarding_station ON station.station_id = boarding_station.station_id WHERE boarding_station.b_station_id = $1', [desSt]);
       const from = fromRes.rows[0].station_name;
       const to = toRes.rows[0].station_name;
-      // console.log(from);
-      // console.log(to);
+    
       transactionJourneyMap[t] = { trainName: trainName.rows[0].train_name, className: className.rows[0].class_name, from: from, to: to, doj: d_o_j, status: tstatus };
     }
-    // console.log(ticket_time_map);
-    // console.log(transactionJourneyMap);
 
     res.status(200).json({
       status: "success",
@@ -167,35 +153,23 @@ app.post("/booking/confirm", async (req, res) => {
       route,
       transMode } = req.body;
 
-    console.log(selectedOffer + "+++++++")
-    console.log("////" + transMode + "////");
-    console.log("******" + selectedSeats + "******" + typeof selectedSeats);
     const selectedSeatsArray = [...selectedSeats];
-    // const ticketId = generateTicketId(selectedStation, selectedStation_d, date);
-    console.log(date + " " + selectedSeats + " " + totalFare + " " + selectedStation + " " + selectedStation_d + " " + selectedOffer + " " + discountedFare + " " + transactionId + " user: " + userId + " " + route);
+   
     const cnt = selectedSeatsArray.length;
-    console.log(cnt);
+ 
 
     const price = totalFare / cnt;
-    console.log(price);
 
-
-
-    // const insertQuery = `INSERT INTO ticket (user_id, boarding_station_id, destination_station_id , price, transaction_id, seat_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
     const result1 = await db.query(`SELECT B_STATION_ID FROM BOARDING_STATION WHERE B_STATION_NAME = $1`, [selectedStation]);
     const result2 = await db.query(`SELECT B_STATION_ID FROM BOARDING_STATION WHERE B_STATION_NAME = $1`, [selectedStation_d]);
     const b_station_id = result1.rows[0].b_station_id;
     const d_station_id = result2.rows[0].b_station_id;
 
 
-    // const result = await db.query(insertQuery, [1, selectedStation, selectedStation_d, price, ]);
     const result4 = await db.query(`SELECT train_id FROM train WHERE train_name = $1 `, [trainName]);
     const train_id = result4.rows[0].train_id;
     const result5 = await db.query(`SELECT class_id FROM class WHERE class_name = $1 `, [className]);
     const class_id = result5.rows[0].class_id;
-
-    console.log("----" + selectedSeatsArray.length + "----")
-
 
     const result = await db.query('SELECT * FROM get_station_sequence($1)', [route]);
 
@@ -205,32 +179,23 @@ app.post("/booking/confirm", async (req, res) => {
     const endStation = await db.query('SELECT station_id FROM boarding_station WHERE B_STATION_NAME = $1', [selectedStation_d]);
 
     const startIndex = stationIds.indexOf(startStation.rows[0].station_id);
-    console.log(startIndex + 'haha' + startStation.rows[0].station_id);
+    
     const endIndex = stationIds.indexOf(endStation.rows[0].station_id);
-    console.log(endIndex + 'haehe' + endStation.rows[0].station_id);
+   
 
     const stations = stationIds.slice(startIndex, endIndex + 1);
 
-
-    console.log(stations + "\\\\\\\\\\\\\\\\\\\\\\");
-
-
-
-    // const tickets = [];
     const offerRes = await db.query('SELECT * FROM offer WHERE offer_id = $1', [selectedOffer]);
     const offer_id = offerRes.rows[0].offer_id;
-    console.log("transac : " + transactionId + "-----");
+
     let t_m = transMode;
     let t_id = transactionId;
     if (transactionId === '') {
       t_id = null;
       t_m = '';
     }
-    // const result = await db.query(insertQuery, [userId, b_station_id, d_station_id, price, transactionId, seat_id]);
     const resTransaction = await db.query('SELECT * FROM insert_transaction($1, $2, $3, $4, $5)', [t_id, t_m, offer_id, totalFare, userId]);
 
-    // console.log(resTransaction.rows);
-    console.log("------//" + resTransaction.rows[0].transaction_id + "//------");
     const transactionId2 = resTransaction.rows[0].transaction_id;
 
     for (const seat of selectedSeatsArray) {
@@ -238,18 +203,17 @@ app.post("/booking/confirm", async (req, res) => {
 
       const result3 = await db.query(`SELECT SEAT_ID FROM SEAT WHERE SEAT_NUMBER = $1 AND route_id= $2 AND TRAIN_ID= $3 AND CLASS_ID=$4`, [seat.toString(), route, train_id, class_id]);
       const seat_id_n = result3.rows[0].seat_id;
-      // console.log(typeof seat_id_n + '++');
+      
 
       const result = await db.query('SELECT * from insert_ticket($1, $2, $3, $4, $5, $6, $7, $8, $9)', [userId, b_station_id, d_station_id, price, transactionId2, seat_id_n, route, date, stations]);
 
     }
 
-    // console.log("-------" + tickets + "-------");
 
     res.status(200).json({
       status: "success",
       data: {
-        // ticket: tickets,
+        
       }
     });
   } catch (error) {
@@ -261,7 +225,7 @@ app.post("/booking/confirm", async (req, res) => {
 
 app.get("/is-verify", authorization, async (req, res) => {
   try {
-    console.log("-----------------");
+    
     console.log("aurthorization successful");
     res.json(true);
   } catch (err) {
