@@ -224,7 +224,7 @@ app.post("/booking/confirm", async (req, res) => {
     let t_id = transactionId;
     if (transactionId === '') {
       t_id = null;
-      t_m = 'not paid';
+      t_m = '';
     }
     // const result = await db.query(insertQuery, [userId, b_station_id, d_station_id, price, transactionId, seat_id]);
     const resTransaction = await db.query('SELECT * FROM insert_transaction($1, $2, $3, $4, $5)', [t_id, t_m, offer_id, totalFare, userId]);
