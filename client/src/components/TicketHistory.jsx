@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
+import { FaStar } from 'react-icons/fa';
 import { useData } from './AppContext';
 import './ticketBook.css';
 import Modal from 'react-modal';
@@ -125,20 +126,7 @@ const TicketHistory = () => {
     function openModal(transactionId) {
         // console.log("ticketId", ticketId);
         setIsOpen(true);
-        // const transactionId = Object.keys(ticketTransactionMap).find(key => {
-        //     const ticketIds = ticketTransactionMap[key];
-        //     return ticketIds.includes(ticketId);
-        // });
-
-        // if (transactionId !== undefined) {
-        //     setOldTransactionId(transactionId);
-        //     console.log("oldTransactionId : ", transactionId);
-        //     setSelectedTicketId(ticketId);
-
-        // } else {
-        //     console.log("Transaction ID not found for ticket ID:", ticketId);
-        // }
-        // setSelectedTicketId(ticketId);
+        
         setOldTransactionId(transactionId);
         setIsOpen(true);
     }
@@ -212,18 +200,22 @@ const TicketHistory = () => {
 
 
     function openModal2(t_name, c_name) {
+        setReview('');
+        setRating(0);
         console.log("clicked");
         console.log("t_name", t_name);
         console.log("c_name", c_name);
         setReviewModalOpen(true);
         setTrainName(t_name);
         setClassName(c_name);
-        
     }
 
     const sendReview = async () => {
+        setReviewModalOpen(false);
+
         console.log("review : ", review);
         try {
+            console.log("rating  : " + rating);
             const response = await fetch(`http://localhost:3001/send/review/${userId}/${trainName}/${className}`, {
                 method: 'POST',
                 headers: {
@@ -237,6 +229,7 @@ const TicketHistory = () => {
         catch (error) {
             console.error(error.message);
         }
+
     }
 
     return (
@@ -280,9 +273,26 @@ const TicketHistory = () => {
                                             <Modal isOpen={reviewModalOpen} onRequestClose={() => setReviewModalOpen(false)} style={customStyles2}>
                                                 <div>
                                                     <h4>Rating</h4>
-                                                    <input type="number" placeholder="Enter Rating"
+                                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                        {[...Array(5)].map((_, index) => {
+                                                            const ratingValue = index + 1;
+                                                            return (
+                                                                <FaStar
+                                                                    key={index}
+                                                                    color={ratingValue <= rating ? '#ffc107' : '#e4e5e9'}
+                                                                    size={30}
+                                                                    style={{ marginRight: '5px', cursor: 'pointer' }}
+                                                                    onClick={() => setRating(ratingValue)}
+                                                                />
+                                                            );
+                                                        })}
+                                                    </div>
+                                                    {/* <input
+                                                        type="number"
+                                                        placeholder="Enter Rating"
                                                         value={rating}
-                                                        onChange={(e) => setRating(e.target.value)} style={{
+                                                        onChange={(e) => setRating(e.target.value)}
+                                                        style={{
                                                             display: 'flex',
                                                             justifyContent: 'center',
                                                             alignItems: 'center',
@@ -290,7 +300,8 @@ const TicketHistory = () => {
                                                             border: '2px solid #0e360e',
                                                             borderColor: '#0e360e',
                                                             width: '100%'
-                                                        }} />
+                                                        }}
+                                                    /> */}
 
                                                     <h4>Review</h4>
 
