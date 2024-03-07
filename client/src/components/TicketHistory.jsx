@@ -6,18 +6,29 @@ import './comp.css'
 
 const customStyles = {
     content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      marginRight: '-50%',
-      transform: 'translate(-50%, -50%)',
-      border: '2px solid #0e360e'
-      
-    },
-  };
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+        border: '2px solid #0e360e'
 
-  
+    },
+};
+
+const customStyles2 = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+        border: '2px solid #0e360e',
+    },
+};
+
 
 function formattime(time24) {
     const [hours, minutes] = time24.split(":");
@@ -53,9 +64,12 @@ const TicketHistory = () => {
     const [transModeMap, setTransModeMap] = useState({});
     const [journey_map, setJourney_map] = useState({});
     const [transMode, setTransMode] = useState('');
-
-
+    const [reviewModalOpen, setReviewModalOpen] = useState(false);
+    const [review, setReview] = useState('');
+    const [rating, setRating] = useState(0);
     const [expandedTransactions, setExpandedTransactions] = useState({});
+    const [trainName, setTrainName] = useState('');
+    const [className, setClassName] = useState('');
 
     const toggleDropdown = (transactionId) => {
         setExpandedTransactions(prev => ({
@@ -142,7 +156,7 @@ const TicketHistory = () => {
                     body: JSON.stringify({ transactionId }),
                 });
                 const data = await response.json();
-                console.log("data", data);
+                // console.log("data", data);
             } catch (error) {
                 console.error(error.message);
             }
@@ -150,15 +164,15 @@ const TicketHistory = () => {
         }
 
         refund(transactionId);
-         window.location.reload();
+        window.location.reload();
     }
 
     function closeModal() {
         setIsOpen(false);
-        console.log("//// selectedTransactionId : ", selectedTransactionId);
-        console.log("//// oldTransactionId : ", oldTransactionId);
+        // console.log("//// selectedTransactionId : ", selectedTransactionId);
+        // console.log("//// oldTransactionId : ", oldTransactionId);
         sendTransactionId(selectedTransactionId, oldTransactionId, transMode);
-         window.location.reload();
+        window.location.reload();
     }
 
     const sendTransactionId = async (transactionId, oldTransactionId, transMode) => {
@@ -171,7 +185,7 @@ const TicketHistory = () => {
                 body: JSON.stringify({ transactionId }),
             });
             const data = await response.json();
-            console.log("data", data);
+            // console.log("data", data);
         } catch (error) {
             console.error(error.message);
         }
@@ -194,6 +208,37 @@ const TicketHistory = () => {
         transactionsByDOJ[formattedDate].push(transactionId);
     });
 
+
+
+
+    function openModal2(t_name, c_name) {
+        console.log("clicked");
+        console.log("t_name", t_name);
+        console.log("c_name", c_name);
+        setReviewModalOpen(true);
+        setTrainName(t_name);
+        setClassName(c_name);
+        
+    }
+
+    const sendReview = async () => {
+        console.log("review : ", review);
+        try {
+            const response = await fetch(`http://localhost:3001/send/review/${userId}/${trainName}/${className}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ review, rating }),
+            });
+            const data = await response.json();
+            console.log("data", data);
+        }
+        catch (error) {
+            console.error(error.message);
+        }
+    }
+
     return (
         <Fragment>
 
@@ -201,7 +246,7 @@ const TicketHistory = () => {
 
             {Object.entries(ticketTransactionMap).map(([transactionId, ticketIds]) => (
                 <div key={transactionId}>
-                    {console.log("transactionId", transactionId)}
+                    {/* {console.log("transactionId", transactionId)} */}
 
                     <div onClick={() => toggleDropdown(transactionId)}>
 
@@ -231,6 +276,38 @@ const TicketHistory = () => {
                                             <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
                                                 Refund
                                             </button>
+                                            <button onClick={() => openModal2(journey_map[transactionId].trainName, journey_map[transactionId].className)} style={{ backgroundColor: '#6AA84F', color: '#212529', border: 'none', padding: '8px 17px', cursor: 'pointer', borderRadius: '20px', fontSize: '17px', marginLeft: '220px' }}>Review</button>
+                                            <Modal isOpen={reviewModalOpen} onRequestClose={() => setReviewModalOpen(false)} style={customStyles2}>
+                                                <div>
+                                                    <h4>Rating</h4>
+                                                    <input type="number" placeholder="Enter Rating"
+                                                        value={rating}
+                                                        onChange={(e) => setRating(e.target.value)} style={{
+                                                            display: 'flex',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center',
+                                                            borderRadius: '5px',
+                                                            border: '2px solid #0e360e',
+                                                            borderColor: '#0e360e',
+                                                            width: '100%'
+                                                        }} />
+
+                                                    <h4>Review</h4>
+
+                                                    <input type="text" placeholder="Enter Review"
+                                                        value={review}
+                                                        onChange={(e) => setReview(e.target.value)} style={{
+                                                            display: 'flex',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center',
+                                                            borderRadius: '5px',
+                                                            border: '2px solid #0e360e',
+                                                            borderColor: '#0e360e',
+                                                            width: '100%'
+                                                        }} />
+                                                    <button onClick={() => sendReview()} style={{ marginTop: '5px' }}>Submit</button>
+                                                </div>
+                                            </Modal>
                                         </>
                                     ) : (<>
                                         {formatDate(journey_map[transactionId].doj)}, {' '}
@@ -240,7 +317,7 @@ const TicketHistory = () => {
 
                                         <span style={{ padding: '0 120px' }} className="spacer"></span>
 
-                                        <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#cc0000', color: 'white', border: 'none', padding: '8px 20px', cursor: 'not-allowed', borderRadius: '20px' }} className="btn btn-warning">
+                                        <button style={{ backgroundColor: '#cc0000', color: 'white', border: 'none', padding: '8px 20px', cursor: 'not-allowed', borderRadius: '20px' }} className="btn btn-warning">
                                             Cancelled
                                         </button> </>
                                     )
@@ -249,10 +326,6 @@ const TicketHistory = () => {
 
 
                         </div>
-
-
-
-
                     </div>
 
                     <span style={{ marginTop: '20px' }}></span>
@@ -277,7 +350,7 @@ const TicketHistory = () => {
                     )}
                 </div>
             ))}
-            <Modal isOpen={modalIsOpen} onRequestClose={closeModal}  style={customStyles}>
+            <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={customStyles}>
                 <div>
                     <input
                         type="checkbox"
@@ -302,17 +375,19 @@ const TicketHistory = () => {
                         placeholder="Enter transaction ID"
                         value={selectedTransactionId}
                         onChange={(e) => setSelectedTransactionId(e.target.value)}
-                        style={{display: 'flex',
+                        style={{
+                            display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center',
                             borderRadius: '5px',
                             border: '2px solid #0e360e',
-                            borderColor: '#0e360e'}}
+                            borderColor: '#0e360e'
+                        }}
 
                     />
                 </div>
-                
-                <button className='button' onClick={closeModal} style={{ marginTop:'5px'}}>Confirm</button>
+
+                <button className='button' onClick={closeModal} style={{ marginTop: '5px' }}>Confirm</button>
             </Modal>
 
 

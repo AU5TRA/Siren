@@ -153,7 +153,6 @@ CREATE TABLE ticket (
 CREATE TABLE review (
     review_id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES passenger(user_id),
-    ticket_id VARCHAR(15) REFERENCES ticket(ticket_id),
     train_id INTEGER REFERENCES train(train_id),
     class_id INTEGER REFERENCES class(class_id),
     review_content VARCHAR(100),
