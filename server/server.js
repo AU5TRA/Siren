@@ -153,81 +153,63 @@ app.post("/booking/confirm", async (req, res) => {
       route,
       transMode } = req.body;
 
-    // const selectedSeatsArray = [...selectedSeats];
+    const selectedSeatsArray = [...selectedSeats];
     console.log(selectedSeats);
     console.log(route);
 
-    // const cnt = selectedSeatsArray.length;
+    const cnt = selectedSeatsArray.length;
 
 
-    // const price = totalFare / cnt;
+    const price = totalFare / cnt;
 
-    // const result1 = await db.query(`SELECT B_STATION_ID FROM BOARDING_STATION WHERE B_STATION_NAME = $1`, [selectedStation]);
-    // const result2 = await db.query(`SELECT B_STATION_ID FROM BOARDING_STATION WHERE B_STATION_NAME = $1`, [selectedStation_d]);
-    // const b_station_id = result1.rows[0].b_station_id;
-    // const d_station_id = result2.rows[0].b_station_id;
-
-
-    // const result4 = await db.query(`SELECT train_id FROM train WHERE train_name = $1 `, [trainName]);
-    // const train_id = result4.rows[0].train_id;
-    // const result5 = await db.query(`SELECT class_id FROM class WHERE class_name = $1 `, [className]);
-    // const class_id = result5.rows[0].class_id;
-
-    // const result = await db.query('SELECT * FROM get_station_sequence($1)', [route]);
-
-    // const stationIds = result.rows.map(row => row.station_id);
-
-    // const startStation = await db.query('SELECT station_id FROM boarding_station WHERE B_STATION_NAME = $1', [selectedStation]);
-    // const endStation = await db.query('SELECT station_id FROM boarding_station WHERE B_STATION_NAME = $1', [selectedStation_d]);
-
-    // const startIndex = stationIds.indexOf(startStation.rows[0].station_id);
-
-    // const endIndex = stationIds.indexOf(endStation.rows[0].station_id);
+    const result1 = await db.query(`SELECT B_STATION_ID FROM BOARDING_STATION WHERE B_STATION_NAME = $1`, [selectedStation]);
+    const result2 = await db.query(`SELECT B_STATION_ID FROM BOARDING_STATION WHERE B_STATION_NAME = $1`, [selectedStation_d]);
+    const b_station_id = result1.rows[0].b_station_id;
+    const d_station_id = result2.rows[0].b_station_id;
 
 
-    // const stations = stationIds.slice(startIndex, endIndex + 1);
+    const result4 = await db.query(`SELECT train_id FROM train WHERE train_name = $1 `, [trainName]);
+    const train_id = result4.rows[0].train_id;
+    const result5 = await db.query(`SELECT class_id FROM class WHERE class_name = $1 `, [className]);
+    const class_id = result5.rows[0].class_id;
 
-    // const offerRes = await db.query('SELECT * FROM offer WHERE offer_id = $1', [selectedOffer]);
-    // const offer_id = offerRes.rows[0].offer_id;
+    const result = await db.query('SELECT * FROM get_station_sequence($1)', [route]);
 
-    // let t_m = transMode;
-    // let t_id = transactionId;
-    // if (transactionId === '') {
-    //   t_id = null;
-    //   t_m = '';
-    // }
-    // const resTransaction = await db.query('SELECT * FROM insert_transaction($1, $2, $3, $4, $5)', [t_id, t_m, offer_id, totalFare, userId]);
+    const stationIds = result.rows.map(row => row.station_id);
 
-    // const transactionId2 = resTransaction.rows[0].transaction_id;
+    const startStation = await db.query('SELECT station_id FROM boarding_station WHERE B_STATION_NAME = $1', [selectedStation]);
+    const endStation = await db.query('SELECT station_id FROM boarding_station WHERE B_STATION_NAME = $1', [selectedStation_d]);
 
-    // for (const seat of selectedSeatsArray) {
+    const startIndex = stationIds.indexOf(startStation.rows[0].station_id);
 
-
-    //   const result3 = await db.query(`SELECT SEAT_ID FROM SEAT WHERE SEAT_NUMBER = $1 AND route_id= $2 AND TRAIN_ID= $3 AND CLASS_ID=$4`, [seat.toString(), route, train_id, class_id]);
-    //   const seat_id_n = result3.rows[0].seat_id;
+    const endIndex = stationIds.indexOf(endStation.rows[0].station_id);
 
 
-    //   const result = await db.query('SELECT * from insert_ticket($1, $2, $3, $4, $5, $6, $7, $8, $9)', [userId, b_station_id, d_station_id, price, transactionId2, seat_id_n, route, date, stations]);
+    const stations = stationIds.slice(startIndex, endIndex + 1);
 
-    // }
-    const res1 = await db.query('call book_tickets($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
-      [date, selectedSeats, totalFare, selectedStation, selectedStation_d, selectedOffer, discountedFare, transactionId, userId, className, trainName, route, transMode]);
+    const offerRes = await db.query('SELECT * FROM offer WHERE offer_id = $1', [selectedOffer]);
+    const offer_id = offerRes.rows[0].offer_id;
 
-    // date_param DATE,
-    // selectedSeats_param INT[],
-    // totalFare_param NUMERIC,
-    // selectedStation_param VARCHAR(50),
-    // selectedStation_d_param VARCHAR(50),
-    // selectedOffer_param INT,
-    // discountedFare_param NUMERIC,
-    // transactionId_param INT,
-    // userId_param INT,
-    // className_param VARCHAR(50),
-    // trainName_param VARCHAR(50),
-    // route_param INT[],
-    // transMode_param VARCHAR(50)
+    let t_m = transMode;
+    let t_id = transactionId;
+    if (transactionId === '') {
+      t_id = null;
+      t_m = '';
+    }
+    const resTransaction = await db.query('SELECT * FROM insert_transaction($1, $2, $3, $4, $5)', [t_id, t_m, offer_id, totalFare, userId]);
+
+    const transactionId2 = resTransaction.rows[0].transaction_id;
+
+    for (const seat of selectedSeatsArray) {
 
 
+      const result3 = await db.query(`SELECT SEAT_ID FROM SEAT WHERE SEAT_NUMBER = $1 AND route_id= $2 AND TRAIN_ID= $3 AND CLASS_ID=$4`, [seat.toString(), route, train_id, class_id]);
+      const seat_id_n = result3.rows[0].seat_id;
+
+
+      const result = await db.query('SELECT * from insert_ticket($1, $2, $3, $4, $5, $6, $7, $8, $9)', [userId, b_station_id, d_station_id, price, transactionId2, seat_id_n, route, date, stations]);
+
+    }
     res.status(200).json({
       status: "success",
       data: {
