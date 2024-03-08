@@ -5,9 +5,53 @@ const cors = require("cors");
 const db = require("./db");
 const jwtGenerator = require("./utils/jwtGenerator");
 const bcrypt = require('bcryptjs');
+const { Brush } = require("@mui/icons-material");
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+
+app.post('/admin/addTrain/confirm', async (req, res) => {
+  console.log("Heloooooooo");
+  try {
+    const {
+      trainId,
+      trainName,
+      routeId,
+      routeName,
+      stationData,
+      classData
+    } = req.body;
+
+    const result = await db.query('CALL add_train($1, $2, $3)', [trainId, trainName, routeId]);
+
+    let class_ids = [];
+    let station_ids = [];
+    let station_arrival = [];
+    let station_departure = [];
+
+    for (const station of stationData) {
+      const { name, arrival, departure } = station;
+      const stationId = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [name.toUpperCase()]);
+      station_ids.push(stationId.rows[0].station_id);
+      station_arrival[stationId.rows[0].station_id] = arrival;
+      station_departure[stationId.rows[0].station_id] = departure;
+    }
+    
+    
+    for (const classItem of classData) {
+      const { name, price, seats } = classItem;
+      const result = await db.query('SELECT class_id FROM class WHERE UPPER(class_name) = $1', [name.toUpperCase()]);
+      console.log(result.rows);
+      class_ids.push(result.rows[0].class_id);
+    }
+    const result2 = await db.query('CALL insert_train($1, $2, $3, $4, $5, $6)', [trainId, routeId, station_ids, class_ids, station_arrival, station_departure]);
+  }
+  catch (error) {
+    console.error(error);
+  }
+
+});
 
 app.get("/admin/addTrain/:trainId/:trainName/:routeId/:number_of_stations/:number_of_classes", async (req, res) => {
   try {
@@ -18,37 +62,53 @@ app.get("/admin/addTrain/:trainId/:trainName/:routeId/:number_of_stations/:numbe
     const route_exists = `select * from route where route_id = $1`;
     const route_exists_res = await db.query(route_exists, [routeId]);
     const exist = route_exists_res.rows.length;
+    const routesStations = await db.query('SELECT * FROM get_station_sequence($1)', [routeId]);
+    const stations = routesStations.rows;
+    const allStations = await db.query('SELECT station_name FROM station order by station_name')
+
+
+    const mappedStations = stations.map(station => ({
+      [station.sequence_number]: station.station_name
+    }));
+
+    const stationNames = allStations.rows.map(station => station.station_name);
+    console.log("stations : " + JSON.stringify(stationNames));
+
+    console.log("-----------")
     res.status(200).json({
       status: "success",
       result: results.rows.length,
+      stations: mappedStations,
+      allStations: stationNames,
       data: {
         trains: results.rows,
-        exist: exist
+        exist: exist,
+
       },
     });
-    
+
   } catch (err) {
     console.log(err);
     console.log(err.message);
-    if(err.code === 'XX010'){
+    if (err.code === 'XX010') {
       res.status(500).json({
         status: "error",
         message: "Train already runs on that route",
       });
     }
-    else if(err.code === 'XX011'){
+    else if (err.code === 'XX011') {
       res.status(500).json({
         status: "error",
         message: "Duplicate Train Name not allowed",
       });
     }
-    else if(err.code === 'XX012'){
+    else if (err.code === 'XX012') {
       res.status(500).json({
         status: "error",
         message: "Train already runs on that route",
       });
     }
-    else if(err.code === 'XX013'){
+    else if (err.code === 'XX013') {
       res.status(500).json({
         status: "error",
         message: "Train ID and Train Name don't match",
@@ -162,7 +222,7 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId/:transMode', async (
     console.log(err.message);
     if (err.code === 'XX001') {
       return res.status(400).json({ error: "transaction id already in use" });
-      
+
     }
   }
 });
@@ -171,9 +231,9 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId/:transMode', async (
 app.get("/users/:id/tickets", async (req, res) => {
   try {
 
-    const cancel_tickets= await db.query(`CALL update_ticket_status($1)`, [req.params.id]);
+    const cancel_tickets = await db.query(`CALL update_ticket_status($1)`, [req.params.id]);
 
-    
+
     const userId = req.params.id;
     const seats_map = {};
     const results = await db.query('SELECT * FROM ticket WHERE user_id = $1', [userId]);

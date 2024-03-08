@@ -54,6 +54,13 @@ const Admin = () => {
   const [message, setMessage] = useState('');
   const [existRoute, setExistRoute] = useState(false);
 
+  const [selectedSuggestionFrom, setSelectedSuggestionFrom] = useState(null);
+
+
+  const [stationData, setStationData] = useState([]);
+  const [classData, setClassData] = useState([]);
+
+  const [allStationData, setAllStationData] = useState([]);
 
 
   const handleAddButtonClick = async () => {
@@ -65,48 +72,172 @@ const Admin = () => {
       const data = await result.json();
       console.log(data);
       setMessage('');
+
       if (data.message !== undefined) {
         console.log("message : " + data.message);
         setMessage(data.message);
       }
+
       setExistRoute(false);
-      if (data.exist === 0) {
+      if (data.data.exist === 0) {
         setExistRoute(true);
+
       }
+      else {
+        setStations(data.stations);
+        console.log(JSON.stringify(stations[1]));
+        console.log("haha");
+        setExistRoute(false);
+
+      }
+      setAllStationData(data.allStations);
+      console.log("allStationData : " + JSON.stringify(allStationData) + "----------------------------");
+      console.log("stations : " + JSON.stringify(data.stations));
+
+
+
+
+
     } catch (error) {
       console.error(error);
     }
     setOpenModal(true);
   }
+  const handleInputChange = (index, type, value) => {
+    const updatedStations = [...stationData];
+    if (!updatedStations[index]) {
+      updatedStations[index] = {};
+    }
+    updatedStations[index][type] = value;
+    setStationData(updatedStations);
+    console.log("updatedStations : " + JSON.stringify(updatedStations));
+  };
+
+  const handleInputChangeClass = (index, type, value) => {
+    const updatedClasses = [...classData];
+    if (!updatedClasses[index]) {
+      updatedClasses[index] = {};
+    }
+    updatedClasses[index][type] = value;
+    setClassData(updatedClasses);
+    console.log("updatedClasses : " + JSON.stringify(updatedClasses));
+  };
 
 
+  const closeModal = async (e)=>{
+    console.log("train id: " + trainId)
+    console.log("train name: " + trainName)
+    console.log("routeId: " + routeId)
+    console.log("routeName: " + routeName)
+    console.log("finalClasses : " + JSON.stringify(classData));
+    console.log("finalStations : " + JSON.stringify(stationData));
 
 
-  function closeModal() {
-    setOpenModal(false);
+    try {
+      const result = await fetch('http://localhost:3001/admin/addTrain/confirm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+           trainId,
+           trainName,
+           routeId,
+           routeName,
+           stationData,
+           classData
+        })
+      
+    })
+    console.log("////////////result : " + JSON.stringify(result));
+    if(result.status === 200)
+    alert("Train added successfully");
+  } catch (error) {
+      console.error(error);
+    }
+    
+    // setOpenModal(false);
   }
+
+
+
+
   function renderInputs() {
     const inputs = [];
-    for (let i = 0; i < number_of_stations; i++) {
-      inputs.push(
-        <Fragment key={i}>
-          {i + 1}.
-          <input type="text" placeholder={`Station ${i + 1} Station ID`} style={{ ...customStyles }} />
-          <input type="text" placeholder={`Station ${i + 1} Name`} style={{ ...customStyles }} />
-          <input type="text" placeholder={`Station ${i + 1} Arrival Time`} style={{ ...customStyles }} />
-          <input type="text" placeholder={`Station ${i + 1} Departure Time`} style={{ ...customStyles }} />
-          <br />
-        </Fragment>
-      );
+    if (!existRoute && stations && stations.length > 0) {
+      // Display existing stations
+      stations.forEach((station, index) => {
+        inputs.push(
+          <Fragment key={index}>
+            {index + 1}.
+            <input
+              type="text"
+              placeholder={`Station ${index + 1} Name`}
+              style={{ ...customStyles }}
+              value={stations[index][index + 1]}
+              disabled={true}
+            />
+            {(index + 1) === 1 ?
+              <></> :
+              <input
+                type="text"
+                placeholder={`Station ${index + 1} Arrival Time`}
+                style={{ ...customStyles }}
+                onChange={(e) => handleInputChange(index, 'arrival', e.target.value)}
+              />}
+            {(index + 1) === stations.length ?
+              <></> :
+              <input
+                type="text"
+                placeholder={`Station ${index + 1} Departure Time`}
+                style={{ ...customStyles }}
+                onChange={(e) => handleInputChange(index, 'departure', e.target.value)}
+              />}
+            <br />
+          </Fragment>
+        );
+      });
+    } else {
+      for (let i = 0; i < number_of_stations; i++) {
+        inputs.push(
+          <Fragment key={i}>
+            {i + 1}.
+            <input
+              type="text"
+              placeholder={`Station ${i + 1} Name`}
+              list="stationSuggestions"
+              style={{ ...customStyles }}
+              onChange={(e) => handleInputChange(i, 'name', e.target.value)}
+            />
+            <datalist id="stationSuggestions" >
+              {allStationData.map((station, index) => (
+                <option key={index + 1} value={station} />
+              ))}
+            </datalist>
+
+            <input
+              type="text"
+              placeholder={`Station ${i + 1} Arrival Time`}
+              style={{ ...customStyles }}
+              onChange={(e) => handleInputChange(i, 'arrival', e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder={`Station ${i + 1} Departure Time`}
+              style={{ ...customStyles }}
+              onChange={(e) => handleInputChange(i, 'departure', e.target.value)}
+            />
+            <br />
+          </Fragment>
+        );
+      }
     }
     for (let i = 0; i < number_of_classes; i++) {
       inputs.push(
         <Fragment key={i}>
           {i + 1}.
-          <input type="text" placeholder={`Class ${i + 1} Class ID`} style={{ ...customStyles }} />
-          <input type="text" placeholder={`Class ${i + 1} Name`} style={{ ...customStyles }} />
-          <input type="text" placeholder={`Class ${i + 1} Price`} style={{ ...customStyles }} />
-          <input type="text" placeholder={`Class ${i + 1} Total Seat Count`} style={{ ...customStyles }} />
+          <input type="text" placeholder={`Class ${i + 1} Name`} style={{ ...customStyles }} onChange={(e) => handleInputChangeClass(i, 'name', e.target.value)} />
+          <input type="text" placeholder={`Class ${i + 1} Total Seat Count`} style={{ ...customStyles }} onChange={(e) => handleInputChangeClass(i, 'seats', e.target.value)} />
           <br />
         </Fragment>
       );
@@ -140,15 +271,15 @@ const Admin = () => {
       style={modalStyle}
       contentLabel="Add stations & classes"
     >
-      {!existRoute && <input type="text" placeholder="Enter Route name" style={{ ...customStyles }} onChange={(e) => setRouteName(e.target.value)} />}
+      {existRoute && <input type="text" placeholder="Enter Route name" style={{ ...customStyles }} onChange={(e) => setRouteName(e.target.value)} />}
 
       <span style={{ spanStyle }}></span>
       {renderInputs()}
-      <button onClick={closeModal}>Close Modal</button>
+      <button onClick={closeModal}> Confirm</button>
     </Modal>
 
     {message && <ErrorModal isOpen={openModal} errorMessage={message} closeModal={closeModal} />}
   </Fragment>
 }
 
-export default Admin
+export default Admin;
