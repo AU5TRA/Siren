@@ -86,3 +86,30 @@ FOR EACH ROW
 EXECUTE FUNCTION check_password();
 
 
+-- trigger for checking admin side train addition
+CREATE OR REPLACE FUNCTION check_train()
+RETURNS TRIGGER AS $$
+DECLARE
+    t_name VARCHAR(100);
+    t_id INTEGER;
+    r_id INTEGER;
+BEGIN
+    t_id := null;
+    t_name := null;
+    r_id := null;
+    SELECT train_id, train_name  INTO t_id, t_name FROM train WHERE train_id = NEW.train_id;
+    SELECT route_id INTO r_id FROM train_routes WHERE route_id = NEW.route_id;
+    IF t_id is not null AND t_name is not null AND r_id is not null THEN
+        RAISE EXCEPTION 'Train already exists' USING ERRCODE = 'XX010';
+    END IF;
+    IF t_id is null AND t_name is not null THEN
+        RAISE EXCEPTION 'Duplicate Train Name not allowed' USING ERRCODE = 'XX011';
+    END IF;
+    IF t_id is not null AND route_ID is not null THEN
+        RAISE EXCEPTION 'Train already has this route' USING ERRCODE = 'XX012';
+    END IF;
+    IF NEW.departure_time > NEW.arrival_time THEN
+        RAISE EXCEPTION 'Departure Time cannot be greater than Arrival Time' USING ERRCODE = 'XX016';
+    END IF;
+    RETURN NEW;
+END;
