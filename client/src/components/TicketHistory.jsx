@@ -3,6 +3,8 @@ import { useData } from './AppContext';
 import './ticketBook.css';
 import Modal from 'react-modal';
 import './comp.css'
+import { MdOutlineDeleteOutline } from "react-icons/md";
+
 
 const customStyles = {
     content: {
@@ -105,7 +107,26 @@ const TicketHistory = () => {
     }, [userId]);
 
 
+    function deleteTransaction(transactionId){
+        const deleteTrans = async () => {
+            try {
+                const response = await fetch(`http://localhost:3001/transaction/delete/${transactionId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ transactionId }),
+                });
+                const data = await response.json();
+                console.log("data", data);
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
+        deleteTrans();
+        window.location.reload();
 
+    }
 
 
     function openModal(transactionId) {
@@ -242,7 +263,10 @@ const TicketHistory = () => {
 
                                         <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#cc0000', color: 'white', border: 'none', padding: '8px 20px', cursor: 'not-allowed', borderRadius: '20px' }} className="btn btn-warning">
                                             Cancelled
-                                        </button> </>
+                                        </button> 
+                                        <button onClick={()=>deleteTransaction(transactionId)} style={{ backgroundColor: 'white', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }}><MdOutlineDeleteOutline /></button>
+                                        </>
+                                        
                                     )
                                 )
                             ) : <></>}

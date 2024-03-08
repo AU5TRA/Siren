@@ -144,7 +144,7 @@ CREATE TABLE ticket (
     destination_station_id INTEGER REFERENCES boarding_station(b_station_id),
     price DECIMAL(10, 2) NOT NULL,
     ticket_status VARCHAR(20),
-    transaction_id INTEGER REFERENCES transaction(transaction_id),
+    transaction_id INTEGER REFERENCES transaction(transaction_id) ON DELETE CASCADE,
     date_of_journey DATE
 );
 
@@ -153,7 +153,6 @@ CREATE TABLE ticket (
 CREATE TABLE review (
     review_id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES passenger(user_id),
-    ticket_id VARCHAR(15) REFERENCES ticket(ticket_id),
     train_id INTEGER REFERENCES train(train_id),
     class_id INTEGER REFERENCES class(class_id),
     review_content VARCHAR(100),
@@ -166,3 +165,11 @@ CREATE TABLE train_class(
     class_id INTEGER REFERENCES class(class_id),
     PRIMARY KEY (train_id, class_id)
 )
+
+
+CREATE TABLE refund (
+    refund_id SERIAL PRIMARY KEY,
+    transaction_id INTEGER REFERENCES payment(transaction_id) ON DELETE CASCADE,
+    time_of_refund TIMESTAMP,
+    refund_amount DECIMAL(10, 2) NOT NULL
+);
