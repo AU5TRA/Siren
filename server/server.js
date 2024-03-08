@@ -41,8 +41,8 @@ app.post('/admin/addTrain/confirm', async (req, res) => {
       station_arrival[stationId.rows[0].station_id] = arrival;
       station_departure[stationId.rows[0].station_id] = departure;
     }
-    
-    
+
+
     for (const classItem of classData) {
       const { name, price, seats } = classItem;
       const result = await db.query('SELECT class_id FROM class WHERE UPPER(class_name) = $1', [name.toUpperCase()]);
@@ -54,7 +54,16 @@ app.post('/admin/addTrain/confirm', async (req, res) => {
     // console.log(typeof(station_ids[0]))
     const result2 = await db.query('CALL add_route_train($1, $2, $3, $4)', [trainId, trainName, routeId, routeName]);
     const result3 = await db.query('CALL insert_class_schedule($1, $2, $3, $4, $5, $6, $7, $8)', [trainId, trainName, routeId, station_ids, class_ids, station_arrival, station_departure, seat_cnt]);
-  }                            
+    res.status(200).json({
+      status: "success",
+      data: {
+        result: result.rows, // add_train
+        result2: result2.rows, // add_route_train
+        result3: result3.rows // insert_class_schedule
+      },
+    });
+  }
+
   catch (error) {
     console.error(error);
   }

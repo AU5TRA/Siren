@@ -155,7 +155,7 @@ const Admin = () => {
       console.error(error);
     }
     
-    // setOpenModal(false);
+    setOpenModal(false);
   }
 
 
