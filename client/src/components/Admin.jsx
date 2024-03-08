@@ -62,6 +62,7 @@ const Admin = () => {
       inputs.push(
         <Fragment key={i}>
           {i + 1}.
+          <input type="text" placeholder={`Station ${i + 1} Station ID`} style={{ ...customStyles }} />
           <input type="text" placeholder={`Station ${i + 1} Name`} style={{ ...customStyles }} />
           <input type="text" placeholder={`Station ${i + 1} Arrival Time`} style={{ ...customStyles }} />
           <input type="text" placeholder={`Station ${i + 1} Departure Time`} style={{ ...customStyles }} />
@@ -73,6 +74,7 @@ const Admin = () => {
       inputs.push(
         <Fragment key={i}>
           {i + 1}.
+          <input type="text" placeholder={`Class ${i + 1} Class ID`} style={{ ...customStyles }} />
           <input type="text" placeholder={`Class ${i + 1} Name`} style={{ ...customStyles }} />
           <input type="text" placeholder={`Class ${i + 1} Price`} style={{ ...customStyles }} />
           <input type="text" placeholder={`Class ${i + 1} Total Seat Count`} style={{ ...customStyles }} />
