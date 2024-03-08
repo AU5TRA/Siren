@@ -86,3 +86,18 @@ FOR EACH ROW
 EXECUTE FUNCTION check_password();
 
 
+--- same transaction id exists
+CREATE OR REPLACE FUNCTION check_transaction_exists()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM transaction WHERE transaction_id = NEW.transaction_id) THEN
+        RAISE EXCEPTION 'Such a transaction already exists' USING ERRCODE = 'XX001';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER before_insert_transaction
+BEFORE INSERT OR UPDATE ON transaction
+FOR EACH ROW
+EXECUTE FUNCTION check_transaction_exists();

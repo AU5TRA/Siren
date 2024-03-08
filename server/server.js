@@ -19,7 +19,7 @@ app.delete('/transaction/delete/:transactionId', async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'An error occurred while deleting the transaction' });
   }
- 
+
 })
 
 app.delete('/users/:userId/delete', async (req, res) => {
@@ -33,13 +33,13 @@ app.delete('/users/:userId/delete', async (req, res) => {
 
 
     const user = await db.query("SELECT password FROM passenger WHERE user_id = $1", [userId]);
-    
+
 
 
 
     const userData = user.rows[0];
 
-    
+
 
 
 
@@ -66,54 +66,66 @@ app.post('/transaction/refund/:userId/:transactionId', async (req, res) => {
 
 
 app.post('/transaction/:id/:transactionId/:oldTransactionId/:transMode', async (req, res) => {
-  console.log(req.params.id);
-  console.log(req.params.transactionId);
-  console.log(req.params.oldTransactionId);
-  console.log(req.params.transMode);
-  const oldTransactionId = req.params.oldTransactionId;
+  try {
+    console.log(req.params.id);
+    console.log(req.params.transactionId);
+    console.log(req.params.oldTransactionId);
+    console.log(req.params.transMode);
+    const oldTransactionId = req.params.oldTransactionId;
 
-  let t_id = req.params.transactionId;
-  if (t_id === '' || t_id === 'null') {
+    let t_id = req.params.transactionId;
+    if (t_id === '' || t_id === 'null') {
 
-    return res.status(400).json({
-      status: "error",
-      message: "Transaction ID cannot be empty",
+      return res.status(400).json({
+        status: "error",
+        message: "Transaction ID cannot be empty",
+      });
+    }
+    const transMode = req.params.transMode;
+
+
+    const result = await db.query(`SELECT * FROM transaction where transaction_id = $1`, [oldTransactionId]);
+    console.log(result.rows[0]);
+    const offerId = result.rows[0].offer_id;
+    const totalFare = result.rows[0].amount;
+    console.log(offerId);
+    console.log(totalFare);
+    let mode = result.rows[0].mode_of_transaction;
+    console.log("type : " + typeof mode);
+    if (mode === '' || mode === 'not paid' || mode === 'null') {
+      mode = transMode;
+    }
+
+
+    const res2 = await db.query(`SELECT * FROM insert_transaction($1, $2, $3, $4, $5)`, [req.params.transactionId, mode, offerId, totalFare, req.params.id]);
+
+    const updateTicket = await db.query(`UPDATE ticket SET transaction_id = $1, ticket_status = 'confirmed' WHERE user_id = $2 AND transaction_id = $3`, [req.params.transactionId, req.params.id, req.params.oldTransactionId]);
+
+    const del = await db.query(`DELETE FROM transaction where transaction_id = $1`, [req.params.oldTransactionId]);
+    ;
+    res.status(200).json({
+      status: "success",
+      data: {
+        ticket: updateTicket.rows,
+      },
     });
   }
-  const transMode = req.params.transMode;
-
-
-  const result = await db.query(`SELECT * FROM transaction where transaction_id = $1`, [oldTransactionId]);
-  console.log(result.rows[0]);
-  const offerId = result.rows[0].offer_id;
-  const totalFare = result.rows[0].amount;
-  console.log(offerId);
-  console.log(totalFare);
-  let mode = result.rows[0].mode_of_transaction;
-  console.log("type : " + typeof mode);
-  if (mode === '' || mode === 'not paid' || mode === 'null') {
-    mode = transMode;
+  catch (err) {
+    console.log(err.message);
+    if (err.code === 'XX001') {
+      return res.status(400).json({ error: "transaction id already in use" });
+      
+    }
   }
-
-
-  const res2 = await db.query(`SELECT * FROM insert_transaction($1, $2, $3, $4, $5)`, [req.params.transactionId, mode, offerId, totalFare, req.params.id]);
-
-  const updateTicket = await db.query(`UPDATE ticket SET transaction_id = $1, ticket_status = 'confirmed' WHERE user_id = $2 AND transaction_id = $3`, [req.params.transactionId, req.params.id, req.params.oldTransactionId]);
-
-  const del = await db.query(`DELETE FROM transaction where transaction_id = $1`, [req.params.oldTransactionId]);
-  ;
-  res.status(200).json({
-    status: "success",
-    data: {
-      ticket: updateTicket.rows,
-    },
-  });
 });
 
 
 app.get("/users/:id/tickets", async (req, res) => {
   try {
 
+    const cancel_tickets= await db.query(`CALL update_ticket_status($1)`, [req.params.id]);
+
+    
     const userId = req.params.id;
     const seats_map = {};
     const results = await db.query('SELECT * FROM ticket WHERE user_id = $1', [userId]);
@@ -260,6 +272,9 @@ app.post("/booking/confirm", async (req, res) => {
     });
   } catch (error) {
     console.error(error.message);
+    if (error.code === 'XX001') {
+      return res.status(400).json({ error: "transaction id already in use" });
+    }
   }
 
 });
@@ -284,7 +299,7 @@ app.get("/booking/ticket", async (req, res) => {
     const seatsArray = selectedSeats.split(',').map(seat => seat.trim());
 
     const offers = await db.query(`SELECT * FROM get_eligible_offers($1)`, [seatsArray.length])
-   
+
     res.status(200).json({
       status: "success",
       data: {
@@ -330,7 +345,7 @@ app.get('/booking/seat', async (req, res) => {
 
     const r1 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [from.toUpperCase()]);
     const r2 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [to.toUpperCase()]);
-    
+
     const fromStationId = parseInt(r1.rows[0].station_id);
     const toStationId = parseInt(r2.rows[0].station_id);
 
@@ -389,7 +404,7 @@ app.get('/booking/seat', async (req, res) => {
     ORDER BY CAST(seat_number AS INTEGER);
      `;
     const result = await db.query(queryForAvailableSeats, [trainId, classId, routeId, formattedDate, stations.map(s => s.station_id), stations.length]);
-  
+
     const availableSeats = [];
     for (const r of result.rows) {
       availableSeats.push(r.seat_number);
@@ -613,7 +628,7 @@ app.get("/book/search", async (req, res) => {
       for (const c of classes.rows) {
         const class_id = c.class_id;
         const result2 = await db.query(queryForAvailableSeats, [t_id, class_id, r_id, formattedDate, stations_in_route.map(s => s.station_id), stations_in_route.length]);
-      
+
         const availableSeats = [];
         for (const r of result2.rows) {
           availableSeats.push(r.seat_number);

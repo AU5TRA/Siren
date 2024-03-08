@@ -5,6 +5,7 @@ import './ticketBook.css';
 import Modal from 'react-modal';
 import './comp.css'
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { MdOutlineCancel } from "react-icons/md";
 
 
 const customStyles = {
@@ -29,6 +30,8 @@ const customStyles2 = {
         marginRight: '-50%',
         transform: 'translate(-50%, -50%)',
         border: '2px solid #0e360e',
+        width: '70%',
+        maxWidth: '500px',
     },
 };
 
@@ -122,7 +125,7 @@ const TicketHistory = () => {
     }, [userId]);
 
 
-    function deleteTransaction(transactionId){
+    function deleteTransaction(transactionId) {
         const deleteTrans = async () => {
             try {
                 const response = await fetch(`http://localhost:3001/transaction/delete/${transactionId}`, {
@@ -143,11 +146,11 @@ const TicketHistory = () => {
 
     }
 
-
+  
     function openModal(transactionId) {
         // console.log("ticketId", ticketId);
         setIsOpen(true);
-        
+
         setOldTransactionId(transactionId);
         setIsOpen(true);
     }
@@ -181,7 +184,7 @@ const TicketHistory = () => {
         // console.log("//// selectedTransactionId : ", selectedTransactionId);
         // console.log("//// oldTransactionId : ", oldTransactionId);
         sendTransactionId(selectedTransactionId, oldTransactionId, transMode);
-        window.location.reload();
+        //window.location.reload();
     }
 
     const sendTransactionId = async (transactionId, oldTransactionId, transMode) => {
@@ -195,6 +198,16 @@ const TicketHistory = () => {
             });
             const data = await response.json();
             // console.log("data", data);
+            if (response.status === 400) {
+                console.log("haha")
+
+                alert("Transaction id already in use");
+            }
+            else {
+                window.location.reload();
+
+            }
+
         } catch (error) {
             console.error(error.message);
         }
@@ -277,6 +290,10 @@ const TicketHistory = () => {
                                         <button onClick={() => openModal(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
                                             Proceed to pay
                                         </button>
+
+                                        <button onClick={() => deleteTransaction(transactionId)} style={{ backgroundColor: 'white', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }}>
+                                            <MdOutlineCancel />
+                                        </button>
                                     </>
                                 ) : (
                                     journey_map[transactionId].status === 'confirmed' ? (
@@ -308,21 +325,7 @@ const TicketHistory = () => {
                                                             );
                                                         })}
                                                     </div>
-                                                    {/* <input
-                                                        type="number"
-                                                        placeholder="Enter Rating"
-                                                        value={rating}
-                                                        onChange={(e) => setRating(e.target.value)}
-                                                        style={{
-                                                            display: 'flex',
-                                                            justifyContent: 'center',
-                                                            alignItems: 'center',
-                                                            borderRadius: '5px',
-                                                            border: '2px solid #0e360e',
-                                                            borderColor: '#0e360e',
-                                                            width: '100%'
-                                                        }}
-                                                    /> */}
+                                                    
 
                                                     <h4>Review</h4>
 
@@ -351,10 +354,12 @@ const TicketHistory = () => {
 
                                         <button style={{ backgroundColor: '#cc0000', color: 'white', border: 'none', padding: '8px 20px', cursor: 'not-allowed', borderRadius: '20px' }} className="btn btn-warning">
                                             Cancelled
-                                        </button> 
-                                        <button onClick={()=>deleteTransaction(transactionId)} style={{ backgroundColor: 'white', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }}><MdOutlineDeleteOutline /></button>
-                                        </>
-                                        
+                                        </button>
+                                        <button onClick={() => deleteTransaction(transactionId)} style={{ backgroundColor: 'white', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }}>
+                                            <MdOutlineDeleteOutline />
+                                        </button>
+                                    </>
+
                                     )
                                 )
                             ) : <></>}
