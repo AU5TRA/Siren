@@ -14,11 +14,14 @@ import BookSeat from './routes/bookSeat';
 import TicketBooking from './routes/ticketBooking';
 import TicketHistory from './routes/ticketHistory';
 import AdminPage from './routes/adminPage';
+import TrainInformation from './routes/trainInfo';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import NavBar from './components/NavBar';
 
 import './components/App.css';
 import { AppProvider } from './components/AppContext';
+import { Train } from '@mui/icons-material';
+import TrainInfo from './components/SearchTrain';
 
 const App = () => {
     const [isAuthenticated, setAuthenticated] = useState(false);
@@ -61,7 +64,7 @@ const App = () => {
     const getTokenExpiration = (token) => {
         try {
             const { exp } = JSON.parse(atob(token.split('.')[1]));
-            return exp * 1000; 
+            return exp * 1000;
         } catch (error) {
             return null;
         }
@@ -70,17 +73,22 @@ const App = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("userId");
         localStorage.removeItem("name");
-        
+
         setAuthenticated(false);
     };
     console.log(isAuthenticated + "....................");
     return (
         <div className="container">
+
+
             <AppProvider>
                 <Router>
+
                     <NavBar isAuthenticated={isAuthenticated} name1={name1} id1={id1} />
                     <Routes>
                         <Route path="/" element={<HomePage />} />
+                        <Route path="/trainInfo" element={<TrainInformation />} />
+
                         <Route path="/users/login" element={<LoginPage setAuth={setAuth} />} />
                         <Route path="/users/:id/update" element={<UpdateUserInfo />} />
                         <Route path="/users/:id" element={<ShowUserInfo />} />
@@ -93,7 +101,7 @@ const App = () => {
                         <Route path="/review" element={<ReviewPage />} />
                         <Route path="/bookseat" element={<BookSeat />} />
                         <Route path="/booking/ticket" element={<TicketBooking />} />
-                        <Route path = "/admin" element = {<AdminPage/>} />
+                        <Route path="/admin" element={<AdminPage />} />
                     </Routes>
                 </Router>
             </AppProvider>
