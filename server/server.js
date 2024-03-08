@@ -384,7 +384,10 @@ app.get("/users/:id/tickets", async (req, res) => {
       const dateOfJourney = formatDate1(d_o_j);
 
       const currentDate = formatDate1(new Date());
-      console.log(dateOfJourney < currentDate && r_check.rows.length === 0);
+
+      console.log(dateOfJourney + " " + currentDate);
+      
+      if(dateOfJourney > currentDate) r_flag = -1;
       if (dateOfJourney < currentDate && r_check.rows.length === 0) {
         r_flag = 0;
       }

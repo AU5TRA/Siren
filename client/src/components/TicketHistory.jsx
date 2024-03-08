@@ -7,6 +7,7 @@ import './comp.css'
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import { MdOutlineCancel } from "react-icons/md";
+import './history.css';
 
 
 const customStyles = {
@@ -53,7 +54,7 @@ function formatDate(dateString) {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
 
-    return `${day}-${month}-${year}`;
+    return `${month}-${day}-${year}`;
 }
 
 
@@ -264,7 +265,10 @@ const TicketHistory = () => {
         catch (error) {
             console.error(error.message);
         }
+        // setReviewModalOpen(false);
+
         window.location.reload();
+        console.log("bblah")
     }
 
     return (
@@ -288,11 +292,11 @@ const TicketHistory = () => {
                                         {journey_map[transactionId].className}
 
                                         <span style={{ padding: '0 120px' }} className="spacer"></span>
-                                        <button onClick={() => openModal(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
+                                        <button onClick={() => openModal(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px', justifyContent:'flex-end' }} className="btn btn-warning">
                                             Proceed to pay
                                         </button>
 
-                                        <button onClick={() => deleteTransaction(transactionId)} style={{ backgroundColor: 'white', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }}>
+                                        <button onClick={() => deleteTransaction(transactionId)} style={{ backgroundColor: 'white', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px',  justifyContent:'flex-end'  }}>
                                             <MdOutlineCancel />
                                         </button>
                                     </>
@@ -305,25 +309,44 @@ const TicketHistory = () => {
                                             {journey_map[transactionId].className}
                                             <span style={{ padding: '0 120px' }} className="spacer"></span>
 
-                                            <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
-                                                Refund
-                                            </button>
-                                            {console.log(journey_map[transactionId].reviewBool)}
-                                            {!journey_map[transactionId].reviewBool ? (<button onClick={() => openModal2(journey_map[transactionId].trainName, journey_map[transactionId].className)} style={{ backgroundColor: '#6AA84F', color: '#212529', border: 'none', padding: '8px 17px', cursor: 'pointer', borderRadius: '20px', fontSize: '17px', marginLeft: '220px' }}>Review</button>) :
-                                                (<Link to={`/review?trainId=${journey_map[transactionId].train_id}&classId=${journey_map[transactionId].class_id}`} style={{
-                                                    display: 'inline-block',
-                                                    marginLeft: '200px',
-                                                    fontSize: '16px',
-                                                    border: '2px solid #6AA84F',
-                                                    borderRadius: '25px',
-                                                    padding: '7px 15px',
-                                                    textDecoration: 'none',
-                                                    color: '#212529',
-                                                    backgroundColor: '#6AA84F',
-                                                    cursor: 'pointer',
+                                            {new Date(formatDate(journey_map[transactionId].doj)) < new Date() ? (<></>) : (
+                                                <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' ,  justifyContent:'flex-end' }} className="button-container">
+                                                    Refund
+                                                </button>)}
 
-                                                }}>Go to Review</Link>)
+
+                                            {/* {console.log(journey_map[transactionId].reviewBool)} */}
+                                            {journey_map[transactionId].reviewBool === -1 ? null :
+                                                journey_map[transactionId].reviewBool === 0 ? (
+                                                    <button onClick={() => openModal2(journey_map[transactionId].trainName, journey_map[transactionId].className)} style={{
+                                                        backgroundColor: '#6AA84F',
+                                                        color: '#212529',
+                                                        border: 'none',
+                                                        padding: '8px 17px',
+                                                        cursor: 'pointer',
+                                                        borderRadius: '20px',
+                                                        fontSize: '17px',
+                                                        marginLeft: '220px',
+                                                        justifyContent:'flex-end' 
+                                                    }} className="btn btn-success review-btn">Review</button>
+                                                ) : (
+                                                    <Link to={`/review?trainId=${journey_map[transactionId].train_id}&classId=${journey_map[transactionId].class_id}`} style={{
+                                                        display: 'inline-block',
+                                                        marginLeft: '200px',
+                                                        fontSize: '16px',
+                                                        border: '2px solid #6AA84F',
+                                                        borderRadius: '25px',
+                                                        padding: '7px 15px',
+                                                        textDecoration: 'none',
+                                                        color: '#212529',
+                                                        backgroundColor: '#6AA84F',
+                                                        cursor: 'pointer',
+                                                        justifyContent:'flex-end' 
+                                                    }}
+                                                        className="btn btn-success review-btn">Go to Review</Link>
+                                                )
                                             }
+
 
                                             <Modal isOpen={reviewModalOpen} onRequestClose={() => setReviewModalOpen(false)} style={customStyles2}>
                                                 <div>
@@ -367,12 +390,12 @@ const TicketHistory = () => {
                                         {journey_map[transactionId].trainName}, {' '}
                                         {journey_map[transactionId].className}
 
-                                        <span style={{ padding: '0 120px' }} className="spacer"></span>
+                                        <span style={{ padding: '0 230px' }} className="spacer"></span>
 
-                                        <button style={{ backgroundColor: '#cc0000', color: 'white', border: 'none', padding: '8px 20px', cursor: 'not-allowed', borderRadius: '20px' }} className="btn btn-warning">
+                                        <button style={{ backgroundColor: '#cc0000', color: 'white', border: 'none', padding: '8px 20px', cursor: 'not-allowed', borderRadius: '20px'  }} className="btn btn-warning">
                                             Cancelled
                                         </button>
-                                        <button onClick={() => deleteTransaction(transactionId)} style={{ backgroundColor: 'white', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }}>
+                                        <button onClick={() => deleteTransaction(transactionId)} style={{ backgroundColor: 'white', color: '#212529', border: 'none', padding: '8px 50px 8px 5px', cursor: 'pointer', borderRadius: '20px' }}>
                                             <MdOutlineDeleteOutline />
                                         </button>
                                     </>
