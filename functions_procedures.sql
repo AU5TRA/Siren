@@ -312,26 +312,27 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
     t_id INTEGER;
-    t_name INTEGER;
+    t_name VARCHAR(100);
     r_id INTEGER;
 BEGIN
-    t_id := 0;
-    t_name := 0;
-    r_id := 0;
-    
-    SELECT 1 INTO t_id FROM train WHERE train_id = train_id_input;
-    SELECT 1 INTO t_name FROM train WHERE UPPER(train_name) = UPPER(train_name_input);
-    SELECT 1 INTO r_id FROM train_routes WHERE route_id = route_id_input;
+    t_id := null;
+    t_name := null;
+    r_id := null;
+    SELECT train_id  INTO t_id FROM train WHERE train_id = train_id_input;
+    SELECT route_id INTO r_id FROM train_routes WHERE route_id = route_id_input;
+    SELECT train_name INTO t_name FROM train WHERE UPPER(train_name) = UPPER(train_name_input);
 
-    IF t_id = 0 AND t_name = 1 THEN
-        RAISE EXCEPTION 'Train name and train ID do not match' USING ERRCODE = 'XX011';
+    IF t_id is not null AND t_name is not null AND r_id is not null THEN
+        RAISE EXCEPTION 'Train already exists' USING ERRCODE = 'XX010';
     END IF;
-    IF t_id = 1 AND t_name = 0 THEN
-        RAISE EXCEPTION 'Duplicate Train Name not allowed' USING ERRCODE = 'XX012';
+    IF t_id is not null AND t_name is null THEN
+        RAISE EXCEPTION 'ID and Name mismatch' USING ERRCODE = 'XX013';
     END IF;
-    IF t_id = 1 AND t_name = 1 AND r_id = 1 THEN
-        RAISE EXCEPTION 'Train already runs on that route' USING ERRCODE = 'XX010';
+    IF t_id is null AND t_name is not null THEN
+        RAISE EXCEPTION 'Duplicate Train Name not allowed' USING ERRCODE = 'XX011';
     END IF;
-
+    IF t_id is not null AND r_id is not null THEN
+        RAISE EXCEPTION 'Train already has this route' USING ERRCODE = 'XX012';
+    END IF;
 END;
 $$;

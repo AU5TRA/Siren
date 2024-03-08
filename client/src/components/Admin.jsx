@@ -52,6 +52,7 @@ const Admin = () => {
   const [routeId, setRouteId] = useState('');
   const [routeName, setRouteName] = useState('');
   const [message, setMessage] = useState('');
+  const [existRoute, setExistRoute] = useState(false);
 
 
 
@@ -59,13 +60,18 @@ const Admin = () => {
     // const stations = 5; // Example number of stations
     try {
       console.log(number_of_classes, number_of_stations, trainId, trainName, routeId, routeName);
-      const result = await fetch(`http://localhost:3001/admin/addTrain/${trainId}/${trainName}/${routeId}/${routeName}/${number_of_stations}/${number_of_classes}`, {
+      const result = await fetch(`http://localhost:3001/admin/addTrain/${trainId}/${trainName}/${routeId}/${number_of_stations}/${number_of_classes}`, {
       });
       const data = await result.json();
       console.log(data);
+      setMessage('');
       if (data.message !== undefined) {
         console.log("message : " + data.message);
         setMessage(data.message);
+      }
+      setExistRoute(false);
+      if (data.exist === 0) {
+        setExistRoute(true);
       }
     } catch (error) {
       console.error(error);
@@ -134,7 +140,7 @@ const Admin = () => {
       style={modalStyle}
       contentLabel="Add stations & classes"
     >
-      <input type="text" placeholder="Enter Route name" style={{ ...customStyles }} onChange={(e) => setRouteName(e.target.value)} />
+      {!existRoute && <input type="text" placeholder="Enter Route name" style={{ ...customStyles }} onChange={(e) => setRouteName(e.target.value)} />}
 
       <span style={{ spanStyle }}></span>
       {renderInputs()}
