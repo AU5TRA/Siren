@@ -338,23 +338,43 @@ END;
 $$;
 
 
+
+
+
 -- procedure for inserting new train
 
-CREATE OR REPLACE PROCEDURE insert_train(train_id_input INT, train_name_input VARCHAR, route_id_input INT, class_ids_input INT[], arrival_time_input TIME[], departure_time_input TIME[])
+
+CREATE OR REPLACE PROCEDURE add_route_train(train_id_input INT, train_name_input VARCHAR, route_id_input INT, route_name_input VARCHAR )
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    
+BEGIN
+    INSERT INTO train (train_id, train_name) VALUES (train_id_input, train_name_input);
+    INSERT INTO route (route_id, route_name) VALUES (route_id_input, route_name_input);
+    INSERT INTO train_routes (train_id, route_id) VALUES (train_id_input, route_id_input);
+END;
+$$;
+
+
+CREATE OR REPLACE PROCEDURE insert_class_schedule(train_id_input INT, train_name_input VARCHAR, route_id_input INT, station_ids_input INT[], class_ids_input INT[], arrival_time_input TIME[], departure_time_input TIME[], seat_count INT[])
 LANGUAGE plpgsql
 AS $$
 DECLARE 
     i INT;
 BEGIN
-    INSERT INTO train (train_id, train_name) VALUES (train_id_input, train_name_input);
-    INSERT INTO train_routes (train_id, route_id) VALUES (train_id_input, route_id_input);
     FOR i IN 1 .. array_length(class_ids_input, 1) LOOP
-        INSERT INTO train_class (train_id, class_id) VALUES (train_id_input, class_ids_input[i]);
+        INSERT INTO train_class (train_id, class_id, seat_count) VALUES (train_id_input, class_ids_input[i], seat_count[i]);
     END LOOP;
-    FOR i IN 1 .. array_length(arrival_time_input, 1) LOOP
-        INSERT INTO schedule (train_id, station_id, route_id, arrival, departure) VALUES (train_id_input, i, route_id_input, arrival_time_input[i], departure_time_input[i]);
+
+    FOR i IN 1 .. array_length(station_ids_input, 1) LOOP
+        INSERT INTO route_stations (route_id, station_id, sequence_number) VALUES (route_id_input, station_ids_input[i], i);
+
+        INSERT INTO schedule (train_id, station_id, route_id, arrival, departure) 
+        VALUES (train_id_input, station_ids_input[i], route_id_input, arrival_time_input[i], departure_time_input[i]);
     END LOOP;
 END;
 $$;
+
 
 

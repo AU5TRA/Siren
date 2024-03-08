@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import ErrorModal from './ErrorModal';
 
-import { json } from 'react-router-dom';
 const customStyles = {
 
   display: 'flex',
@@ -217,13 +216,13 @@ const Admin = () => {
 
             <input
               type="text"
-              placeholder={`Station ${i + 1} Arrival Time`}
+              placeholder={`Station ${i + 1} Arrival Time HH:MM`}
               style={{ ...customStyles }}
               onChange={(e) => handleInputChange(i, 'arrival', e.target.value)}
             />
             <input
               type="text"
-              placeholder={`Station ${i + 1} Departure Time`}
+              placeholder={`Station ${i + 1} Departure Time HH:MM`}
               style={{ ...customStyles }}
               onChange={(e) => handleInputChange(i, 'departure', e.target.value)}
             />
