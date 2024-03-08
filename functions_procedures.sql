@@ -278,6 +278,29 @@ END;
 $$;
 
 
+--procedure to auto cancel tickets
+CREATE OR REPLACE PROCEDURE update_ticket_status(userId IN INTEGER)
+AS $$
+DECLARE
+trans_row RECORD;
+BEGIN
+    FOR trans_row IN 
+        SELECT * FROM transaction WHERE received = 0 and user_id = userId
+    LOOP
+        IF trans_row.transaction_time + INTERVAL '6 hours' < CURRENT_TIMESTAMP THEN
+            UPDATE ticket SET ticket_status = 'cancelled'
+            WHERE transaction_id = trans_row.transaction_id;
+        END IF;
+    END LOOP;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+
+
+
+
 
 
 -- procedure for checking admin side train addition

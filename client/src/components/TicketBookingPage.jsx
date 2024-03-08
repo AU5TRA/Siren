@@ -77,7 +77,7 @@ const TicketBookingPage = () => {
   const handleConfirm = async () => {
     try {
       console.log("***********-------******" + selectedOffer);
-      console.log("***********-------******" + transMode); 
+      console.log("***********-------******" + transMode);
       const response = await fetch('http://localhost:3001/booking/confirm', {
         method: 'POST',
         headers: {
@@ -112,8 +112,17 @@ const TicketBookingPage = () => {
           // navigate(`/users/${userId}`, {state : {seat_numbers : selectedSeats, ticket_ids : tickets}});
         }
         else window.location.href = window.location.href = `/users/${userId}`;
-      } else {
-        alert('Booking failed');
+      }
+      else {
+        if (response.status === 400) {
+          console.log("haha")
+
+          alert("Transaction id already in use");
+        }
+        else {
+          alert('Booking failed');
+
+        }
       }
 
       openModal();

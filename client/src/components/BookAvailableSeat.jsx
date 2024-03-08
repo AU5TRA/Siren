@@ -146,15 +146,11 @@ const BookAvailableSeat = () => {
 
     const handleDropdownChange = (event) => {
         setSelectedStation(event.target.value);
-        console.log(event.target.value+'vvvvvvvvvvvvvvvvvvvvvvvvv')
-        console.log(selectedStation+'------------------------------------');
-        console.log("hehehheheeeeeeeehehehehehheheheh");
+        
     };
 
     const handleDropdownChange2 = (event) => {
         setSelectedStation_d(event.target.value);
-        console.log(selectedStation_d+'------------------------------------++++++');
-        console.log(event.target.value+'ttttttttttttttttttttttt')
         
     };
 

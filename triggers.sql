@@ -86,6 +86,23 @@ FOR EACH ROW
 EXECUTE FUNCTION check_password();
 
 
+<<<<<<< HEAD
+--- same transaction id exists
+CREATE OR REPLACE FUNCTION check_transaction_exists()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM transaction WHERE transaction_id = NEW.transaction_id) THEN
+        RAISE EXCEPTION 'Such a transaction already exists' USING ERRCODE = 'XX001';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER before_insert_transaction
+BEFORE INSERT OR UPDATE ON transaction
+FOR EACH ROW
+EXECUTE FUNCTION check_transaction_exists();
+=======
 -- trigger for checking admin side train addition
 CREATE OR REPLACE FUNCTION check_train()
 RETURNS TRIGGER AS $$
@@ -113,3 +130,4 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
+>>>>>>> aa8bcb9ba83c6d83367b4596cc2a565a6dfc88ee
