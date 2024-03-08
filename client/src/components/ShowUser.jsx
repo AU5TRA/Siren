@@ -40,13 +40,16 @@ const ShowUser = () => {
   const [errMessage, setErrMessage] = useState('');
   const [errorModalIsOpen, setErrorModalIsOpen] = useState(false);
 
+  const [deletePassword, setDeletePassword] = useState('');
+  const [delModal, setDelModal] = useState(false);
+
   const {
     setUserId,
     token,
     setToken,
     name,
     setName,
-    setLoginState} = useData();
+    setLoginState } = useData();
 
 
 
@@ -97,7 +100,7 @@ const ShowUser = () => {
 
   }, [id]);
 
- 
+
 
   function openModal() {
     setIsOpen(true);
@@ -152,10 +155,6 @@ const ShowUser = () => {
         setErrorModalIsOpen(true);
       }
 
-      // -----------------------
-      // window.location = `/users/${userData.user_id}`;
-      // console.log("updated")
-      // console.log(res)
     } catch (err) {
       console.error(err.message);
     }
@@ -179,12 +178,44 @@ const ShowUser = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('name');
-      setName('');
-      setUserId('');
-      setLoginState(false);
-      window.location = '/';
+    setName('');
+    setUserId('');
+    setLoginState(false);
+    window.location = '/';
 
   }
+
+
+  const handleDeleteConfirmation = async () => {
+    try {
+      if (!deletePassword) {
+        console.log("enter password");
+        setErrMessage("Please enter your password to delete the account.");
+        setErrorModalIsOpen(true);
+        return;
+      }
+
+      const body = { password: deletePassword };
+      const response = await fetch(`http://localhost:3001/users/${userData.user_id}/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body),
+      });
+      if (response.status === 200) {
+        window.location = '/'; 
+      } else {
+        const errorMessage = await response.json();
+        console.log(errorMessage.error);
+        setErrMessage(errorMessage.error); 
+        setErrorModalIsOpen(true);
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
 
 
 
@@ -219,38 +250,6 @@ const ShowUser = () => {
                   </div>
                 </div>
 
-                {/* <div className={"col-md-6"}>
-                  <div className="ticket-information">
-                    <div className={"col-md-6"}>
-                      {Object.entries(ticketTransactionMap).map(([transactionId, ticketIds]) => (
-                        <div key={transactionId}>
-                          <h4>Transaction ID: {transactionId}</h4>
-                          <ul className='ticket-details-list'>
-                            {ticketIds.map(ticketId => {
-                              const ticket = ticketHistory.find(ticket => ticket.ticket_id === ticketId);
-                              return (
-                                <li key={ticketId}>
-                                  <p>Ticket ID: {ticketId}</p>
-                                  <p>Ticket status: {ticket.ticket_status}</p>
-                                  <p>Date: {formatDate(ticket.date_of_journey)}</p>
-                                  <p>Seat: {seatmap[ticketId]}</p>
-                                  {ticket.ticket_status === 'pending' && (
-                                    <button onClick={() => handleProceedToPay(transactionId)} className="payButton">
-                                     Proceed to Pay
-                                    </button>
-                                  )}
-                                  <span style={{ marginLeft: '150px' }}></span>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-
-                  </div>
-                </div> */}
-
               </div>
             </div>
             <div className="card-footer">
@@ -262,6 +261,9 @@ const ShowUser = () => {
                 Ticket History
               </button>
               <button onClick={logOut} className='btn btn-danger' style={{ float: 'right' }}>Log Out</button>
+
+              <button onClick={() => setDelModal(true)} className='btn btn-danger' style={{ float: 'right' }}>Delete</button>
+
             </div>
           </div>
         ) : (
@@ -333,7 +335,6 @@ const ShowUser = () => {
             />
 
 
-            {/*<input type="text" className='form-control' placeholder='First name' value={first_name} onChange={e => setFirstName(e.target.value)} /> */}
           </div>
 
           <div className="modal-footer">
@@ -349,6 +350,44 @@ const ShowUser = () => {
           isOpen={errorModalIsOpen}
           errorMessage={errMessage}
           closeModal={closeErrorModal}
+        />
+      </Modal>
+
+      <Modal
+        isOpen={delModal}
+        onRequestClose={() => setDelModal(false)}
+        style={customStyles}
+        contentLabel="Delete User Modal"
+      >
+        <div className="modal-header">
+          <h2>Delete Account</h2>
+          <button onClick={() => setDelModal(false)} className="close">
+            &times;
+          </button>
+        </div>
+        <div className="modal-body">
+          <p>Are you sure you want to delete your account?</p>
+          <input
+            type="password"
+            className="form-control mb-2"
+            placeholder="Enter your password to confirm deletion"
+            value={deletePassword}
+            onChange={e => setDeletePassword(e.target.value)}
+          />
+        </div>
+        <div className="modal-footer">
+          <button onClick={handleDeleteConfirmation} className="btn btn-danger">
+            Confirm Delete
+          </button>
+          <button onClick={() => setDelModal(false)} className="btn btn-secondary">
+            Cancel
+          </button>
+        </div>
+        <ErrorModal
+          isOpen={errorModalIsOpen}
+          errorMessage={errMessage}
+          closeModal={closeErrorModal}
+          
         />
       </Modal>
 

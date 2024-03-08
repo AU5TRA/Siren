@@ -9,6 +9,48 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.delete('/transaction/delete/:transactionId', async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+    const result = await db.query(`DELETE FROM transaction WHERE transaction_id = $1`, [transactionId]);
+    console.log("deleted lmao");
+    res.status(200).json({ message: 'Transaction deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while deleting the transaction' });
+  }
+ 
+})
+
+app.delete('/users/:userId/delete', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { password } = req.body;
+
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    var hashedPassword = await bcrypt.hash(password, salt);
+
+
+    const user = await db.query("SELECT password FROM passenger WHERE user_id = $1", [userId]);
+    
+
+
+
+    const userData = user.rows[0];
+
+    
+
+
+
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while deleting the user' });
+  }
+});
+
+
 
 app.post('/transaction/refund/:userId/:transactionId', async (req, res) => {
 
@@ -242,9 +284,7 @@ app.get("/booking/ticket", async (req, res) => {
     const seatsArray = selectedSeats.split(',').map(seat => seat.trim());
 
     const offers = await db.query(`SELECT * FROM get_eligible_offers($1)`, [seatsArray.length])
-    console.log(offers.rows[0]);
-    console.log(trainName + " " + className + " " + routeName + " " + date + " " + from + " " + to + " " + seatsArray + " " + totalFare + ' ' + boarding + ' ' + destination);
-
+   
     res.status(200).json({
       status: "success",
       data: {
@@ -273,7 +313,6 @@ app.get("/booking/ticket", async (req, res) => {
 app.get('/booking/seat', async (req, res) => {
   try {
     const { trainId, classId, routeId, date, from, to } = req.query;
-    console.log(trainId + " " + classId + " " + routeId + " " + date + " " + from + " " + to);
 
     const dateReceived = new Date(date);
     const year = dateReceived.getFullYear();
@@ -291,32 +330,21 @@ app.get('/booking/seat', async (req, res) => {
 
     const r1 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [from.toUpperCase()]);
     const r2 = await db.query('SELECT station_id FROM station WHERE UPPER(station_name) = $1', [to.toUpperCase()]);
-    console.log(r1.rows[0]);
-    console.log(r2.rows[0]);
-
+    
     const fromStationId = parseInt(r1.rows[0].station_id);
     const toStationId = parseInt(r2.rows[0].station_id);
-    console.log("from station id : " + fromStationId);
-    console.log("to station id : " + toStationId);
 
     const RouteNameQuery = `SELECT route_name FROM route WHERE route_id = $1`;
     const resultRouteName = await db.query(RouteNameQuery, [routeId]);
     const routeName = resultRouteName.rows[0].route_name;
 
 
-
-
     const query3 = `SELECT * FROM get_station_sequence($1);`
 
 
     const resultForStations = await db.query(query3, [routeId]);
-    console.log("resultForStations : " + resultForStations.rows.length);
 
     const stations = resultForStations.rows;
-    console.log(stations);
-    console.log(stations.length);
-    console.log("--------------");
-
 
     const queryForFare = `SELECT 
         f.fare, t.train_name, c.class_name
@@ -361,7 +389,7 @@ app.get('/booking/seat', async (req, res) => {
     ORDER BY CAST(seat_number AS INTEGER);
      `;
     const result = await db.query(queryForAvailableSeats, [trainId, classId, routeId, formattedDate, stations.map(s => s.station_id), stations.length]);
-    // console.log("res : " + result.rows.length);
+  
     const availableSeats = [];
     for (const r of result.rows) {
       availableSeats.push(r.seat_number);
@@ -374,8 +402,6 @@ app.get('/booking/seat', async (req, res) => {
       `;
     const result3 = await db.query(queryForTotalSeats, [trainId, classId]);
     const total_seat = result3.rows[0].seat_count;
-    console.log("res3 : " + total_seat);
-    // console.log("res3 : " + result3.rows.length);
 
     const b_station = await db.query('SELECT b_station_name FROM BOARDING_STATION WHERE STATION_ID = $1', [fromStationId]);
 
@@ -447,14 +473,11 @@ app.get("/book/station/search", async (req, res) => {
       'SELECT station_name FROM station WHERE LOWER(station_name) LIKE LOWER($1)',
       [`%${st.toLowerCase()}%`]
     );
-    console.log(results);
-    //const firstNames = results.rows.map(row => row.first_name);
 
     res.status(200).json({
       status: "success",
       data: {
         result: results.rows,
-        //names : firstNames 
       },
     });
   } catch (error) {
@@ -472,10 +495,7 @@ app.get("/book/station/search", async (req, res) => {
 app.get("/book/search", async (req, res) => {
   try {
     const fromS = req.query.from;
-    console.log(fromS);
     const toS = req.query.to;
-    console.log(toS);
-    console.log("******");
     const dateString = req.query.date;
 
 
@@ -573,7 +593,6 @@ app.get("/book/search", async (req, res) => {
     ) AS seats
     ORDER BY CAST(seat_number AS INTEGER);
      `;
-    // console.log("m2");
 
     const queryForTotalSeats = `
       SELECT seat_count FROM train_class WHERE train_id = $1 AND class_id = $2;
@@ -594,16 +613,13 @@ app.get("/book/search", async (req, res) => {
       for (const c of classes.rows) {
         const class_id = c.class_id;
         const result2 = await db.query(queryForAvailableSeats, [t_id, class_id, r_id, formattedDate, stations_in_route.map(s => s.station_id), stations_in_route.length]);
-        // console.log(result2.rows.length);
-        // console.log("---------------");
+      
         const availableSeats = [];
         for (const r of result2.rows) {
           availableSeats.push(r.seat_number);
         }
 
         const result3 = await db.query(queryForTotalSeats, [t_id, class_id]);
-
-        // console.log(result2.rows[0].seat_id + " " + result2.rows[1].seat_id);
 
         result4.push({ train_id: t_id, route_id: r_id, class_id: class_id, available_seats_count: result2.rows.length, available_seats: availableSeats, total_seats: result3.rows[0].seat_count });
       }
@@ -638,8 +654,6 @@ app.get("/book/search", async (req, res) => {
 // Get all users
 app.get("/users", async (req, res) => {
   try {
-    // console.log("route handler");
-
     const results = await db.query('SELECT * FROM passenger ORDER BY user_id');
 
     res.status(200).json({
@@ -657,7 +671,6 @@ app.get("/users", async (req, res) => {
 // get all trains
 app.get("/trains", async (req, res) => {
   try {
-    // console.log("route handler");
 
     const results = await db.query('SELECT * FROM train ORDER BY train_id');
     console.log(results.rows[0]);
@@ -733,7 +746,7 @@ app.get("/users/:id", async (req, res) => {
     );
 
     res.status(200).json({
-      status: "succes",
+      status: "success",
       data: {
         result: results.rows[0],
       },
@@ -817,7 +830,6 @@ app.put("/users/:id/update", async (req, res) => {
   try {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
-    // console.log("here" + req.body.new_password + " here" + req.body.password);
     var hashedPassword = await bcrypt.hash(req.body.new_password, salt);
 
     const user = await db.query("SELECT * FROM passenger WHERE user_id = $1", [req.params.id]);
@@ -855,14 +867,11 @@ app.put("/users/:id/update", async (req, res) => {
     });
   } catch (err) {
     console.error(err.code);
-    console.error("-------------------")
     console.error(err);
-    // res.status(500).json({ error: err.message });
     if (err.code === 'XX004') {
       return res.status(400).json({ error: "Invalid phone Number" });
     }
     else if (err.code === 'XX009') {
-      // console.log("in Incorrect password");
       return res.status(400).json({ error: "Incorrect Password" });
     }
   }
@@ -879,7 +888,7 @@ app.delete("/users/:id", async (req, res) => {
     ]);
     // console.log(results);
     res.status(204).json({
-      status: "sucess",
+      status: "success",
 
     });
   } catch (err) {
@@ -889,7 +898,7 @@ app.delete("/users/:id", async (req, res) => {
 
 
 
-// Search User // dummy
+// Search train // dummy
 app.get("/search", async (req, res) => {
   try {
     const userName = req.query.name;
@@ -898,8 +907,6 @@ app.get("/search", async (req, res) => {
       'SELECT * FROM train WHERE LOWER(train_name) LIKE LOWER($1)',
       [`%${userName.toLowerCase()}%`]
     );
-    console.log(results);
-    //const firstNames = results.rows.map(row => row.first_name);
 
     res.status(200).json({
       status: "success",
@@ -928,14 +935,11 @@ app.get("/trains/name/search", async (req, res) => {
       'SELECT * FROM train WHERE LOWER(train_name) LIKE LOWER($1)',
       [`%${userName.toLowerCase()}%`]
     );
-    console.log(results);
-    //const firstNames = results.rows.map(row => row.first_name);
 
     res.status(200).json({
       status: "success",
       data: {
         result: results.rows,
-        //names : firstNames 
       },
     });
   } catch (error) {
@@ -957,14 +961,11 @@ app.get("/trains/search", async (req, res) => {
       'SELECT * FROM train WHERE LOWER(train_name) LIKE LOWER($1)',
       [`%${userName.toLowerCase()}%`]
     );
-    console.log(results);
-    //const firstNames = results.rows.map(row => row.first_name);
 
     res.status(200).json({
       status: "success",
       data: {
         result: results.rows,
-        //names : firstNames 
       },
     });
   } catch (error) {
