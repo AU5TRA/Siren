@@ -309,21 +309,34 @@ const TicketHistory = () => {
                                                 Refund
                                             </button>
                                             {console.log(journey_map[transactionId].reviewBool)}
-                                            {!journey_map[transactionId].reviewBool ? (<button onClick={() => openModal2(journey_map[transactionId].trainName, journey_map[transactionId].className)} style={{ backgroundColor: '#6AA84F', color: '#212529', border: 'none', padding: '8px 17px', cursor: 'pointer', borderRadius: '20px', fontSize: '17px', marginLeft: '220px' }}>Review</button>) :
-                                                (<Link to={`/review?trainId=${journey_map[transactionId].train_id}&classId=${journey_map[transactionId].class_id}`} style={{
-                                                    display: 'inline-block',
-                                                    marginLeft: '200px',
-                                                    fontSize: '16px',
-                                                    border: '2px solid #6AA84F',
-                                                    borderRadius: '25px',
-                                                    padding: '7px 15px',
-                                                    textDecoration: 'none',
-                                                    color: '#212529',
-                                                    backgroundColor: '#6AA84F',
-                                                    cursor: 'pointer',
-
-                                                }}>Go to Review</Link>)
+                                            {journey_map[transactionId].reviewBool === -1 ? null :
+                                                journey_map[transactionId].reviewBool === 0 ? (
+                                                    <button onClick={() => openModal2(journey_map[transactionId].trainName, journey_map[transactionId].className)} style={{
+                                                        backgroundColor: '#6AA84F',
+                                                        color: '#212529',
+                                                        border: 'none',
+                                                        padding: '8px 17px',
+                                                        cursor: 'pointer',
+                                                        borderRadius: '20px',
+                                                        fontSize: '17px',
+                                                        marginLeft: '220px'
+                                                    }}>Review</button>
+                                                ) : (
+                                                    <Link to={`/review?trainId=${journey_map[transactionId].train_id}&classId=${journey_map[transactionId].class_id}`} style={{
+                                                        display: 'inline-block',
+                                                        marginLeft: '200px',
+                                                        fontSize: '16px',
+                                                        border: '2px solid #6AA84F',
+                                                        borderRadius: '25px',
+                                                        padding: '7px 15px',
+                                                        textDecoration: 'none',
+                                                        color: '#212529',
+                                                        backgroundColor: '#6AA84F',
+                                                        cursor: 'pointer',
+                                                    }}>Go to Review</Link>
+                                                )
                                             }
+
 
                                             <Modal isOpen={reviewModalOpen} onRequestClose={() => setReviewModalOpen(false)} style={customStyles2}>
                                                 <div>
