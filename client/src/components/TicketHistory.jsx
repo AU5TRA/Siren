@@ -5,6 +5,7 @@ import './ticketBook.css';
 import Modal from 'react-modal';
 import './comp.css'
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { Link } from 'react-router-dom';
 import { MdOutlineCancel } from "react-icons/md";
 
 
@@ -146,7 +147,7 @@ const TicketHistory = () => {
 
     }
 
-  
+
     function openModal(transactionId) {
         // console.log("ticketId", ticketId);
         setIsOpen(true);
@@ -263,7 +264,7 @@ const TicketHistory = () => {
         catch (error) {
             console.error(error.message);
         }
-
+        window.location.reload();
     }
 
     return (
@@ -307,7 +308,23 @@ const TicketHistory = () => {
                                             <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="btn btn-warning">
                                                 Refund
                                             </button>
-                                            <button onClick={() => openModal2(journey_map[transactionId].trainName, journey_map[transactionId].className)} style={{ backgroundColor: '#6AA84F', color: '#212529', border: 'none', padding: '8px 17px', cursor: 'pointer', borderRadius: '20px', fontSize: '17px', marginLeft: '220px' }}>Review</button>
+                                            {console.log(journey_map[transactionId].reviewBool)}
+                                            {!journey_map[transactionId].reviewBool ? (<button onClick={() => openModal2(journey_map[transactionId].trainName, journey_map[transactionId].className)} style={{ backgroundColor: '#6AA84F', color: '#212529', border: 'none', padding: '8px 17px', cursor: 'pointer', borderRadius: '20px', fontSize: '17px', marginLeft: '220px' }}>Review</button>) :
+                                                (<Link to={`/review?trainId=${journey_map[transactionId].train_id}&classId=${journey_map[transactionId].class_id}`} style={{
+                                                    display: 'inline-block',
+                                                    marginLeft: '200px',
+                                                    fontSize: '16px',
+                                                    border: '2px solid #6AA84F',
+                                                    borderRadius: '25px',
+                                                    padding: '7px 15px',
+                                                    textDecoration: 'none',
+                                                    color: '#212529',
+                                                    backgroundColor: '#6AA84F',
+                                                    cursor: 'pointer',
+
+                                                }}>Go to Review</Link>)
+                                            }
+
                                             <Modal isOpen={reviewModalOpen} onRequestClose={() => setReviewModalOpen(false)} style={customStyles2}>
                                                 <div>
                                                     <h4>Rating</h4>
@@ -325,7 +342,7 @@ const TicketHistory = () => {
                                                             );
                                                         })}
                                                     </div>
-                                                    
+
 
                                                     <h4>Review</h4>
 

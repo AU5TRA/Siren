@@ -290,7 +290,7 @@ BEGIN
     FOR trans_row IN 
         SELECT * FROM transaction WHERE received = 0 and user_id = userId
     LOOP
-        IF trans_row.transaction_time + INTERVAL '6 hours' < CURRENT_TIMESTAMP THEN
+        IF trans_row.transaction_time + INTERVAL '2 minutes' < CURRENT_TIMESTAMP THEN
             UPDATE ticket SET ticket_status = 'cancelled'
             WHERE transaction_id = trans_row.transaction_id;
         END IF;
@@ -299,6 +299,23 @@ END;
 $$
 LANGUAGE plpgsql;
 
+
+
+-- procedure for checking if user can give review
+
+CREATE OR REPLACE PROCEDURE check_review(user_id_input INT, train_id_input INT, class_id_input INT, transaction_id_input INT)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    journey_date DATE;
+BEGIN
+    SELECT date_of_journey INTO journey_date FROM ticket JOIN transaction ON ticket.transaction_id = transaction.transaction_id WHERE ticket.user_id = user_id_input AND transaction.transaction_id = transaction_id_input;
+    IF journey_date > CURRENT_DATE THEN
+        RAISE EXCEPTION 'Review can be given only after the journey';
+    END IF;
+END;
+$$;
+ 
 
 
 
