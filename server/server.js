@@ -9,39 +9,49 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.get("/admin/addTrain/:trainId/:trainName/:routeId/:routeName/:number_of_stations/:number_of_classes", async (req, res) => {
+app.get("/admin/addTrain/:trainId/:trainName/:routeId/:number_of_stations/:number_of_classes", async (req, res) => {
   try {
     console.log("here");
-    const { trainId, trainName, routeId, routeName, number_of_stations, number_of_classes } = req.params;
-    console.log(trainId, trainName, routeId, routeName, number_of_stations, number_of_classes);
+    const { trainId, trainName, routeId, number_of_stations, number_of_classes } = req.params;
+    console.log(trainId, trainName, routeId, number_of_stations, number_of_classes);
     const results = await db.query('call add_train($1, $2, $3)', [trainId, trainName, routeId]);
+    const route_exists = `select * from route where route_id = $1`;
+    const route_exists_res = await db.query(route_exists, [routeId]);
+    const exist = route_exists_res.rows.length;
     res.status(200).json({
       status: "success",
       result: results.rows.length,
       data: {
         trains: results.rows,
+        exist: exist
       },
     });
     
   } catch (err) {
     console.log(err);
     console.log(err.message);
-    if(err.code === 'XX011'){
+    if(err.code === 'XX010'){
       res.status(500).json({
         status: "error",
-        message: "Train name and train ID do not match",
+        message: "Train already runs on that route",
       });
     }
-    else if(err.code === 'XX012'){
+    else if(err.code === 'XX011'){
       res.status(500).json({
         status: "error",
         message: "Duplicate Train Name not allowed",
       });
     }
-    else if(err.code === 'XX010'){
+    else if(err.code === 'XX012'){
       res.status(500).json({
         status: "error",
         message: "Train already runs on that route",
+      });
+    }
+    else if(err.code === 'XX013'){
+      res.status(500).json({
+        status: "error",
+        message: "Train ID and Train Name don't match",
       });
     }
   }
