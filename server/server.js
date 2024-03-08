@@ -6,10 +6,10 @@ const db = require("./db");
 const jwtGenerator = require("./utils/jwtGenerator");
 const bcrypt = require('bcryptjs');
 const { Brush } = require("@mui/icons-material");
+const { format } = require("morgan");
 const app = express();
 app.use(express.json());
 app.use(cors());
-
 app.get("/admin/trains", async (req, res) => {
   try {
     const results = await db.query('SELECT * FROM train ORDER BY train_id');
@@ -34,11 +34,11 @@ app.get("/admin/trains", async (req, res) => {
         FROM train_routes tr WHERE train_id = $1
       `, [trainId]);
 
-      train.trainRoutes = []; 
+      train.trainRoutes = [];
       for (const routeRow of routeResults.rows) {
         const stationsResult = await db.query('SELECT * FROM get_station_sequence($1)', [routeRow.route_id]);
         let stationNames = stationsResult.rows.map(row => row.station_name);
-        train.trainRoutes.push({ 
+        train.trainRoutes.push({
           route: routeRow.route_name,
           stations: stationNames
         });
@@ -66,8 +66,6 @@ app.get("/admin/trains", async (req, res) => {
   }
 });
 
-
-
 app.post('/admin/addTrain/confirm', async (req, res) => {
   console.log("Heloooooooo");
   try {
@@ -80,12 +78,16 @@ app.post('/admin/addTrain/confirm', async (req, res) => {
       classData
     } = req.body;
 
+    console.log("route id : " + routeId);
+    console.log("class Data : " + JSON.stringify(classData));
+
     const result = await db.query('CALL add_train($1, $2, $3)', [trainId, trainName, routeId]);
 
     let class_ids = [];
     let station_ids = [];
     let station_arrival = [];
     let station_departure = [];
+    let seat_cnt = [];
 
     for (const station of stationData) {
       const { name, arrival, departure } = station;
@@ -94,16 +96,30 @@ app.post('/admin/addTrain/confirm', async (req, res) => {
       station_arrival[stationId.rows[0].station_id] = arrival;
       station_departure[stationId.rows[0].station_id] = departure;
     }
-    
-    
+
+
     for (const classItem of classData) {
       const { name, price, seats } = classItem;
       const result = await db.query('SELECT class_id FROM class WHERE UPPER(class_name) = $1', [name.toUpperCase()]);
       console.log(result.rows);
       class_ids.push(result.rows[0].class_id);
+      seat_cnt.push(seats);
     }
-    const result2 = await db.query('CALL insert_train($1, $2, $3, $4, $5, $6)', [trainId, routeId, station_ids, class_ids, station_arrival, station_departure]);
+    console.log("=============")
+    // console.log(typeof(station_ids[0]))
+    const result2 = await db.query('CALL add_route_train($1, $2, $3, $4)', [trainId, trainName, routeId, routeName]);
+    const result3 = await db.query('CALL insert_class_schedule($1, $2, $3, $4, $5, $6, $7, $8)', [trainId, trainName, routeId, station_ids, class_ids, station_arrival, station_departure, seat_cnt]);
+    res.status(200).json({
+      status: "success",
+      data: {
+        result: result.rows, // add_train
+        result2: result2.rows, // add_route_train
+        result3: result3.rows // insert_class_schedule
+      },
+    });
   }
+
+
   catch (error) {
     console.error(error);
   }
@@ -328,10 +344,14 @@ app.get("/users/:id/tickets", async (req, res) => {
       const tstatus = seatIDs.rows[0].ticket_status;
       const d_o_j = seatIDs.rows[0].date_of_journey;
 
+
+
+
+
       const seat = await db.query('SELECT train_id, class_id FROM seat WHERE seat_id = $1', [seat_id_temp]);
 
-      const trainName = await db.query('SELECT train_name from train WHERE train_id = $1', [seat.rows[0].train_id]);
-      const className = await db.query('SELECT class_name from class WHERE class_id = $1', [seat.rows[0].class_id]);
+      const trainName = await db.query('SELECT train_name, train_id from train WHERE train_id = $1', [seat.rows[0].train_id]);
+      const className = await db.query('SELECT class_name, class_id from class WHERE class_id = $1', [seat.rows[0].class_id]);
 
 
       const fromRes = await db.query('SELECT station_name from station JOIN boarding_station ON station.station_id = boarding_station.station_id WHERE boarding_station.b_station_id = $1', [boardSt]);
@@ -339,8 +359,43 @@ app.get("/users/:id/tickets", async (req, res) => {
       const from = fromRes.rows[0].station_name;
       const to = toRes.rows[0].station_name;
 
-      transactionJourneyMap[t] = { trainName: trainName.rows[0].train_name, className: className.rows[0].class_name, from: from, to: to, doj: d_o_j, status: tstatus };
+      function formatDate1(dateString) {
+        if (!dateString) return '';
+
+        const date = new Date(dateString);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+
+        return `${day}-${month}-${year}`;
+      }
+
+
+      // const res1 = await db.query('SELECT * FROM transaction JOIN ticket ON transaction.transaction_id = ticket.transaction_id WHERE ticket.ticket_id = $1', 
+      // let r_flag = 0;
+      const query = 'SELECT * from review where user_id = $1 and train_id = $2 and class_id = $3';
+      const r_check = await db.query(query, [userId, trainName.rows[0].train_id, className.rows[0].class_id]);
+      console.log("====");
+      console.log(userId + " " + trainName.rows[0].train_id + " " + className.rows[0].class_id);
+
+      console.log(r_check.rows.length);
+      let r_flag = r_check.rows.length;
+
+      const dateOfJourney = formatDate1(d_o_j);
+
+      const currentDate = formatDate1(new Date());
+      console.log(dateOfJourney < currentDate && r_check.rows.length === 0);
+      if (dateOfJourney < currentDate && r_check.rows.length === 0) {
+        r_flag = 0;
+      }
+      // console.log(trainName.rows[0].train_id + " " + className.rows[0].class_id + " " );
+      console.log("review flag : " + r_flag);
+      console.log("====");
+
+      transactionJourneyMap[t] = { train_id: trainName.rows[0].train_id, class_id: className.rows[0].class_id, trainName: trainName.rows[0].train_name, className: className.rows[0].class_name, from: from, to: to, doj: d_o_j, status: tstatus, reviewBool: r_flag };
     }
+
+
 
     res.status(200).json({
       status: "success",
