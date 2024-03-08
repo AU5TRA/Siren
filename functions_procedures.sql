@@ -303,102 +303,32 @@ LANGUAGE plpgsql;
 
 
 
-
-
-CREATE OR REPLACE PROCEDURE book_tickets(
-    date_param DATE,
-    selectedSeats_param INT[],
-    totalFare_param NUMERIC,
-    selectedStation_param VARCHAR(50),
-    selectedStation_d_param VARCHAR(50),
-    selectedOffer_param INT,
-    discountedFare_param NUMERIC,
-    transactionId_param INT,
-    userId_param INT,
-    className_param VARCHAR(50),
-    trainName_param VARCHAR(50),
-    route_param INT,
-    transMode_param VARCHAR(50)
-)
+-- procedure for checking admin side train addition
+CREATE OR REPLACE PROCEDURE add_train(train_id_input INT, train_name_input VARCHAR, route_id_input INT)
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    selectedSeatsArray INT[];
-    cnt INT;
-    price NUMERIC;
-    result1 RECORD;
-    result2 RECORD;
-    b_id INT;
-    d_id INT;
-    result4 RECORD;
-    tr_id INT;
-    result5 RECORD;
-    cl_id INT;
-    result RECORD;
-    stationIds INT[];
-    startStation RECORD;
-    endStation RECORD;
-    startIndex INT;
-    endIndex INT;
-    stations INT[];
-    offerRes RECORD;
-    offer_id INT;
-    t_m VARCHAR(50);
-    t_id INT;
-    resTransaction RECORD;
-    transactionId2 INT;
-    seat INT;
-    result3 RECORD;
-    seat_id_n INT;
+    t_id INTEGER;
+    t_name INTEGER;
+    r_id INTEGER;
 BEGIN
-    selectedSeatsArray := selectedSeats_param;
-    cnt := array_length(selectedSeatsArray, 1);
+    t_id := 0;
+    t_name := 0;
+    r_id := 0;
+    
+    SELECT 1 INTO t_id FROM train WHERE train_id = train_id_input;
+    SELECT 1 INTO t_name FROM train WHERE UPPER(train_name) = UPPER(train_name_input);
+    SELECT 1 INTO r_id FROM train_routes WHERE route_id = route_id_input;
 
-    price := totalFare_param / cnt;
-
-    SELECT B_STATION_ID INTO result1 FROM BOARDING_STATION WHERE B_STATION_NAME = selectedStation_param;
-    SELECT B_STATION_ID INTO result2 FROM BOARDING_STATION WHERE B_STATION_NAME = selectedStation_d_param;
-    b_id := result1.B_STATION_ID;
-    d_id := result2.B_STATION_ID;
-
-    SELECT train_id INTO result4 FROM train WHERE train_name = trainName_param;
-    tr_id := result4.train_id;
-    SELECT class_id INTO result5 FROM class WHERE class_name = className_param;
-    cl_id := result5.class_id;
-
-    SELECT * INTO result FROM get_station_sequence(route_param);
-
-    stationIds := ARRAY(SELECT station_id FROM result);
-
-    SELECT station_id INTO startStation FROM boarding_station WHERE B_STATION_NAME = selectedStation_param;
-    SELECT station_id INTO endStation FROM boarding_station WHERE B_STATION_NAME = selectedStation_d_param;
-
-    startIndex := array_position(stationIds, startStation.station_id);
-    endIndex := array_position(stationIds, endStation.station_id);
-
-    stations := ARRAY(SELECT unnest(stationIds[startIndex:endIndex + 1]));
-
-    SELECT * INTO offerRes FROM offer WHERE offer_id = selectedOffer_param;
-    offer_id := offerRes.offer_id;
-
-    t_m := transMode_param;
-    t_id := transactionId_param;
-    IF (t_id = '') THEN
-        t_id := NULL;
-        t_m := '';
+    IF t_id = 0 AND t_name = 1 THEN
+        RAISE EXCEPTION 'Train name and train ID do not match' USING ERRCODE = 'XX011';
+    END IF;
+    IF t_id = 1 AND t_name = 0 THEN
+        RAISE EXCEPTION 'Duplicate Train Name not allowed' USING ERRCODE = 'XX012';
+    END IF;
+    IF t_id = 1 AND t_name = 1 AND r_id = 1 THEN
+        RAISE EXCEPTION 'Train already runs on that route' USING ERRCODE = 'XX010';
     END IF;
 
-    SELECT * INTO resTransaction FROM insert_transaction(t_id, t_m, offer_id, totalFare_param, userId_param);
-    transactionId2 := resTransaction.transaction_id;
-
-    FOR seat IN SELECT unnest(selectedSeatsArray) LOOP
-        SELECT SEAT_ID INTO result3 FROM SEAT WHERE SEAT_NUMBER = seat AND route_id = route_param AND TRAIN_ID = tr_id AND CLASS_ID = cl_id;
-        seat_id_n := result3.SEAT_ID;
-
-        PERFORM insert_ticket(userId_param, b_id, d_id, price, transactionId2, seat_id_n, route_param, date_param, stations);
-    END LOOP;
 END;
 $$;
-
-
-

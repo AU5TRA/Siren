@@ -9,6 +9,44 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.get("/admin/addTrain/:trainId/:trainName/:routeId/:routeName/:number_of_stations/:number_of_classes", async (req, res) => {
+  try {
+    console.log("here");
+    const { trainId, trainName, routeId, routeName, number_of_stations, number_of_classes } = req.params;
+    console.log(trainId, trainName, routeId, routeName, number_of_stations, number_of_classes);
+    const results = await db.query('call add_train($1, $2, $3)', [trainId, trainName, routeId]);
+    res.status(200).json({
+      status: "success",
+      result: results.rows.length,
+      data: {
+        trains: results.rows,
+      },
+    });
+    
+  } catch (err) {
+    console.log(err);
+    console.log(err.message);
+    if(err.code === 'XX011'){
+      res.status(500).json({
+        status: "error",
+        message: "Train name and train ID do not match",
+      });
+    }
+    else if(err.code === 'XX012'){
+      res.status(500).json({
+        status: "error",
+        message: "Duplicate Train Name not allowed",
+      });
+    }
+    else if(err.code === 'XX010'){
+      res.status(500).json({
+        status: "error",
+        message: "Train already runs on that route",
+      });
+    }
+  }
+});
+
 app.delete('/transaction/delete/:transactionId', async (req, res) => {
   try {
     const { transactionId } = req.params;
