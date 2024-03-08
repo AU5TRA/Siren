@@ -9,6 +9,69 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.get("/admin/trains", async (req, res) => {
+  try {
+    const results = await db.query('SELECT * FROM train ORDER BY train_id');
+    const trainsData = results.rows;
+
+    for (const train of trainsData) {
+      const trainId = train.train_id;
+
+      
+      const classesResult = await db.query(`
+        SELECT class_id, (SELECT class_name FROM class WHERE class_id = tc.class_id) AS class_name, seat_count 
+        FROM train_class tc WHERE train_id = $1 ORDER BY class_id
+      `, [trainId]);
+      train.trainClass = classesResult.rows.map(classRow => ({
+        class: classRow.class_name,
+        seats: classRow.seat_count
+      }));
+
+    
+      const routeResults = await db.query(`
+        SELECT route_id, (SELECT route_name FROM route WHERE route_id = tr.route_id) AS route_name 
+        FROM train_routes tr WHERE train_id = $1
+      `, [trainId]);
+
+      train.trainRoutes = []; 
+      for (const routeRow of routeResults.rows) {
+        const stationsResult = await db.query('SELECT * FROM get_station_sequence($1)', [routeRow.route_id]);
+        let stationNames = stationsResult.rows.map(row => row.station_name);
+        train.trainRoutes.push({ 
+          route: routeRow.route_name,
+          stations: stationNames
+        });
+      }
+
+      const ticketCountResult = await db.query(`
+      SELECT COUNT(ticket.ticket_id) AS tickets_booked
+      FROM ticket
+      JOIN seat ON ticket.seat_id = seat.seat_id
+      WHERE seat.train_id = $1
+    `, [trainId]);
+    train.ticketsBooked = parseInt(ticketCountResult.rows[0].tickets_booked, 10);
+  
+
+    
+    }
+  
+    
+    
+    console.log(JSON.stringify(trainsData));
+    res.status(200).json({
+      status: "success",
+      data: {
+        trains: trainsData
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ status: "error", message: "Internal server error" });
+  }
+});
+
+
+
 app.get("/admin/addTrain/:trainId/:trainName/:routeId/:routeName/:number_of_stations/:number_of_classes", async (req, res) => {
   try {
     console.log("here");
@@ -22,23 +85,23 @@ app.get("/admin/addTrain/:trainId/:trainName/:routeId/:routeName/:number_of_stat
         trains: results.rows,
       },
     });
-    
+
   } catch (err) {
     console.log(err);
     console.log(err.message);
-    if(err.code === 'XX011'){
+    if (err.code === 'XX011') {
       res.status(500).json({
         status: "error",
         message: "Train name and train ID do not match",
       });
     }
-    else if(err.code === 'XX012'){
+    else if (err.code === 'XX012') {
       res.status(500).json({
         status: "error",
         message: "Duplicate Train Name not allowed",
       });
     }
-    else if(err.code === 'XX010'){
+    else if (err.code === 'XX010') {
       res.status(500).json({
         status: "error",
         message: "Train already runs on that route",
@@ -152,7 +215,7 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId/:transMode', async (
     console.log(err.message);
     if (err.code === 'XX001') {
       return res.status(400).json({ error: "transaction id already in use" });
-      
+
     }
   }
 });
@@ -161,9 +224,9 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId/:transMode', async (
 app.get("/users/:id/tickets", async (req, res) => {
   try {
 
-    const cancel_tickets= await db.query(`CALL update_ticket_status($1)`, [req.params.id]);
+    const cancel_tickets = await db.query(`CALL update_ticket_status($1)`, [req.params.id]);
 
-    
+
     const userId = req.params.id;
     const seats_map = {};
     const results = await db.query('SELECT * FROM ticket WHERE user_id = $1', [userId]);
