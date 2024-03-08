@@ -9,7 +9,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-<<<<<<< HEAD
 app.get("/admin/trains", async (req, res) => {
   try {
     const results = await db.query('SELECT * FROM train ORDER BY train_id');
@@ -74,9 +73,6 @@ app.get("/admin/trains", async (req, res) => {
 
 
 app.get("/admin/addTrain/:trainId/:trainName/:routeId/:routeName/:number_of_stations/:number_of_classes", async (req, res) => {
-=======
-app.get("/admin/addTrain/:trainId/:trainName/:routeId/:number_of_stations/:number_of_classes", async (req, res) => {
->>>>>>> 1c0b2994f89094b4be716b0edad208eed6debd5d
   try {
     console.log("here");
     const { trainId, trainName, routeId, number_of_stations, number_of_classes } = req.params;
@@ -97,31 +93,19 @@ app.get("/admin/addTrain/:trainId/:trainName/:routeId/:number_of_stations/:numbe
   } catch (err) {
     console.log(err);
     console.log(err.message);
-<<<<<<< HEAD
-    if (err.code === 'XX011') {
-=======
     if(err.code === 'XX010'){
->>>>>>> 1c0b2994f89094b4be716b0edad208eed6debd5d
       res.status(500).json({
         status: "error",
         message: "Train already runs on that route",
       });
     }
-<<<<<<< HEAD
-    else if (err.code === 'XX012') {
-=======
     else if(err.code === 'XX011'){
->>>>>>> 1c0b2994f89094b4be716b0edad208eed6debd5d
       res.status(500).json({
         status: "error",
         message: "Duplicate Train Name not allowed",
       });
     }
-<<<<<<< HEAD
-    else if (err.code === 'XX010') {
-=======
     else if(err.code === 'XX012'){
->>>>>>> 1c0b2994f89094b4be716b0edad208eed6debd5d
       res.status(500).json({
         status: "error",
         message: "Train already runs on that route",
