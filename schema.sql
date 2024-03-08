@@ -167,9 +167,17 @@ CREATE TABLE train_class(
 )
 
 
+<<<<<<< HEAD
 CREATE TABLE refund (
     refund_id SERIAL PRIMARY KEY,
     transaction_id INTEGER REFERENCES payment(transaction_id) ON DELETE CASCADE,
     time_of_refund TIMESTAMP,
+=======
+
+CREATE TABLE refund (
+    refund_id SERIAL PRIMARY KEY,
+    transaction_id INTEGER REFERENCES transaction(transaction_id),
+    refund_time TIMESTAMP,
+>>>>>>> 51882519cc1a4dee8606a4da1b7f7f97dd4e304a
     refund_amount DECIMAL(10, 2) NOT NULL
 );
