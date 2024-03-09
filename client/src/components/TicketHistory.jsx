@@ -7,7 +7,7 @@ import './comp.css'
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { Link, json } from 'react-router-dom';
 import { MdOutlineCancel } from "react-icons/md";
-import './history.css';
+// import './history.css';
 
 
 const customStyles = {
@@ -55,6 +55,18 @@ function formatDate(dateString) {
     const year = date.getFullYear();
 
     return `${month}-${day}-${year}`;
+}
+
+
+function formatDate2(dateString) {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
 }
 
 
@@ -297,7 +309,7 @@ const TicketHistory = () => {
                             {journey_map[transactionId] ? (
                                 journey_map[transactionId].status === 'pending' ? (
                                     <>
-                                        {formatDate(journey_map[transactionId].doj)}, {' '}
+                                        {formatDate2(journey_map[transactionId].doj)}, {' '}
 
                                         {journey_map[transactionId].trainName}, {' '}
                                         {journey_map[transactionId].className}
@@ -321,7 +333,7 @@ const TicketHistory = () => {
                                             <span style={{ padding: '0 120px' }} className="spacer"></span>
 
                                             {new Date(formatDate(journey_map[transactionId].doj)) < new Date() ? (<></>) : (
-                                                <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' ,  justifyContent:'flex-end' }} className="button-container">
+                                                <button onClick={() => openModal1(transactionId)} style={{ backgroundColor: '#ffc107', color: '#212529', border: 'none', padding: '8px 20px', cursor: 'pointer', borderRadius: '20px' }} className="button-container">
                                                     Refund
                                                 </button>)}
 

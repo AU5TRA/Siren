@@ -10,6 +10,9 @@ const { format } = require("morgan");
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+
+
 app.get("/admin/trains", async (req, res) => {
   try {
     const results = await db.query('SELECT * FROM train ORDER BY train_id');
