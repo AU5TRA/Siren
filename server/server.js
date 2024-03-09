@@ -213,6 +213,7 @@ app.get("/admin/addTrain/:trainId/:trainName/:routeId/:number_of_stations/:numbe
 app.delete('/transaction/delete/:transactionId', async (req, res) => {
   try {
     const { transactionId } = req.params;
+    const res1 = await db.query(`UPDATE seat_availability SET available = TRUE WHERE seat_id IN (SELECT seat_id FROM ticket WHERE transaction_id = $1)`, [transactionId]);
     const result = await db.query(`DELETE FROM transaction WHERE transaction_id = $1`, [transactionId]);
     console.log("deleted lmao");
     res.status(200).json({ message: 'Transaction deleted successfully' });
