@@ -25,7 +25,8 @@ const About = () => {
         <div className="about-buttons-container">
           <button className="secondary-button2">Learn More</button>
           <button className="watch-video-button">
-            <BsFillPlayCircleFill /> Watch Video
+          <a href="https://www.youtube.com/watch?v=Irei0XVnEHA" style={{textDecoration:'none'}}>
+            <BsFillPlayCircleFill /> Watch Video </a>
           </button>
         </div>
       </div>
