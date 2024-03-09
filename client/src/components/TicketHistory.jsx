@@ -5,7 +5,7 @@ import './ticketBook.css';
 import Modal from 'react-modal';
 import './comp.css'
 import { MdOutlineDeleteOutline } from "react-icons/md";
-import { Link } from 'react-router-dom';
+import { Link, json } from 'react-router-dom';
 import { MdOutlineCancel } from "react-icons/md";
 
 
@@ -77,7 +77,7 @@ const TicketHistory = () => {
     const [expandedTransactions, setExpandedTransactions] = useState({});
     const [trainName, setTrainName] = useState('');
     const [className, setClassName] = useState('');
-
+    // const [refund_status, setRefund_status] = useState('');
     const toggleDropdown = (transactionId) => {
         setExpandedTransactions(prev => ({
             ...prev,
@@ -169,7 +169,15 @@ const TicketHistory = () => {
                     body: JSON.stringify({ transactionId }),
                 });
                 const data = await response.json();
-                // console.log("data", data);
+                console.log("data", data);
+                // setRefund_status(data.message);
+                if (response.status === 200) {
+                    alert(data.message);
+                }
+                else if (response.status === 400) {
+                    alert(data.message);
+                }
+                console.log("data", data);
             } catch (error) {
                 console.error(error.message);
             }
@@ -177,7 +185,10 @@ const TicketHistory = () => {
         }
 
         refund(transactionId);
-        window.location.reload();
+        // alert(refund_status);
+        // window.location.reload();
+        // window.location.reload();
+
     }
 
     function closeModal() {
