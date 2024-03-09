@@ -86,7 +86,7 @@ app.post('/admin/addTrain/confirm', async (req, res) => {
     console.log("station Data : " + JSON.stringify(stationData));
     console.log("train id : " + trainId);
     console.log("train name : " + trainName);
-    
+
 
     const result = await db.query('CALL add_train($1, $2, $3)', [trainId, trainName, routeId]);
 
@@ -110,7 +110,7 @@ app.post('/admin/addTrain/confirm', async (req, res) => {
     station_departure = filteredStationData2;
 
     for (const classItem of classData) {
-      const { name, price, seats } =   classItem;
+      const { name, price, seats } = classItem;
       const result = await db.query('SELECT class_id FROM class WHERE UPPER(class_name) = $1', [name.toUpperCase()]);
       console.log(result.rows);
       class_ids.push(result.rows[0].class_id);
@@ -124,7 +124,7 @@ app.post('/admin/addTrain/confirm', async (req, res) => {
     console.log(JSON.stringify(station_departure));
     console.log(JSON.stringify(seat_cnt))
     console.log('iftti')
-    console.log(typeof(station_ids[0]))
+    console.log(typeof (station_ids[0]))
     const result2 = await db.query('CALL add_route_train($1, $2, $3, $4)', [trainId, trainName, routeId, routeName]);
     const result3 = await db.query('CALL insert_class_schedule($1, $2, $3, $4, $5, $6, $7, $8)', [trainId, trainName, routeId, station_ids, class_ids, station_arrival, station_departure, seat_cnt]);
     const result4 = await db.query('CALL populate_seat_availability_new($1)', [trainId]);
@@ -216,7 +216,42 @@ app.get("/admin/addTrain/:trainId/:trainName/:routeId/:number_of_stations/:numbe
 app.delete('/transaction/delete/:transactionId', async (req, res) => {
   try {
     const { transactionId } = req.params;
-    const res1 = await db.query(`UPDATE seat_availability SET available = TRUE WHERE seat_id IN (SELECT seat_id FROM ticket WHERE transaction_id = $1)`, [transactionId]);
+
+    const routeRes = await db.query(`SELECT r.route_id FROM ticket t JOIN seat s ON t.seat_id = s.seat_id JOIN route r ON s.route_id = r.route_id
+    WHERE t.transaction_id = $1`, [transactionId]);
+    const routeid = routeRes.rows[0].route_id;
+    console.log("route id : " + routeid);
+
+    const b_st = await db.query(`SELECT t.boarding_station_id, t.destination_station_id
+    FROM ticket t JOIN transaction tr ON t.transaction_id = tr.transaction_id
+    WHERE tr.transaction_id = $1`, [transactionId]);
+    const b_station_id = b_st.rows[0].boarding_station_id;
+    const d_station_id = b_st.rows[0].destination_station_id;
+    console.log("boarding station id : " + b_station_id);
+    console.log("destination station id : " + d_station_id);
+
+
+    const seq = await db.query(`SELECT station_id FROM get_station_sequence($1)`, [routeid]);
+    const station_ids = seq.rows.map(row => row.station_id);
+    console.log("station ids : " + station_ids);
+
+    const boardingIndex = station_ids.indexOf(b_station_id);
+    const destinationIndex = station_ids.indexOf(d_station_id);
+    const filteredStationIds = station_ids.slice(boardingIndex, destinationIndex + 1);
+    console.log("Filtered station ids : " + filteredStationIds);
+
+    const res2 = await db.query(`SELECT * FROM ticket WHERE transaction_id = $1`, [transactionId]);  
+    const date_j = res2.rows[0].date_of_journey;
+
+    for (const ticket of res2.rows) {
+      const seat_id = ticket.seat_id;
+      for(const station_id of filteredStationIds){
+        const res = await db.query(`UPDATE seat_availability SET available = TRUE WHERE seat_id = $1 AND travel_date = $2 AND station_id = $3`, [seat_id, date_j, station_id]);
+      }
+
+    }
+
+    // const res1 = await db.query(`UPDATE seat_availability SET available = TRUE WHERE seat_id IN (SELECT seat_id FROM ticket WHERE transaction_id = $1)`, [transactionId]);
     const result = await db.query(`DELETE FROM transaction WHERE transaction_id = $1`, [transactionId]);
     console.log("deleted lmao");
     res.status(200).json({ message: 'Transaction deleted successfully' });
