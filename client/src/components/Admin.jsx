@@ -60,7 +60,7 @@ const Admin = () => {
   const [classData, setClassData] = useState([]);
 
   const [allStationData, setAllStationData] = useState([]);
-  const [allClass, setAllClass]= useState([]);
+  const [allClass, setAllClass] = useState([]);
 
   const handleAddButtonClick = async () => {
     // const stations = 5; // Example number of stations
@@ -124,19 +124,44 @@ const Admin = () => {
     setClassData(updatedClasses);
     console.log("updatedClasses : " + JSON.stringify(updatedClasses));
   };
-  const closeModal1 = async(e) => {
+  const closeModal1 = async (e) => {
 
     setOpenModal(false);
 
   }
 
   const closeModal = async (e) => {
+
+
+
+    const stationNames = stationData.map(station => station.name);
+    const duplicateStationNames = stationNames.filter((name, index) => stationNames.indexOf(name) !== index || name==='' );
+
+    // Check for duplicate class names and filter out null values
+    const classNames = classData.map(classObj => classObj.className);
+    const duplicateClassNames = classNames.filter((name, index) => name && classNames.indexOf(name) !== index || name==='' );
+
+    // If duplicates are found, display an alert and return without sending data to the endpoint
+    if (duplicateStationNames.length > 0 || duplicateClassNames.length > 0) {
+      alert("Duplicate/Empty station or class names found. Please fix them before adding the train.");
+      return;
+    }
+
+    // Check arrival and departure times format
+    const invalidTimes = stationData.filter(station => !/^\d{2}:\d{2}$/.test(station.arrival) || !/^\d{2}:\d{2}$/.test(station.departure));
+    if (invalidTimes.length > 0) {
+      alert("Invalid arrival or departure time format. Please use HH:MM format.");
+      return;
+    }
+
+
     console.log("train id: " + trainId)
     console.log("train name: " + trainName)
     console.log("routeId: " + routeId)
     console.log("routeName: " + routeName)
     console.log("finalClasses : " + JSON.stringify(classData));
     console.log("finalStations : " + JSON.stringify(stationData));
+
 
     console.log('-----------------')
     try {
@@ -248,10 +273,10 @@ const Admin = () => {
           <input type="text" placeholder={`Class ${i + 1} Name`} list="classSuggestions" style={{ ...customStyles }} onChange={(e) => handleInputChangeClass(i, 'name', e.target.value)} />
           <input type="text" placeholder={`Class ${i + 1} Total Seat Count`} list="classSuggestions" style={{ ...customStyles }} onChange={(e) => handleInputChangeClass(i, 'seats', e.target.value)} />
           <datalist id="classSuggestions" >
-              {allClass.map((classes, i) => (
-                <option key={i + 1} value={classes} />
-              ))}
-            </datalist>
+            {allClass.map((classes, i) => (
+              <option key={i + 1} value={classes} />
+            ))}
+          </datalist>
           <br />
         </Fragment>
       );
@@ -291,7 +316,7 @@ const Admin = () => {
       {renderInputs()}
       <button onClick={closeModal}> Confirm</button>
 
-      <button onClick={closeModal1} style={{marginLeft:'20px'}}> Close</button> 
+      <button onClick={closeModal1} style={{ marginLeft: '20px' }}> Close</button>
     </Modal>
 
     {message && <ErrorModal isOpen={openModal} errorMessage={message} closeModal={closeModal} />}
