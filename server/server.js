@@ -385,12 +385,12 @@ app.get("/users/:id/tickets", async (req, res) => {
 
       const currentDate = formatDate1(new Date());
 
-      console.log(dateOfJourney + " " + currentDate);
-      
+      console.log(dateOfJourney < currentDate && r_check.rows.length === 0);
       if(dateOfJourney > currentDate) r_flag = -1;
       if (dateOfJourney < currentDate && r_check.rows.length === 0) {
         r_flag = 0;
       }
+      
       // console.log(trainName.rows[0].train_id + " " + className.rows[0].class_id + " " );
       console.log("review flag : " + r_flag);
       console.log("====");
