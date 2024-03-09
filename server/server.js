@@ -227,23 +227,11 @@ app.delete('/users/:userId/delete', async (req, res) => {
   try {
     const { userId } = req.params;
     const { password } = req.body;
-
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     var hashedPassword = await bcrypt.hash(password, salt);
-
-
     const user = await db.query("SELECT password FROM passenger WHERE user_id = $1", [userId]);
-
-
-
-
     const userData = user.rows[0];
-
-
-
-
-
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error(error);

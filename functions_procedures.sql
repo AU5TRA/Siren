@@ -224,7 +224,7 @@ BEGIN
 
     
     UPDATE seat_availability sa
-    SET available = TRUE
+    SET available = 'TRUE'
     FROM ticket t 
     WHERE sa.seat_id = t.seat_id 
     AND t.transaction_id = transaction_id1
@@ -303,17 +303,17 @@ $$;
 -- procedure for inserting new train
 
 
-CREATE OR REPLACE PROCEDURE add_route_train(train_id_input INT, train_name_input VARCHAR, route_id_input INT, route_name_input VARCHAR )
-LANGUAGE plpgsql
-AS $$
-DECLARE
+-- CREATE OR REPLACE PROCEDURE add_route_train(train_id_input INT, train_name_input VARCHAR, route_id_input INT, route_name_input VARCHAR )
+-- LANGUAGE plpgsql
+-- AS $$
+-- DECLARE
     
-BEGIN
-    INSERT INTO train (train_id, train_name) VALUES (train_id_input, train_name_input);
-    INSERT INTO route (route_id, route_name) VALUES (route_id_input, route_name_input);
-    INSERT INTO train_routes (train_id, route_id) VALUES (train_id_input, route_id_input);
-END;
-$$;
+-- BEGIN
+--     INSERT INTO train (train_id, train_name) VALUES (train_id_input, train_name_input);
+--     INSERT INTO route (route_id, route_name) VALUES (route_id_input, route_name_input);
+--     INSERT INTO train_routes (train_id, route_id) VALUES (train_id_input, route_id_input);
+-- END;
+-- $$;
 
 CREATE OR REPLACE PROCEDURE add_route_train(train_id_input INT, train_name_input VARCHAR, route_id_input INT, route_name_input VARCHAR)
 LANGUAGE plpgsql
@@ -391,20 +391,20 @@ $$;
 
 -- procedure for checking duplicate stations in station array
 
-CREATE OR REPLACE FUNCTION check_duplicate_stations(station_ids_input INT[])
-RETURNS INT[] AS $$
-DECLARE 
-    i INT;
-    EXIST INT;
-    new_station_id_arr INT[] := '{}';
-BEGIN
-    FOR i IN 1 .. array_length(station_ids_input, 1) LOOP
-        SELECT COUNT(*) INTO EXIST FROM station WHERE station_id = station_ids_input[i];
-        IF EXIST = 0 THEN
-            new_station_id_arr := array_append(new_station_id_arr, station_ids_input[i]);
-        END IF;
-    END LOOP;
-RETURN new_station_id_arr;
-END;
-$$ LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION check_duplicate_stations(station_ids_input INT[])
+-- RETURNS INT[] AS $$
+-- DECLARE 
+--     i INT;
+--     EXIST INT;
+--     new_station_id_arr INT[] := '{}';
+-- BEGIN
+--     FOR i IN 1 .. array_length(station_ids_input, 1) LOOP
+--         SELECT COUNT(*) INTO EXIST FROM station WHERE station_id = station_ids_input[i];
+--         IF EXIST = 0 THEN
+--             new_station_id_arr := array_append(new_station_id_arr, station_ids_input[i]);
+--         END IF;
+--     END LOOP;
+-- RETURN new_station_id_arr;
+-- END;
+-- $$ LANGUAGE plpgsql;
 

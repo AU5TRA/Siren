@@ -106,3 +106,30 @@ BEFORE INSERT
 ON refund
 FOR EACH ROW
 EXECUTE FUNCTION block_refund();
+
+
+
+
+CREATE OR REPLACE FUNCTION check_transaction_exists()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM transaction WHERE transaction_id = NEW.transaction_id) THEN
+        RAISE EXCEPTION 'Such a transaction already exists' USING ERRCODE = 'XX001';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+CREATE TRIGGER before_insert_transaction
+BEFORE INSERT ON "transaction"
+FOR EACH ROW
+EXECUTE FUNCTION check_transaction_exists();
+
+
+
+CREATE OR REPLACE TRIGGER before_update_transaction
+BEFORE UPDATE OF transaction_id ON "transaction"
+FOR EACH ROW
+EXECUTE FUNCTION check_transaction_exists();
