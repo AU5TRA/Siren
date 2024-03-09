@@ -148,11 +148,11 @@ const Admin = () => {
     }
 
     // Check arrival and departure times format
-    const invalidTimes = stationData.filter(station => !/^\d{2}:\d{2}$/.test(station.arrival) || !/^\d{2}:\d{2}$/.test(station.departure));
-    if (invalidTimes.length > 0) {
-      alert("Invalid arrival or departure time format. Please use HH:MM format.");
-      return;
-    }
+    // const invalidTimes = stationData.filter(station => !/^\d{2}:\d{2}$/.test(station.arrival) || !/^\d{2}:\d{2}$/.test(station.departure));
+    // if (invalidTimes.length > 0) {
+    //   alert("Invalid arrival or departure time format. Please use HH:MM format.");
+    //   return;
+    // }
 
 
     console.log("train id: " + trainId)

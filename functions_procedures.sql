@@ -249,7 +249,7 @@ BEGIN
     FOR trans_row IN 
         SELECT * FROM transaction WHERE received = 0 and user_id = userId
     LOOP
-        IF trans_row.transaction_time + INTERVAL '2 hours' < CURRENT_TIMESTAMP THEN
+        IF trans_row.transaction_time + INTERVAL '12 hours' < CURRENT_TIMESTAMP THEN
             UPDATE ticket SET ticket_status = 'cancelled'
             WHERE transaction_id = trans_row.transaction_id;
         END IF;

@@ -359,6 +359,8 @@ app.post('/transaction/:id/:transactionId/:oldTransactionId/:transMode', async (
 app.get("/users/:id/tickets", async (req, res) => {
   try {
 
+
+    
     const cancel_tickets = await db.query(`CALL update_ticket_status($1)`, [req.params.id]);
 
 

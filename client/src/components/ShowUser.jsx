@@ -262,7 +262,7 @@ const ShowUser = () => {
               </button>
               <button onClick={logOut} className='btn btn-danger' style={{ float: 'right' }}>Log Out</button>
 
-              <button onClick={() => setDelModal(true)} className='btn btn-danger' style={{ float: 'right' }}>Delete</button>
+              {/* <button onClick={() => setDelModal(true)} className='btn btn-danger' style={{ float: 'right' }}>Delete</button> */}
 
             </div>
           </div>
