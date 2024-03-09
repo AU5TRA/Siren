@@ -136,27 +136,53 @@ $$ LANGUAGE plpgsql;
 
 ------------------populate the seat availability table
 
+-- CREATE OR REPLACE PROCEDURE populate_seat_availability()
+-- LANGUAGE plpgsql
+-- AS $$
+-- BEGIN
+--   DELETE FROM seat_availability WHERE travel_date < CURRENT_DATE;
+
+--   IF NOT EXISTS (SELECT 1 FROM seat_availability WHERE travel_date = CURRENT_DATE + INTERVAL '1 day') THEN
+--     INSERT INTO seat_availability (seat_id, travel_date, station_id, available)
+--     SELECT seat.seat_id, CURRENT_DATE + INTERVAL '1 day', route_stations.station_id, TRUE
+--     FROM seat
+--     JOIN route_stations ON seat.route_id = route_stations.route_id
+--     WHERE NOT EXISTS (
+--       SELECT 1 
+--       FROM seat_availability 
+--       WHERE seat_availability.seat_id = seat.seat_id 
+--       AND seat_availability.travel_date = CURRENT_DATE + INTERVAL '1 day'
+--       AND seat_availability.station_id = route_stations.station_id
+--     );
+--   END IF;
+-- END;
+-- $$;
+
 CREATE OR REPLACE PROCEDURE populate_seat_availability()
 LANGUAGE plpgsql
 AS $$
 BEGIN
   DELETE FROM seat_availability WHERE travel_date < CURRENT_DATE;
 
-  IF NOT EXISTS (SELECT 1 FROM seat_availability WHERE travel_date = CURRENT_DATE + INTERVAL '3 day') THEN
-    INSERT INTO seat_availability (seat_id, travel_date, station_id, available)
-    SELECT seat.seat_id, CURRENT_DATE + INTERVAL '3 day', route_stations.station_id, TRUE
-    FROM seat
-    JOIN route_stations ON seat.route_id = route_stations.route_id
-    WHERE NOT EXISTS (
-      SELECT 1 
-      FROM seat_availability 
-      WHERE seat_availability.seat_id = seat.seat_id 
-      AND seat_availability.travel_date = CURRENT_DATE + INTERVAL '3 day'
-      AND seat_availability.station_id = route_stations.station_id
-    );
-  END IF;
+  FOR i IN 0..2 LOOP
+    IF NOT EXISTS (SELECT 1 FROM seat_availability WHERE travel_date = CURRENT_DATE + i) THEN
+      INSERT INTO seat_availability (seat_id, travel_date, station_id, available)
+      SELECT seat.seat_id, CURRENT_DATE + i, route_stations.station_id, TRUE
+      FROM seat
+      JOIN route_stations ON seat.route_id = route_stations.route_id
+      WHERE NOT EXISTS (
+        SELECT 1 
+        FROM seat_availability 
+        WHERE seat_availability.seat_id = seat.seat_id 
+        AND seat_availability.travel_date = CURRENT_DATE + i
+        AND seat_availability.station_id = route_stations.station_id
+      );
+    END IF;
+  END LOOP;
 END;
 $$;
+
+
 
 -- refunding
 
