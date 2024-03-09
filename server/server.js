@@ -80,6 +80,10 @@ app.post('/admin/addTrain/confirm', async (req, res) => {
 
     console.log("route id : " + routeId);
     console.log("class Data : " + JSON.stringify(classData));
+    console.log("station Data : " + JSON.stringify(stationData));
+    console.log("train id : " + trainId);
+    console.log("train name : " + trainName);
+    
 
     const result = await db.query('CALL add_train($1, $2, $3)', [trainId, trainName, routeId]);
 
@@ -97,18 +101,30 @@ app.post('/admin/addTrain/confirm', async (req, res) => {
       station_departure[stationId.rows[0].station_id] = departure;
     }
 
+    const filteredStationData1 = station_arrival.filter(value => value !== null);
+    const filteredStationData2 = station_departure.filter(value => value !== null);
+    station_arrival = filteredStationData1;
+    station_departure = filteredStationData2;
 
     for (const classItem of classData) {
-      const { name, price, seats } = classItem;
+      const { name, price, seats } =   classItem;
       const result = await db.query('SELECT class_id FROM class WHERE UPPER(class_name) = $1', [name.toUpperCase()]);
       console.log(result.rows);
       class_ids.push(result.rows[0].class_id);
       seat_cnt.push(seats);
     }
     console.log("=============")
-    // console.log(typeof(station_ids[0]))
+    console.log("class ids : " + class_ids);
+    console.log(JSON.stringify(station_ids));
+    console.log(JSON.stringify(class_ids));
+    console.log(JSON.stringify(station_arrival));
+    console.log(JSON.stringify(station_departure));
+    console.log(JSON.stringify(seat_cnt))
+    console.log('iftti')
+    console.log(typeof(station_ids[0]))
     const result2 = await db.query('CALL add_route_train($1, $2, $3, $4)', [trainId, trainName, routeId, routeName]);
     const result3 = await db.query('CALL insert_class_schedule($1, $2, $3, $4, $5, $6, $7, $8)', [trainId, trainName, routeId, station_ids, class_ids, station_arrival, station_departure, seat_cnt]);
+    const result4 = await db.query('CALL populate_seat_availability_new($1)', [trainId]);
     res.status(200).json({
       status: "success",
       data: {
@@ -138,11 +154,13 @@ app.get("/admin/addTrain/:trainId/:trainName/:routeId/:number_of_stations/:numbe
     const routesStations = await db.query('SELECT * FROM get_station_sequence($1)', [routeId]);
     const stations = routesStations.rows;
     const allStations = await db.query('SELECT station_name FROM station order by station_name')
-
+    const allClasses = await db.query('SELECT class_name FROM class order by class_name')
 
     const mappedStations = stations.map(station => ({
       [station.sequence_number]: station.station_name
     }));
+
+    const mappedClasses = allClasses.rows.map(class_name => class_name.class_name);
 
     const stationNames = allStations.rows.map(station => station.station_name);
     console.log("stations : " + JSON.stringify(stationNames));
@@ -153,6 +171,7 @@ app.get("/admin/addTrain/:trainId/:trainName/:routeId/:number_of_stations/:numbe
       result: results.rows.length,
       stations: mappedStations,
       allStations: stationNames,
+      allClasses: mappedClasses,
       data: {
         trains: results.rows,
         exist: exist,

@@ -60,7 +60,7 @@ const Admin = () => {
   const [classData, setClassData] = useState([]);
 
   const [allStationData, setAllStationData] = useState([]);
-
+  const [allClass, setAllClass]= useState([]);
 
   const handleAddButtonClick = async () => {
     // const stations = 5; // Example number of stations
@@ -90,6 +90,9 @@ const Admin = () => {
 
       }
       setAllStationData(data.allStations);
+      setAllClass(data.allClasses);
+
+      ////////////set all class
       console.log("allStationData : " + JSON.stringify(allStationData) + "----------------------------");
       console.log("stations : " + JSON.stringify(data.stations));
 
@@ -121,9 +124,13 @@ const Admin = () => {
     setClassData(updatedClasses);
     console.log("updatedClasses : " + JSON.stringify(updatedClasses));
   };
+  const closeModal1 = async(e) => {
 
+    setOpenModal(false);
 
-  const closeModal = async (e)=>{
+  }
+
+  const closeModal = async (e) => {
     console.log("train id: " + trainId)
     console.log("train name: " + trainName)
     console.log("routeId: " + routeId)
@@ -131,7 +138,7 @@ const Admin = () => {
     console.log("finalClasses : " + JSON.stringify(classData));
     console.log("finalStations : " + JSON.stringify(stationData));
 
-
+    console.log('-----------------')
     try {
       const result = await fetch('http://localhost:3001/admin/addTrain/confirm', {
         method: 'POST',
@@ -139,22 +146,22 @@ const Admin = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-           trainId,
-           trainName,
-           routeId,
-           routeName,
-           stationData,
-           classData
+          trainId,
+          trainName,
+          routeId,
+          routeName,
+          stationData,
+          classData
         })
-      
-    })
-    console.log("////////////result : " + JSON.stringify(result));
-    if(result.status === 200)
-    alert("Train added successfully");
-  } catch (error) {
+
+      })
+      console.log("////////////result : " + JSON.stringify(result));
+      if (result.status === 200)
+        alert("Train added successfully");
+    } catch (error) {
       console.error(error);
     }
-    
+
     setOpenModal(false);
   }
 
@@ -176,22 +183,24 @@ const Admin = () => {
               value={stations[index][index + 1]}
               disabled={true}
             />
-            {(index + 1) === 1 ?
-              <></> :
-              <input
-                type="text"
-                placeholder={`Station ${index + 1} Arrival Time`}
-                style={{ ...customStyles }}
-                onChange={(e) => handleInputChange(index, 'arrival', e.target.value)}
-              />}
-            {(index + 1) === stations.length ?
-              <></> :
-              <input
-                type="text"
-                placeholder={`Station ${index + 1} Departure Time`}
-                style={{ ...customStyles }}
-                onChange={(e) => handleInputChange(index, 'departure', e.target.value)}
-              />}
+
+            <input
+              type="text"
+              placeholder={` Arrival Time HH:MM(24H)`}
+              style={{ ...customStyles }}
+              onChange={(e) => {
+                handleInputChange(index, 'arrival', e.target.value);
+                handleInputChange(index, 'name', stations[index][index + 1]);
+              }}
+            />
+
+
+            <input
+              type="text"
+              placeholder={` Departure Time HH:MM(24H)`}
+              style={{ ...customStyles }}
+              onChange={(e) => handleInputChange(index, 'departure', e.target.value)}
+            />
             <br />
           </Fragment>
         );
@@ -214,15 +223,16 @@ const Admin = () => {
               ))}
             </datalist>
 
+
             <input
               type="text"
-              placeholder={`Station ${i + 1} Arrival Time HH:MM`}
+              placeholder={`Arrival Time HH:MM(24H)`}
               style={{ ...customStyles }}
               onChange={(e) => handleInputChange(i, 'arrival', e.target.value)}
             />
             <input
               type="text"
-              placeholder={`Station ${i + 1} Departure Time HH:MM`}
+              placeholder={`Departure Time HH:MM(24H)`}
               style={{ ...customStyles }}
               onChange={(e) => handleInputChange(i, 'departure', e.target.value)}
             />
@@ -235,8 +245,13 @@ const Admin = () => {
       inputs.push(
         <Fragment key={i}>
           {i + 1}.
-          <input type="text" placeholder={`Class ${i + 1} Name`} style={{ ...customStyles }} onChange={(e) => handleInputChangeClass(i, 'name', e.target.value)} />
-          <input type="text" placeholder={`Class ${i + 1} Total Seat Count`} style={{ ...customStyles }} onChange={(e) => handleInputChangeClass(i, 'seats', e.target.value)} />
+          <input type="text" placeholder={`Class ${i + 1} Name`} list="classSuggestions" style={{ ...customStyles }} onChange={(e) => handleInputChangeClass(i, 'name', e.target.value)} />
+          <input type="text" placeholder={`Class ${i + 1} Total Seat Count`} list="classSuggestions" style={{ ...customStyles }} onChange={(e) => handleInputChangeClass(i, 'seats', e.target.value)} />
+          <datalist id="classSuggestions" >
+              {allClass.map((classes, i) => (
+                <option key={i + 1} value={classes} />
+              ))}
+            </datalist>
           <br />
         </Fragment>
       );
@@ -266,7 +281,7 @@ const Admin = () => {
 
     <Modal
       isOpen={openModal}
-      onRequestClose={closeModal}
+      onRequestClose={closeModal1}
       style={modalStyle}
       contentLabel="Add stations & classes"
     >
@@ -275,6 +290,8 @@ const Admin = () => {
       <span style={{ spanStyle }}></span>
       {renderInputs()}
       <button onClick={closeModal}> Confirm</button>
+
+      <button onClick={closeModal1} style={{marginLeft:'20px'}}> Close</button> 
     </Modal>
 
     {message && <ErrorModal isOpen={openModal} errorMessage={message} closeModal={closeModal} />}
