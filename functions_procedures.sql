@@ -288,3 +288,24 @@ $$;
 
 
 
+
+
+-- procedure for checking duplicate stations in station array
+
+CREATE OR REPLACE FUNCTION check_duplicate_stations(station_ids_input INT[])
+RETURNS INT[] AS $$
+DECLARE 
+    i INT;
+    EXIST INT;
+    new_station_id_arr INT[] := '{}';
+BEGIN
+    FOR i IN 1 .. array_length(station_ids_input, 1) LOOP
+        SELECT COUNT(*) INTO EXIST FROM station WHERE station_id = station_ids_input[i];
+        IF EXIST = 0 THEN
+            new_station_id_arr := array_append(new_station_id_arr, station_ids_input[i]);
+        END IF;
+    END LOOP;
+RETURN new_station_id_arr;
+END;
+$$ LANGUAGE plpgsql;
+
