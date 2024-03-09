@@ -254,14 +254,22 @@ app.delete('/users/:userId/delete', async (req, res) => {
 
 
 app.post('/transaction/refund/:userId/:transactionId', async (req, res) => {
-
-  const { userId, transactionId } = req.params;
-
-
-  const result = await db.query(`SELECT * FROM transaction WHERE user_id = $1 AND transaction_id = $2`, [userId, transactionId])
-
-
-  const refund = await db.query(`CALL refund_tickets($1, $2)`, [userId, transactionId]);
+  try {
+    console.log("|||||||||||||||||||||||| in refund|||||")
+    const { userId, transactionId } = req.params;
+    console.log("t id  " + transactionId)
+    const result = await db.query(`SELECT * FROM transaction WHERE user_id = $1 AND transaction_id = $2`, [userId, transactionId])
+    const refund = await db.query(`CALL refund_tickets($1, $2)`, [userId, transactionId]);
+    console.log("refund done");
+    res.status(200).json({ message: 'Refund successful' });
+  }
+  catch (err) {
+    console.log(err.message);
+    if (err.code === 'XX010') {
+      // console.log(err.message);
+      return res.status(400).json({ message: "Refund is not allowed the day before journey" });
+    }
+  }
 
 });
 
@@ -394,25 +402,25 @@ app.get("/users/:id/tickets", async (req, res) => {
       // let r_flag = 0;
       const query = 'SELECT * from review where user_id = $1 and train_id = $2 and class_id = $3';
       const r_check = await db.query(query, [userId, trainName.rows[0].train_id, className.rows[0].class_id]);
-      console.log("====");
-      console.log(userId + " " + trainName.rows[0].train_id + " " + className.rows[0].class_id);
+      // console.log("====");
+      // console.log(userId + " " + trainName.rows[0].train_id + " " + className.rows[0].class_id);
 
-      console.log(r_check.rows.length);
+      // console.log(r_check.rows.length);
       let r_flag = r_check.rows.length;
 
       const dateOfJourney = formatDate1(d_o_j);
 
       const currentDate = formatDate1(new Date());
 
-      console.log(dateOfJourney < currentDate && r_check.rows.length === 0);
-      if(dateOfJourney > currentDate) r_flag = -1;
+      // console.log(dateOfJourney < currentDate && r_check.rows.length === 0);
+      if (dateOfJourney > currentDate) r_flag = -1;
       if (dateOfJourney < currentDate && r_check.rows.length === 0) {
         r_flag = 0;
       }
-      
+
       // console.log(trainName.rows[0].train_id + " " + className.rows[0].class_id + " " );
-      console.log("review flag : " + r_flag);
-      console.log("====");
+      // console.log("review flag : " + r_flag);
+      // console.log("====");
 
       transactionJourneyMap[t] = { train_id: trainName.rows[0].train_id, class_id: className.rows[0].class_id, trainName: trainName.rows[0].train_name, className: className.rows[0].class_name, from: from, to: to, doj: d_o_j, status: tstatus, reviewBool: r_flag };
     }

@@ -134,96 +134,6 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE PROCEDURE book_tickets(
-    date_param DATE,
-    selectedSeats_param INT[],
-    totalFare_param NUMERIC,
-    selectedStation_param VARCHAR(50),
-    selectedStation_d_param VARCHAR(50),
-    selectedOffer_param INT,
-    discountedFare_param NUMERIC,
-    transactionId_param INT,
-    userId_param INT,
-    className_param VARCHAR(50),
-    trainName_param VARCHAR(50),
-    route_param INT,
-    transMode_param VARCHAR(50)
-)
-LANGUAGE plpgsql
-AS $$
-DECLARE
-    selectedSeatsArray INT[];
-    cnt INT;
-    price NUMERIC;
-    b_id INT;
-    d_id INT;
-    tr_id INT;
-    cl_id INT;
-    result RECORD;
-    stationIds INT[];
-    startStation INT;
-    endStation INT;
-    startIndex INT;
-    endIndex INT;
-    stations INT[];
-    offer_id INT;
-    t_m VARCHAR(50);
-    t_id INT;
-    resTransaction RECORD;
-    transactionId2 INT;
-    seat INT;
-    result3 RECORD;
-    seat_id_n INT;
-BEGIN
-    selectedSeatsArray := selectedSeats_param;
-    cnt := array_length(selectedSeatsArray, 1);
-
-    price := totalFare_param / cnt;
-
-    SELECT B_STATION_ID INTO b_id FROM BOARDING_STATION WHERE B_STATION_NAME = selectedStation_param;
-    SELECT B_STATION_ID INTO d_id FROM BOARDING_STATION WHERE B_STATION_NAME = selectedStation_d_param;
-    
-
-    SELECT train_id INTO tr_id FROM train WHERE train_name = trainName_param;
-    SELECT class_id INTO cl_id FROM class WHERE class_name = className_param;
-    
-
-    SELECT * INTO result FROM get_station_sequence(route_param);
-
-    stationIds := ARRAY(SELECT station_id FROM result);
-
-    SELECT station_id INTO startStation FROM boarding_station WHERE B_STATION_NAME = selectedStation_param;
-    SELECT station_id INTO endStation FROM boarding_station WHERE B_STATION_NAME = selectedStation_d_param;
-
-    startIndex := array_position(stationIds, startStation);
-    endIndex := array_position(stationIds, endStation);
-
-    stations := ARRAY(SELECT unnest(stationIds[startIndex:endIndex + 1]));
-
-    offer_id := selectedOffer_param;
-
-    t_m := transMode_param;
-    IF (transactionId_param IS NULL) THEN
-        t_id := NULL;
-        t_m := '';
-    ELSE
-        t_id := transactionId_param;
-    END IF;
-
-    SELECT transaction_id INTO transactionId2 FROM insert_transaction(t_id, t_m, offer_id, totalFare_param, userId_param);
-    
-
-    FOR seat IN SELECT unnest(selectedSeatsArray) LOOP
-        SELECT SEAT_ID INTO seat_id_n FROM SEAT WHERE SEAT_NUMBER = seat AND route_id = route_param AND TRAIN_ID = tr_id AND CLASS_ID = cl_id;
-       
-        PERFORM insert_ticket(userId_param, b_id, d_id, price, transactionId2, seat_id_n, route_param, date_param, stations);
-    END LOOP;
-END;
-$$;
-
-
-
-
 ------------------populate the seat availability table
 
 -- CREATE OR REPLACE PROCEDURE populate_seat_availability()
@@ -339,7 +249,7 @@ BEGIN
     FOR trans_row IN 
         SELECT * FROM transaction WHERE received = 0 and user_id = userId
     LOOP
-        IF trans_row.transaction_time + INTERVAL '2 minutes' < CURRENT_TIMESTAMP THEN
+        IF trans_row.transaction_time + INTERVAL '2 hours' < CURRENT_TIMESTAMP THEN
             UPDATE ticket SET ticket_status = 'cancelled'
             WHERE transaction_id = trans_row.transaction_id;
         END IF;
@@ -347,23 +257,6 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
-
-
-
--- procedure for checking if user can give review
-
-CREATE OR REPLACE PROCEDURE check_review(user_id_input INT, train_id_input INT, class_id_input INT, transaction_id_input INT)
-LANGUAGE plpgsql
-AS $$
-DECLARE
-    journey_date DATE;
-BEGIN
-    SELECT date_of_journey INTO journey_date FROM ticket JOIN transaction ON ticket.transaction_id = transaction.transaction_id WHERE ticket.user_id = user_id_input AND transaction.transaction_id = transaction_id_input;
-    IF journey_date > CURRENT_DATE THEN
-        RAISE EXCEPTION 'Review can be given only after the journey';
-    END IF;
-END;
-$$;
  
 
 
@@ -493,4 +386,25 @@ $$;
 
 
 
+
+
+
+-- procedure for checking duplicate stations in station array
+
+CREATE OR REPLACE FUNCTION check_duplicate_stations(station_ids_input INT[])
+RETURNS INT[] AS $$
+DECLARE 
+    i INT;
+    EXIST INT;
+    new_station_id_arr INT[] := '{}';
+BEGIN
+    FOR i IN 1 .. array_length(station_ids_input, 1) LOOP
+        SELECT COUNT(*) INTO EXIST FROM station WHERE station_id = station_ids_input[i];
+        IF EXIST = 0 THEN
+            new_station_id_arr := array_append(new_station_id_arr, station_ids_input[i]);
+        END IF;
+    END LOOP;
+RETURN new_station_id_arr;
+END;
+$$ LANGUAGE plpgsql;
 

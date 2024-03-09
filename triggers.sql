@@ -63,7 +63,7 @@ EXECUTE FUNCTION sign_up();
 
 
 
--- check for password match , phone number check , postcode check before updating passenger information
+-- check for password match , phone number check before updating passenger information
 CREATE OR REPLACE FUNCTION check_password()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -86,30 +86,23 @@ FOR EACH ROW
 EXECUTE FUNCTION check_password();
 
 
--- trigger for checking admin side train addition
-CREATE OR REPLACE FUNCTION check_train()
+-- trigger for blocking refund the day before journey
+
+CREATE OR REPLACE FUNCTION block_refund()
 RETURNS TRIGGER AS $$
 DECLARE
-    t_name VARCHAR(100);
-    t_id INTEGER;
-    r_id INTEGER;
+    doj DATE;
 BEGIN
-    t_id := null;
-    t_name := null;
-    r_id := null;
-    SELECT train_id, train_name  INTO t_id, t_name FROM train WHERE train_id = NEW.train_id;
-    SELECT route_id INTO r_id FROM train_routes WHERE route_id = NEW.route_id;
-    IF t_id is not null AND t_name is not null AND r_id is not null THEN
-        RAISE EXCEPTION 'Train already exists' USING ERRCODE = 'XX010';
-    END IF;
-    IF t_id is null AND t_name is not null THEN
-        RAISE EXCEPTION 'Duplicate Train Name not allowed' USING ERRCODE = 'XX011';
-    END IF;
-    IF t_id is not null AND route_ID is not null THEN
-        RAISE EXCEPTION 'Train already has this route' USING ERRCODE = 'XX012';
-    END IF;
-    IF NEW.departure_time > NEW.arrival_time THEN
-        RAISE EXCEPTION 'Departure Time cannot be greater than Arrival Time' USING ERRCODE = 'XX016';
+    SELECT date_of_journey INTO doj FROM ticket WHERE transaction_id = NEW.transaction_id;
+    IF doj - CURRENT_DATE = 1 THEN
+        RAISE EXCEPTION 'Refund not allowed the day before journey' USING ERRCODE = 'XX010';
     END IF;
     RETURN NEW;
 END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER block_refund_trigger
+BEFORE INSERT
+ON refund
+FOR EACH ROW
+EXECUTE FUNCTION block_refund();
