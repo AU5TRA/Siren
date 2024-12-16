@@ -24,6 +24,8 @@ Included:
 
 Project Partner: 
 ## Anika Morshed (2105068)
+[GitHub](https://github.com/Anika-34)
+
 Dept. of Computer Science and Engineering
 
 Bangladesh University of Engineering and Technology
